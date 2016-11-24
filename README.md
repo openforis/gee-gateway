@@ -26,4 +26,8 @@ This is a REST API designed to be used by [CEO (Collect Earth Online)](https://g
        ├── utils.py
        ├── api
        │   ├── __init__.py
-       │   ├── views.py             routes definition
+       │   ├── routes.py             routes definition
+       │   ├── errors.py             error handlers definition
+       ├── gee
+       │   ├── __init__.py
+       │   ├── utils.py
