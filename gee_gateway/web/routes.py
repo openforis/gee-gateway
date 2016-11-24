@@ -4,32 +4,30 @@ from flask_cors import CORS, cross_origin
 from .. import app
 from ..gee.utils import *
 
-@app.route('/image')
+@app.route('/image', methods=['POST'])
 @cross_origin()
 def image():
     """  """
     values = {}
-    imageName = request.args.get('imageName', None)
-    Min = request.args.get('min', None)
-    Max = request.args.get('max', None)
-    bands = request.args.get('bands', None)
-    visParams = visParamsBuilder(Min, Max, bands)
-    if imageName:
-        values = imageToMapId(imageName, visParams);
+    json = request.get_json()
+    if json:
+        imageName = json.get('imageName', None)
+        if imageName:
+            visParams = json.get('visParams', None)
+            values = imageToMapId(imageName, visParams);
     return jsonify(values), 200
 
-@app.route('/imageByMosaicCollection')
+@app.route('/imageByMosaicCollection', methods=['POST'])
 @cross_origin()
 def imageByMosaicCollection():
     """  """
     values = {}
-    collectionName = request.args.get('collectionName', None)
-    Min = request.args.get('min', None)
-    Max = request.args.get('max', None)
-    bands = request.args.get('bands', None)
-    dateFrom = request.args.get('dateFrom', None)
-    dateTo = request.args.get('dateTo', None)
-    visParams = visParamsBuilder(Min, Max, bands)
-    if collectionName:
-        values = fistImageInMosaicToMapId(collectionName, visParams, dateFrom, dateTo);
+    json = request.get_json()
+    if json:
+        collectionName = json.get('collectionName', None)
+        if collectionName:
+            visParams = json.get('visParams', None)
+            dateFrom = json.get('dateFrom', None)
+            dateTo = json.get('dateTo', None)
+            values = fistImageInMosaicToMapId(collectionName, visParams, dateFrom, dateTo)
     return jsonify(values), 200

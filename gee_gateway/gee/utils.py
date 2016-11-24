@@ -1,15 +1,6 @@
 import ee
 from ee.ee_exception import EEException
 
-def visParamsBuilder(Min, Max, bands):
-    """  """
-    visParams = {}
-    if Min and Max and Min < Max:
-        visParams['min'] = Min
-        visParams['max'] = Max
-    visParams['bands'] = bands
-    return visParams
-
 def imageToMapId(imageName, visParams={}):
     """  """
     try:
