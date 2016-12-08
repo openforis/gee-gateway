@@ -10,7 +10,15 @@ This is a REST API designed to be used by [CEO (Collect Earth Online)](https://g
 
 ### gee-gateway
 
+From project root directory
+
 > pip install -r requirements.txt
+
+## INSTALLATION
+
+> python run.py
+
+From project root directory
 
 ## STRUCTURE
 

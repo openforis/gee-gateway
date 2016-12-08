@@ -1,3 +1,5 @@
 DEBUG = False
-PORT = 5000
+PORT = 8888
 HOST = '0.0.0.0'
+
+CO_ORIGINS = '127.0.0.1'
