@@ -19,7 +19,6 @@ def imageToMapId(imageName, visParams={}):
 def fistImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None):
     """  """
     try:
-        print 0
         eeCollection = ee.ImageCollection(collectionName)
         if (dateFrom and dateTo):
             eeFilterDate = ee.Filter.date(dateFrom, dateTo)

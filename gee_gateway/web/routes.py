@@ -5,6 +5,9 @@ from .. import app
 from ..gee.utils import *
 from ..gee.gee_exception import GEEException
 
+import logging
+logger = logging.getLogger(__name__)
+
 @app.route('/image', methods=['POST'])
 @cross_origin(origins=app.config['CO_ORIGINS'])
 def image():
@@ -18,6 +21,7 @@ def image():
                 visParams = json.get('visParams', None)
                 values = imageToMapId(imageName, visParams)
     except GEEException as e:
+        logger.error(e.message)
         values = {
             'errMsg': e.message
         }
@@ -38,7 +42,7 @@ def imageByMosaicCollection():
                 dateTo = json.get('dateTo', None)
                 values = fistImageInMosaicToMapId(collectionName, visParams, dateFrom, dateTo)
     except GEEException as e:
-        print 2
+        logger.error(e.message)
         values = {
             'errMsg': e.message
         }
