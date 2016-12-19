@@ -24,6 +24,15 @@ From project root directory
 
 > python run.py
 
+## DOCUMENTATION
+
+> pip install sphinx
+> pip install sphinxcontrib-httpdomain
+
+From project root directory
+
+sphinx-build -aE -b html . static/docs
+
 ## STRUCTURE
 
     ├── README.md
@@ -38,9 +47,11 @@ From project root directory
        ├── utils.py
        ├── web
        │   ├── __init__.py
-       │   ├── errors.py             error handlers definition
-       │   ├── routes.py             routes definition
+       │   ├── errors.py            error handlers definition
+       │   ├── routes.py            routes definition
        ├── gee
        │   ├── __init__.py
        │   ├── gee_exception.py
        │   ├── utils.py
+    ├── conf.py                     sphinx configuration file
+    ├── index.rst                   sphinx index file

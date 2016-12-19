@@ -11,7 +11,37 @@ logger = logging.getLogger(__name__)
 @app.route('/image', methods=['POST'])
 @cross_origin(origins=app.config['CO_ORIGINS'])
 def image():
-    """  """
+    """ Return
+
+    .. :quickref: Image; Get the MapID of a EE Image.
+
+    **Example request**:
+
+    .. code-block:: javascript
+
+        {
+           imageName: "XXX",
+           visParams: {
+               min: 0.0,
+               max: 0.0,
+               bands: "XX,XX,XX"
+           }
+        }
+
+    **Example response**:
+
+    .. code-block:: javascript
+
+        {
+           mapid: "XXX",
+           token: "XXX"
+        }
+
+    :reqheader Accept: application/json
+    :<json String imageName: name of the image
+    :<json Object visParams: visualization parameters
+    :resheader Content-Type: application/json
+    """
     values = {}
     try:
         json = request.get_json()
@@ -30,7 +60,40 @@ def image():
 @app.route('/imageByMosaicCollection', methods=['POST'])
 @cross_origin(origins=app.config['CO_ORIGINS'])
 def imageByMosaicCollection():
-    """  """
+    """
+    .. :quickref: ImageCollection; Get the MapID of a EE ImageCollection.
+
+    **Example request**:
+
+    .. code-block:: javascript
+
+        {
+           collectionName: "XX",
+           visParams: {
+               min: 0.0,
+               max: 0.0,
+               bands: "XX,XX,XX"
+           },
+           dateFrom: "YYYY-MM-DD",
+           dateTo: "YYYY-MM-DD"
+        }
+
+    **Example response**:
+
+    .. code-block:: javascript
+
+        {
+           mapid: "XXX",
+           token: "XXX"
+        }
+
+    :reqheader Accept: application/json
+    :<json String collectionName: name of the image collection
+    :<json Object visParams: visualization parameters
+    :<json String dateFrom: start date
+    :<json String dateTo: end date
+    :resheader Content-Type: application/json
+    """
     values = {}
     try:
         json = request.get_json()
