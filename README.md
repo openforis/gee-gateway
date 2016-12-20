@@ -12,7 +12,9 @@ This is a REST API designed to be used by [CEO (Collect Earth Online)](https://g
 
 From project root directory
 
-> pip install -r requirements.txt
+```
+pip install -r requirements.txt
+```
 
 ## CONFIGURATION
 
@@ -22,16 +24,22 @@ Edit the configuration file (config.py)
 
 From project root directory
 
-> python run.py
+```
+python run.py
+```
 
 ## DOCUMENTATION
 
-> pip install sphinx
-> pip install sphinxcontrib-httpdomain
+```
+pip install sphinx
+pip install sphinxcontrib-httpdomain
+```
 
 From project root directory
 
+```
 sphinx-build -aE -b html . static/docs
+```
 
 ## STRUCTURE
 
@@ -53,5 +61,5 @@ sphinx-build -aE -b html . static/docs
        │   ├── __init__.py
        │   ├── gee_exception.py
        │   ├── utils.py
-    ├── conf.py                     sphinx configuration file
+    ├── conf.py                     sphinx (documentation) configuration file
     ├── index.rst                   sphinx index file
