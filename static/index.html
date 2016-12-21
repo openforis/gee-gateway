@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>gee-gateway-web</title>
+        <link rel="shortcut icon" href="static/favicon.ico">
+        <style>
+            body {
+                padding-top: 65px;
+            }
+            #map {
+                height: 400px;
+                width: 100%;
+            }
+        </style>
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" media="all" rel="stylesheet" type="text/css" />
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a href="" class="navbar-brand">gee-gateway-web</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="nav nav-pills nav-stacked">
+                            <li class="active"><a href="#tab1primary" data-toggle="tab">/image</a></li>
+                            <li><a href="#tab2primary" data-toggle="tab">/imageByMosaicCollection</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="tab-content">
+                            <div class="tab-pane fade in active" id="tab1primary">
+                                <div class="form-group">
+                                    <label>Image</label>
+                                    <select class="form-control" name="imageName">
+                                        <option value="" selected>CHOOSE AN IMAGE</option>
+                                        <option value="srtm90_v4">srtm90_v4</option>
+                                        <option value="MCD12Q1/MCD12Q1_005_2001_01_01">MCD12Q1/MCD12Q1_005_2001_01_01</option>
+                                        <option value="MOD09GA/MOD09GA_005_2012_03_09">MOD09GA/MOD09GA_005_2012_03_09</option>
+                                        <option value="ERROR">ERROR</option>
+                                    </select>
+                                </div>
+                                <button type="button" class="btn btn-primary" name="image">Send</button>
+                            </div>
+                            <div class="tab-pane fade" id="tab2primary">
+                                <div class="form-group">
+                                  <label>ImageCollection</label>
+                                  <select class="form-control" name="collectionName">
+                                    <option value="" selected>CHOOSE A COLLECTION</option>
+                                    <option value="LANDSAT/LE7_L1T_ANNUAL_GREENEST_TOA">LANDSAT/LE7_L1T_ANNUAL_GREENEST_TOA</option>
+                                    <option value="LANDSAT/LC8_L1T_ANNUAL_GREENEST_TOA">LANDSAT/LC8_L1T_ANNUAL_GREENEST_TOA</option>
+                                  </select>
+                                </div>
+                                <div class="form-group">
+                                  <label>From (YYYY-MM-DD)</label>
+                                  <input type="text" class="form-control" name="dateFrom" placeholder="" />
+                                </div>
+                                <div class="form-group">
+                                  <label>To (YYYY-MM-DD)</label>
+                                  <input type="text" class="form-control" name="dateTo" placeholder="" />
+                                </div>
+                                <button type="button" class="btn btn-primary" name="imageByMosaicCollection">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <br />
+                        <div id="map"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Latitude</label>
+                    <input type="text" class="form-control" name="lat" data-default="41.891" value="41.891" />
+                </div>
+                <div class="form-group">
+                    <label>Longitude</label>
+                    <input type="text" class="form-control" name="lng" data-default="12.511" value="12.511" />
+                </div>
+                <div class="form-group">
+                    <label>Min</label>
+                    <input type="text" class="form-control" name="min" />
+                </div>
+                <div class="form-group">
+                    <label>Max</label>
+                    <input type="text" class="form-control" name="max" />
+                </div>
+                <div class="form-group">
+                    <label>Bands</label>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="band1" />
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="band2" />
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="band3" />
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-warning">RESET</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js"></script>
+
+    <script>
+        var lat = $("input[name='lat']").val();
+        var lng = $("input[name='lng']").val();
+        lat = parseFloat(lat);
+        lng = parseFloat(lng);
+        var myLatLng = new google.maps.LatLng(lat, lng);
+        var mapOptions = {
+            center: myLatLng,
+            zoom: 8,
+            maxZoom: 14,
+            streetViewControl: false,
+            mapTypeId: 'satellite',
+            styles: [{
+                featureType: "water",
+                elementType: "labels",
+                stylers: [{
+                    visibility: "off"
+                }]
+            }]
+        };
+        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    </script>
+
+    <script>
+
+    $('button.btn-warning').click(function(e) {
+        e.preventDefault();
+        $("select[name='imageName']").val('');
+        $("select[name='collectionName']").val('');
+        $("input[name='lat']").val($("input[name='lat']").data('default'));
+        $("input[name='lng']").val($("input[name='lng']").data('default'));
+        $("input[name='min']").val('');
+        $("input[name='max']").val('');
+        $("input[name='band1']").val('');
+        $("input[name='band2']").val('');
+        $("input[name='band3']").val('');
+        $("input[name='dateFrom']").val('');
+        $("input[name='dateTo']").val('');
+    });
+
+    $('button.btn-primary').click(function(e) {
+        e.preventDefault();
+        var serviceName = $(this).attr("name");
+        var imageName = $("select[name='imageName']").val();
+        var collectionName = $("select[name='collectionName']").val();
+        var bands = '';
+        var b1 = $("input[name='band1']").val();
+        var b2 = $("input[name='band2']").val();
+        var b3 = $("input[name='band3']").val();
+        if (b1 != '' && b2 != '' && b3 != '') {
+            bands = b1 + ',' + b2 + ',' + b3;
+        }
+        var visParams = {
+            min: $("input[name='min']").val(),
+            max: $("input[name='max']").val(),
+            bands: bands
+        };
+        var dateFrom = $("input[name='dateFrom']").val();
+        var dateTo = $("input[name='dateTo']").val();
+        var url = "http://127.0.0.1:8888/" + serviceName;
+        $.ajax({
+            url: url,
+            type: 'POST',
+            async: false,
+            crossDomain : true,
+            contentType: 'application/json',
+            data: JSON.stringify({
+                imageName: imageName,
+                collectionName: collectionName,
+                visParams, visParams,
+                dateFrom: dateFrom,
+                dateTo: dateTo
+            })
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            alert(textStatus);
+        }).done(function(data, textStatus, jqXHR) {
+            if (data.errMsg) {
+                alert(data.errMsg);
+            } else {
+                var mapId = data.mapid;
+                var token = data.token;
+                //
+                var eeMapOptions = {
+                    getTileUrl: function(tile, zoom) {
+                      var baseUrl = 'https://earthengine.googleapis.com/map';
+                      var url = [baseUrl, mapId, zoom, tile.x, tile.y].join('/');
+                      url += '?token=' + token;
+                      return url;
+                    },
+                    tileSize: new google.maps.Size(256, 256)
+                };
+                // Create the map type.
+                var mapType = new google.maps.ImageMapType(eeMapOptions);
+                // Create the base Google Map.
+                google.maps.event.trigger(map, 'resize');
+                // Add the EE layer to the map.
+                map.overlayMapTypes.pop();
+                map.overlayMapTypes.push(mapType);
+                //
+                var lat = $("input[name='lat']").val();
+                var lng = $("input[name='lng']").val();
+                var myLatLng = new google.maps.LatLng(lat, lng);
+                map.panTo(myLatLng);
+            }
+        });
+    });
+
+    </script>
+
+    </body>
+</html>
