@@ -54,16 +54,17 @@ sphinx-build -aE -b html . static/docs
         ├── __init__.py             application initialization
         ├── utils.py
         ├── web/
-        │    ├── __init__.py
-        │    ├── errors.py          error handlers definition
-        │    ├── routes.py          routes definition
+             ├── __init__.py
+             ├── errors.py          error handlers definition
+             ├── routes.py          routes definition
         ├──  gee/
-        │    ├── __init__.py
-        │    ├── gee_exception.py
-        │    ├── utils.py
+             ├── __init__.py
+             ├── gee_exception.py
+             ├── utils.py
     ├── conf.py                     sphinx (documentation) configuration file
     ├── index.rst                   sphinx index file
     ├── static/                     static resources folder
-        │    ├── index.html         playground
-        │    ├── docs/              documentation folder
-                ├── index.html
+             ├── index.html         playground
+             ├── assets/            css, images, js, libs and fonts
+             ├── docs/              documentation folder
+                  ├── index.html
