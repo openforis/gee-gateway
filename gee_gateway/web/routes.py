@@ -117,7 +117,7 @@ def imageByMosaicCollection():
 @cross_origin(origins=app.config['CO_ORIGINS'])
 def timeSeriesIndex():
     """
-    .. :quickref: NDVI; Get the NDVI values for a specific ImageCollection, date range and polygon
+    .. :quickref: TimeSeries; Get the timeseries for a specific ImageCollection index, date range and polygon
 
     **Example request**:
 
@@ -125,6 +125,7 @@ def timeSeriesIndex():
 
         {
             collectionName: "XX",
+            indexName: "XX"
             scale: 0.0,
             polygon: [
                 [0.0, 0.0],
@@ -138,13 +139,16 @@ def timeSeriesIndex():
 
     .. code-block:: javascript
 
-        [
-            [0, 0],
-            ...
-        ]
+        {
+            timeseries: [
+                [0, 0],
+                ...
+            ]
+        }
 
     :reqheader Accept: application/json
     :<json String collectionName: name of the image collection
+    :<json String index: name of the index:  (e.g. NDVI, NDWI, NVI)
     :<json Float scale: scale in meters of the projection
     :<json Array polygon: the region over which to reduce data
     :<json String dateFrom: start date
@@ -157,16 +161,18 @@ def timeSeriesIndex():
         if json:
             collectionName = json.get('collectionNameTimeSeries', None)
             polygon = json.get('polygon', None)
-            scale = json.get('scale', 30)
             if collectionName and polygon:
+                indexName = json.get('indexName', 'NDVI')
+                scale = float(json.get('scale', 30))
                 dateFrom = json.get('dateFromTimeSeries', None)
                 dateTo = json.get('dateToTimeSeries', None)
-                indexName = json.get('indexName', 'ndvi')
-                values = getTimeSeriesByIndex(collectionName, indexName, scale, polygon, dateFrom, dateTo)
+                timeseries = getTimeSeriesByIndex(collectionName, indexName, scale, polygon, dateFrom, dateTo)
+                values = {
+                    'timeseries': timeseries
+                }
     except GEEException as e:
         logger.error(e.message)
         values = {
             'errMsg': e.message
         }
-    
-    return jsonify( {'timeseries': values}), 200
+    return jsonify(values), 200
