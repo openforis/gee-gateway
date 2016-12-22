@@ -1,11 +1,13 @@
+import logging
+
 from flask import request, jsonify
 from flask_cors import CORS, cross_origin
 
 from .. import app
-from ..gee.utils import *
 from ..gee.gee_exception import GEEException
+from ..gee.utils import *
 
-import logging
+
 logger = logging.getLogger(__name__)
 
 @app.route('/image', methods=['POST'])
@@ -111,9 +113,9 @@ def imageByMosaicCollection():
         }
     return jsonify(values), 200
 
-@app.route('/ndvi', methods=['POST'])
+@app.route('/timeSeriesIndex', methods=['POST'])
 @cross_origin(origins=app.config['CO_ORIGINS'])
-def ndvi():
+def timeSeriesIndex():
     """
     .. :quickref: NDVI; Get the NDVI values for a specific ImageCollection, date range and polygon
 
@@ -153,16 +155,18 @@ def ndvi():
     try:
         json = request.get_json()
         if json:
-            collectionName = json.get('collectionName', None)
+            collectionName = json.get('collectionNameTimeSeries', None)
             polygon = json.get('polygon', None)
             scale = json.get('scale', 30)
             if collectionName and polygon:
-                dateFrom = json.get('dateFrom', None)
-                dateTo = json.get('dateTo', None)
-                values = calculateNdvi(collectionName, scale, polygon, dateFrom, dateTo)
+                dateFrom = json.get('dateFromTimeSeries', None)
+                dateTo = json.get('dateToTimeSeries', None)
+                indexName = json.get('indexName', 'ndvi')
+                values = getTimeSeriesByIndex(collectionName, indexName, scale, polygon, dateFrom, dateTo)
     except GEEException as e:
         logger.error(e.message)
         values = {
             'errMsg': e.message
         }
-    return jsonify(values), 200
+    
+    return jsonify( {'timeseries': values}), 200
