@@ -2,17 +2,9 @@
 <html>
     <head>
         <title>gee-gateway-web</title>
-        <link rel="shortcut icon" href="static/favicon.ico">
-        <style>
-            body {
-                padding-top: 65px;
-            }
-            #map {
-                height: 400px;
-                width: 100%;
-            }
-        </style>
+        <link rel="shortcut icon" href="static/assets/images/favicon.ico">
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" media="all" rel="stylesheet" type="text/css" />
+        <link href="static/assets/css/style.css" media="all" rel="stylesheet" type="text/css" />
         <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     </head>
@@ -63,40 +55,48 @@
                                 </div>
                                 <div class="form-group">
                                   <label>From (YYYY-MM-DD)</label>
-                                  <input type="text" class="form-control" name="dateFrom" placeholder="" />
+                                  <input type="text" class="form-control" name="dateFrom" />
                                 </div>
                                 <div class="form-group">
                                   <label>To (YYYY-MM-DD)</label>
-                                  <input type="text" class="form-control" name="dateTo" placeholder="" />
+                                  <input type="text" class="form-control" name="dateTo" />
                                 </div>
                                 <button type="button" class="btn btn-primary" name="imageByMosaicCollection">Send</button>
                             </div>
-							<div class="tab-pane fade" id="tab3primary">
+                            <div class="tab-pane fade" id="tab3primary">
                                 <div class="form-group">
-                                  <label>ImageCollection</label>
-                                  <select class="form-control" name="collectionNameTimeSeries">
-                                    <option value="" selected>CHOOSE A COLLECTION</option>
-                                    <option value="LANDSAT/LE7_L1T_32DAY_NDVI">LANDSAT/LE7_L1T_32DAY_NDVI</option>
-                                    <option value="LANDSAT/LE7_L1T_8DAY_NDWI">LANDSAT/LE7_L1T_8DAY_NDWI</option>
-                                    <option value="LANDSAT/LE7_L1T_8DAY_EVI">LANDSAT/LE7_L1T_8DAY_EVI</option>
-                                  </select>
+                                    <label>ImageCollection</label>
+                                    <select class="form-control" name="collectionNameTimeSeries">
+                                        <option value="" selected>CHOOSE A COLLECTION</option>
+                                        <option value="LANDSAT/LE7_L1T_32DAY_NDVI">LANDSAT/LE7_L1T_32DAY_NDVI</option>
+                                        <option value="LANDSAT/LE7_L1T_8DAY_NDWI">LANDSAT/LE7_L1T_8DAY_NDWI</option>
+                                        <option value="LANDSAT/LE7_L1T_8DAY_EVI">LANDSAT/LE7_L1T_8DAY_EVI</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
-                                  <label>IndexName</label>
-                                  <select class="form-control" name="indexName">
-                                    <option value="" selected>CHOOSE AN INDEX</option>
-                                    <option value="NDVI">NDVI</option>
-                                    <option value="NDWI">NDWI</option>
-                                    <option value="EVI">EVI</option>
-                                  </select>
+                                    <label>IndexName</label>
+                                    <select class="form-control" name="indexName">
+                                        <option value="" selected>CHOOSE AN INDEX</option>
+                                        <option value="NDVI">NDVI</option>
+                                        <option value="NDWI">NDWI</option>
+                                        <option value="EVI">EVI</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
-                                  <label>From (YYYY-MM-DD)</label>
-                                  <input type="text" class="form-control" name="dateFromTimeSeries" placeholder="" />
+                                    <label>Polygon</label>
+                                    <textarea class="form-control" name="polygon" value="[[-85.25507948537992, 40.10371721058706],[-85.25425851083126, 40.103717207677605],[-85.25425851083126, 40.10308678503157],[-85.25507948537992, 40.10308678794103],[-85.25507948537992, 40.10371721058706]]"></textarea>
                                 </div>
                                 <div class="form-group">
-                                  <label>To (YYYY-MM-DD)</label>
-                                  <input type="text" class="form-control" name="dateToTimeSeries" placeholder="" />
+                                    <label>Scale</label>
+                                    <input type="text" class="form-control" name="scale" value="30" />
+                                </div>
+                                <div class="form-group">
+                                    <label>From (YYYY-MM-DD)</label>
+                                    <input type="text" class="form-control" name="dateFromTimeSeries" />
+                                </div>
+                                <div class="form-group">
+                                    <label>To (YYYY-MM-DD)</label>
+                                    <input type="text" class="form-control" name="dateToTimeSeries" />
                                 </div>
                                 <button type="button" class="btn btn-primary" name="timeSeriesIndex">Send</button>
                             </div>
@@ -193,9 +193,6 @@
         var serviceName = $(this).attr("name");
         var imageName = $("select[name='imageName']").val();
         var collectionName = $("select[name='collectionName']").val();
-        var collectionNameTimeSeries = $("select[name='collectionNameTimeSeries']").val();
-        var indexName = $("select[name='indexName']").val();
-        var polygon = [[-85.25507948537992, 40.10371721058706],[-85.25425851083126, 40.103717207677605],[-85.25425851083126, 40.10308678503157],[-85.25507948537992, 40.10308678794103],[-85.25507948537992, 40.10371721058706]];
         var bands = '';
         var b1 = $("input[name='band1']").val();
         var b2 = $("input[name='band2']").val();
@@ -210,6 +207,10 @@
         };
         var dateFrom = $("input[name='dateFrom']").val();
         var dateTo = $("input[name='dateTo']").val();
+        var collectionNameTimeSeries = $("select[name='collectionNameTimeSeries']").val();
+        var indexName = $("select[name='indexName']").val();
+        var polygon = $("input[name='polygon']").val();
+        var scale = $("input[name='scale']").val();
         var dateFromTimeSeries = $("input[name='dateFromTimeSeries']").val();
         var dateToTimeSeries = $("input[name='dateToTimeSeries']").val();
         var url = "http://127.0.0.1:8888/" + serviceName;
@@ -222,48 +223,50 @@
             data: JSON.stringify({
                 imageName: imageName,
                 collectionName: collectionName,
-                collectionNameTimeSeries : collectionNameTimeSeries,
                 visParams, visParams,
                 dateFrom: dateFrom,
-                dateToTimeSeries: dateToTimeSeries,
-                dateFromTimeSeries: dateFromTimeSeries,
                 dateTo: dateTo,
-                polygon: polygon,
-                indexName: indexName
+                collectionNameTimeSeries: collectionNameTimeSeries,
+                indexName: indexName,
+                polygon: JSON.parse(polygon),
+                scale: scale,
+                dateToTimeSeries: dateToTimeSeries,
+                dateFromTimeSeries: dateFromTimeSeries
             })
         }).fail(function(jqXHR, textStatus, errorThrown) {
             alert(textStatus);
         }).done(function(data, textStatus, jqXHR) {
             if (data.errMsg) {
                 alert(data.errMsg);
-            } else if( data.mapid != null ){
-            	
-                var mapId = data.mapid;
-                var token = data.token;
-                //
-                var eeMapOptions = {
-                    getTileUrl: function(tile, zoom) {
-                      var baseUrl = 'https://earthengine.googleapis.com/map';
-                      var url = [baseUrl, mapId, zoom, tile.x, tile.y].join('/');
-                      url += '?token=' + token;
-                      return url;
-                    },
-                    tileSize: new google.maps.Size(256, 256)
-                };
-                // Create the map type.
-                var mapType = new google.maps.ImageMapType(eeMapOptions);
-                // Create the base Google Map.
-                google.maps.event.trigger(map, 'resize');
-                // Add the EE layer to the map.
-                map.overlayMapTypes.pop();
-                map.overlayMapTypes.push(mapType);
-                //
-                var lat = $("input[name='lat']").val();
-                var lng = $("input[name='lng']").val();
-                var myLatLng = new google.maps.LatLng(lat, lng);
-                map.panTo(myLatLng);
-            }else if( data.timeseries != null ){
-               alert( data.timeseries);
+            } else {
+                if (data.hasOwnProperty('mapid')) {
+                    var mapId = data.mapid;
+                    var token = data.token;
+                    //
+                    var eeMapOptions = {
+                        getTileUrl: function(tile, zoom) {
+                          var baseUrl = 'https://earthengine.googleapis.com/map';
+                          var url = [baseUrl, mapId, zoom, tile.x, tile.y].join('/');
+                          url += '?token=' + token;
+                          return url;
+                        },
+                        tileSize: new google.maps.Size(256, 256)
+                    };
+                    // Create the map type.
+                    var mapType = new google.maps.ImageMapType(eeMapOptions);
+                    // Create the base Google Map.
+                    google.maps.event.trigger(map, 'resize');
+                    // Add the EE layer to the map.
+                    map.overlayMapTypes.pop();
+                    map.overlayMapTypes.push(mapType);
+                    //
+                    var lat = $("input[name='lat']").val();
+                    var lng = $("input[name='lng']").val();
+                    var myLatLng = new google.maps.LatLng(lat, lng);
+                    map.panTo(myLatLng);
+                } else if (data.hasOwnProperty('timeseries')) {
+                    alert( data.timeseries);
+                }
             }
         });
     });
