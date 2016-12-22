@@ -33,13 +33,13 @@ def getTimeSeriesByIndex(collectionName, indexName, scale, polygon=[], dateFrom=
     """  """
     try:
         plot = ee.Geometry.Polygon(polygon)
-        indexCollection = ee.ImageCollection(collectionName).filterDate(dateFrom, dateTo).select( indexName )
+        indexCollection = ee.ImageCollection(collectionName).filterDate(dateFrom, dateTo).select(indexName)
         def getIndex(image):
             """  """
-            indexValue = image.reduceRegion(ee.Reducer.mean(), plot, scale).get( indexName )
+            indexValue = image.reduceRegion(ee.Reducer.mean(), plot, scale).get(indexName)
             date = image.get('system:time_start')
-            ndviImage = ee.Image().set('indexValue', [indexValue, ee.Number(date)])
-            return ndviImage
+            indexImage = ee.Image().set('indexValue', [indexValue, ee.Number(date)])
+            return indexImage
         indexCollection1 = indexCollection.map(getIndex)
         indexCollection2 = indexCollection1.aggregate_array('indexValue')
         values = indexCollection2.getInfo()
