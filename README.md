@@ -48,15 +48,15 @@ sphinx-build -aE -b html . static/docs
     ├── requirements.txt            third party libraries
     ├── config.py                   configuration file
     ├── run.py                      application start up
-    ├── instance                    (not in version control)
-        ├── config.py                alternative configuration file (not in version control)
-    ├── gee_gateway/                 application folder
-        ├── __init__.py              application initialization
+    ├── instance/                   (not in version control)
+        ├── config.py               alternative configuration file (not in version control)
+    ├── gee_gateway/                application folder
+        ├── __init__.py             application initialization
         ├── utils.py
         ├── web/
         │    ├── __init__.py
-        │    ├── errors.py            error handlers definition
-        │    ├── routes.py            routes definition
+        │    ├── errors.py          error handlers definition
+        │    ├── routes.py          routes definition
         ├──  gee/
         │    ├── __init__.py
         │    ├── gee_exception.py
@@ -64,6 +64,6 @@ sphinx-build -aE -b html . static/docs
     ├── conf.py                     sphinx (documentation) configuration file
     ├── index.rst                   sphinx index file
     ├── static/                     static resources folder
-        │    ├── index.html           playground
-        │    ├── docs/                documentation folder
+        │    ├── index.html         playground
+        │    ├── docs/              documentation folder
                 ├── index.html
