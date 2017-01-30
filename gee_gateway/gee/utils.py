@@ -16,7 +16,7 @@ def imageToMapId(imageName, visParams={}):
         raise GEEException(e.message)
     return values
 
-def fistImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None):
+def firstImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None):
     """  """
     try:
         eeCollection = ee.ImageCollection(collectionName)
