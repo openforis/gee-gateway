@@ -7,6 +7,7 @@
         <link href="static/assets/css/style.css" media="all" rel="stylesheet" type="text/css" />
         <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="https://code.highcharts.com/highcharts.js"></script>
     </head>
     <body>
 
@@ -123,6 +124,9 @@
                     <div class="col-md-12">
                         <br />
                         <div id="map"></div>
+                        <div id="chart" style="display: none;">
+                            <div id="container" style="width:100%; height:400px;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -256,6 +260,9 @@
                 alert(data.errMsg);
             } else {
                 if (data.hasOwnProperty('mapid')) {
+                    $('#map').show();
+                    $('#chart').hide();
+                    //
                     var mapId = data.mapid;
                     var token = data.token;
                     //
@@ -281,7 +288,70 @@
                     var myLatLng = new google.maps.LatLng(lat, lng);
                     map.panTo(myLatLng);
                 } else if (data.hasOwnProperty('timeseries')) {
-                    alert( data.timeseries);
+                    $('#map').hide();
+                    $('#chart').show();
+                    //
+                    timeseriesData = [];
+                    $.each(data.timeseries, function(index, value) {
+                        if (value[0] != null) {
+                            timeseriesData.push([value[1], value[0]]);
+                        }
+                    });
+                    //
+                    text = indexName;
+                    Highcharts.chart('container', {
+                        chart: {
+                            zoomType: 'x'
+                        },
+                        title: {
+                            text: text
+                        },
+                        subtitle: {
+                            text: document.ontouchstart === undefined ? 'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+                        },
+                        xAxis: {
+                            type: 'datetime'
+                        },
+                        yAxis: {
+                            title: {
+                                text: text
+                            }
+                        },
+                        legend: {
+                            enabled: false
+                        },
+                        plotOptions: {
+                            area: {
+                                fillColor: {
+                                    linearGradient: {
+                                        x1: 0,
+                                        y1: 0,
+                                        x2: 0,
+                                        y2: 1
+                                    },
+                                    stops: [
+                                        [0, Highcharts.getOptions().colors[0]],
+                                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                                    ]
+                                },
+                                marker: {
+                                    radius: 2
+                                },
+                                lineWidth: 1,
+                                states: {
+                                    hover: {
+                                        lineWidth: 1
+                                    }
+                                },
+                                threshold: null
+                            }
+                        },
+                        series: [{
+                            type: 'area',
+                            name: text,
+                            data: timeseriesData
+                        }]
+                    });
                 }
             }
         });
