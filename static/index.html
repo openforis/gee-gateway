@@ -233,7 +233,8 @@
         var scale = $("input[name='scale']").val();
         var dateFromTimeSeries = $("input[name='dateFromTimeSeries']").val();
         var dateToTimeSeries = $("input[name='dateToTimeSeries']").val();
-        var url = "http://127.0.0.1:8888/" + serviceName;
+        var currentLocation = location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "");
+        var url = currentLocation + "/" + serviceName;
         $.ajax({
             url: url,
             type: 'POST',
