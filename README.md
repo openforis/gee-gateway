@@ -1,5 +1,8 @@
 # gee-gateway
 
+[![Python: 2.7](https://img.shields.io/badge/python-2.7-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 This is a REST API designed to be used by [CEO (Collect Earth Online)](https://github.com/openforis/collect-earth-online) to interface with Google Earth Engine.
 
 ## REQUIREMENTS
@@ -12,7 +15,7 @@ This is a REST API designed to be used by [CEO (Collect Earth Online)](https://g
 
 From project root directory
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
@@ -24,20 +27,20 @@ Edit the configuration file (config.py)
 
 From project root directory
 
-```
+```bash
 python run.py
 ```
 
 ## DOCUMENTATION
 
-```
+```bash
 pip install sphinx
 pip install sphinxcontrib-httpdomain
 ```
 
 From project root directory
 
-```
+```bash
 sphinx-build -aE -b html . static/docs
 ```
 
