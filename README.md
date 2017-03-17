@@ -10,6 +10,7 @@ This is a REST API designed to be used by [CEO (Collect Earth Online)](https://g
 1. [Python 2.7](https://www.python.org/)
 2. [pip (package manager)](https://github.com/pypa/pip)
 3. [Earth Engine Python API](https://developers.google.com/earth-engine/python_install)
+4. [virtualenv](https://pypi.python.org/pypi/virtualenv) (Optional)
 
 ## INSTALLATION
 
@@ -19,15 +20,40 @@ From project root directory
 pip install -r requirements.txt
 ```
 
+OR using **virtualenv** (Optional)
+
+```bash
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
+```
+
 ## CONFIGURATION
 
-Edit the configuration file (config.py)
+Edit the configuration file (`config.py` or `instance/config.py`)
+
+
+```python
+DEBUG = False # {True|False}
+PORT = 8888 # flask server running port
+HOST = '0.0.0.0' # flask server running host
+CO_ORIGINS = '*' # origin or list of origins to allow requests from
+import logging
+LOGGING_LEVEL = logging.INFO # {NOTSET|DEBUG|INFO|WARNING|ERROR|CRITICAL}
+```
 
 ## EXECUTION
 
 From project root directory
 
 ```bash
+python run.py
+```
+
+OR using **virtualenv** (Optional)
+
+```bash
+source env/bin/activate
 python run.py
 ```
 
