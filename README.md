@@ -57,6 +57,20 @@ source env/bin/activate
 python run.py
 ```
 
+```bash
+usage: run.py [-h] [--gmaps_api_key GMAPS_API_KEY] [--ee_account EE_ACCOUNT]
+              [--ee_key_path EE_KEY_PATH]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --gmaps_api_key GMAPS_API_KEY
+                        Google Maps API key
+  --ee_account EE_ACCOUNT
+                        Google Earth Engine account
+  --ee_key_path EE_KEY_PATH
+                        Google Earth Engine key path
+```
+
 ## DOCUMENTATION
 
 ```bash

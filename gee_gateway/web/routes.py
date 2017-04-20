@@ -1,6 +1,6 @@
 import logging
 
-from flask import request, jsonify
+from flask import request, jsonify, render_template
 from flask_cors import CORS, cross_origin
 
 from .. import app
@@ -9,6 +9,11 @@ from ..gee.utils import *
 
 
 logger = logging.getLogger(__name__)
+
+@app.route('/', methods=['GET'])
+@cross_origin(origins=app.config['CO_ORIGINS'])
+def index():
+    return render_template('index.html')
 
 @app.route('/image', methods=['POST'])
 @cross_origin(origins=app.config['CO_ORIGINS'])

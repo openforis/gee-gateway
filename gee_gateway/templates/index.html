@@ -65,9 +65,10 @@
                                 <div class="form-group">
                                   <label>ImageCollection</label>
                                   <select class="form-control" name="collectionName">
-                                    <option value="" selected>CHOOSE A COLLECTION</option>
-                                    <option value="LANDSAT/LE7_L1T_ANNUAL_GREENEST_TOA">LANDSAT/LE7_L1T_ANNUAL_GREENEST_TOA</option>
-                                    <option value="LANDSAT/LC8_L1T_ANNUAL_GREENEST_TOA">LANDSAT/LC8_L1T_ANNUAL_GREENEST_TOA</option>
+                                      <option value="" selected>CHOOSE A COLLECTION</option>
+                                      <option value="LANDSAT/LE7_L1T_ANNUAL_GREENEST_TOA">LANDSAT/LE7_L1T_ANNUAL_GREENEST_TOA</option>
+                                      <option value="LANDSAT/LC8_L1T_ANNUAL_GREENEST_TOA">LANDSAT/LC8_L1T_ANNUAL_GREENEST_TOA</option>
+                                      <option value="LANDSAT/LC8_L1T_TOA">LANDSAT/LC8_L1T_TOA</option>
                                   </select>
                                 </div>
                                 <div class="form-group">
@@ -166,7 +167,11 @@
         </div>
     </div>
 
-    <script src="https://maps.googleapis.com/maps/api/js"></script>
+    {% if config.GMAPS_API_KEY is defined and config.GMAPS_API_KEY != '' %}
+        <script src="http://maps.google.com/maps/api/js?key={{ config.GMAPS_API_KEY }}"></script>
+    {% else %}
+        <script src="http://maps.google.com/maps/api/js"></script>
+    {% endif %}
 
     <script>
         var lat = $("input[name='lat']").val();
@@ -233,8 +238,7 @@
         var scale = $("input[name='scale']").val();
         var dateFromTimeSeries = $("input[name='dateFromTimeSeries']").val();
         var dateToTimeSeries = $("input[name='dateToTimeSeries']").val();
-        var currentLocation = location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "");
-        var url = currentLocation + "/" + serviceName;
+        var url = "http://127.0.0.1:8888/" + serviceName;
         $.ajax({
             url: url,
             type: 'POST',
