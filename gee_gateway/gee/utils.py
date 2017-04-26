@@ -46,3 +46,33 @@ def getTimeSeriesByIndex(collectionName, indexName, scale, polygon=[], dateFrom=
     except EEException as e:
         raise GEEException(e.message)
     return values
+def getStatistics(paramType, aOIPoly):
+    values = {}
+    if (paramType == 'basin'):
+      basinFC = ee.FeatureCollection('ft:1aIbTi69cXMMIm5ZvHNC67hVmhefPDLfEat15iike')
+      basin = basinFC.filter(ee.Filter.eq('SubBasin', aOIPoly)).first();
+      poly = basin.geometry()
+    elif (paramType == 'landscape'):
+      lscapeFC = ee.FeatureCollection('ft:1XuZH2r-oai_knDgWiOUxyDjlHZQKsEZChOjGsTjr')
+      landscape = lscapeFC.filter(ee.Filter.eq('NAME', aOIPoly)).first();
+      poly = landscape.geometry()
+      
+    else:
+      poly = ee.Geometry.Polygon(aOIPoly)
+
+    elev = ee.Image('USGS/GTOPO30')
+    minmaxElev = elev.reduceRegion(ee.Reducer.minMax(), poly, 1000, maxPixels=500000000)
+    minElev = minmaxElev.get('elevation_min').getInfo()
+    maxElev = minmaxElev.get('elevation_max').getInfo()
+    ciesinPopGrid = ee.Image('CIESIN/GPWv4/population-count/2015')
+    popDict = ciesinPopGrid.reduceRegion(ee.Reducer.sum(), poly, maxPixels=500000000)
+    pop = popDict.get('population-count').getInfo()
+    pop = int(pop) 
+    
+    values = {
+        'minElev': minElev,
+        'maxElev': maxElev,
+        'pop': pop       
+                 
+    }
+    return values

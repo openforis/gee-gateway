@@ -181,3 +181,45 @@ def timeSeriesIndex():
             'errMsg': e.message
         }
     return jsonify(values), 200
+@app.route('/getStats', methods=['POST'])
+@cross_origin(origins=app.config['CO_ORIGINS'])
+def getStats():
+    """
+    .. :quickref: getStats; Get the population and elevation for a polygon
+
+    **Example request**:
+
+    .. code-block:: javascript
+
+        {
+            paramType: "XX",
+            paramValue: [
+                [0.0, 0.0],
+                [...]
+            ]
+        }
+
+    **Example response**:
+
+    .. code-block:: javascript
+
+        {maxElev: 1230, minElev: 1230, pop: 0}
+
+    :reqheader Accept: application/json
+    :<json String paramType: basin, landscape, or ''
+    :<json Array polygon: the region over which to reduce data
+    :resheader Content-Type: application/json
+    """
+    try:
+        values = {}
+        json = request.get_json()
+        paramType = json.get('paramType', None)
+        paramValue = json.get('paramValue', None)
+    
+        values = getStatistics(paramType, paramValue)
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }    
+    return jsonify(values), 200
