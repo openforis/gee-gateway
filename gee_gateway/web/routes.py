@@ -3,20 +3,17 @@ import logging
 from flask import request, jsonify, render_template
 from flask_cors import CORS, cross_origin
 
-from .. import app
+from .. import gee_gateway
 from ..gee.gee_exception import GEEException
 from ..gee.utils import *
 
-
 logger = logging.getLogger(__name__)
 
-@app.route('/', methods=['GET'])
-@cross_origin(origins=app.config['CO_ORIGINS'])
+@gee_gateway.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
 
-@app.route('/image', methods=['POST'])
-@cross_origin(origins=app.config['CO_ORIGINS'])
+@gee_gateway.route('/image', methods=['POST'])
 def image():
     """ Return
 
@@ -64,8 +61,7 @@ def image():
         }
     return jsonify(values), 200
 
-@app.route('/imageByMosaicCollection', methods=['POST'])
-@cross_origin(origins=app.config['CO_ORIGINS'])
+@gee_gateway.route('/imageByMosaicCollection', methods=['POST'])
 def imageByMosaicCollection():
     """
     .. :quickref: ImageCollection; Get the MapID of a EE ImageCollection.
@@ -118,8 +114,7 @@ def imageByMosaicCollection():
         }
     return jsonify(values), 200
 
-@app.route('/timeSeriesIndex', methods=['POST'])
-@cross_origin(origins=app.config['CO_ORIGINS'])
+@gee_gateway.route('/timeSeriesIndex', methods=['POST'])
 def timeSeriesIndex():
     """
     .. :quickref: TimeSeries; Get the timeseries for a specific ImageCollection index, date range and polygon
@@ -181,8 +176,8 @@ def timeSeriesIndex():
             'errMsg': e.message
         }
     return jsonify(values), 200
-@app.route('/getStats', methods=['POST'])
-@cross_origin(origins=app.config['CO_ORIGINS'])
+
+@gee_gateway.route('/getStats', methods=['POST'])
 def getStats():
     """
     .. :quickref: getStats; Get the population and elevation for a polygon
@@ -215,11 +210,10 @@ def getStats():
         json = request.get_json()
         paramType = json.get('paramType', None)
         paramValue = json.get('paramValue', None)
-    
         values = getStatistics(paramType, paramValue)
     except GEEException as e:
         logger.error(e.message)
         values = {
             'errMsg': e.message
-        }    
+        }
     return jsonify(values), 200

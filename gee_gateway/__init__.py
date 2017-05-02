@@ -1,8 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Blueprint
 
-app = Flask(__name__, instance_relative_config=True, static_url_path="/static", static_folder="../static")
-app.config.from_object('config')
-app.config.from_pyfile('config.py', silent=True)
+gee_gateway = Blueprint('gee_gateway', __name__, template_folder='templates', static_folder='static', static_url_path='/static/gee_gateway')
 
-import web
-import gee
+import gee, web
