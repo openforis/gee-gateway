@@ -238,7 +238,7 @@
         var scale = $("input[name='scale']").val();
         var dateFromTimeSeries = $("input[name='dateFromTimeSeries']").val();
         var dateToTimeSeries = $("input[name='dateToTimeSeries']").val();
-        var url = "http://127.0.0.1:8888/" + serviceName;
+        var url = "/" + serviceName;
         $.ajax({
             url: url,
             type: 'POST',
