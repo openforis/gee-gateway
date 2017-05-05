@@ -1,0 +1,2 @@
+recursive-include gee_gateway/templates *
+recursive-include gee_gateway/static *
