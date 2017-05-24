@@ -28,7 +28,8 @@ def image():
             visParams: {
                 min: 0.0,
                 max: 0.0,
-                bands: "XX,XX,XX"
+                bands: "XX,XX,XX",
+                gamma: 0.0
            }
         }
 
@@ -75,7 +76,8 @@ def imageByMosaicCollection():
             visParams: {
                 min: 0.0,
                 max: 0.0,
-                bands: "XX,XX,XX"
+                bands: "XX,XX,XX",
+                gamma: 0.0
             },
             dateFrom: "YYYY-MM-DD",
             dateTo: "YYYY-MM-DD"

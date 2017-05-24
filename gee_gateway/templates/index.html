@@ -162,6 +162,10 @@
                         </div>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label>Gamma</label>
+                    <input type="text" class="form-control" name="gamma" />
+                </div>
                 <button type="button" class="btn btn-warning">RESET</button>
             </div>
         </div>
@@ -209,6 +213,7 @@
         $("input[name='band1']").val('');
         $("input[name='band2']").val('');
         $("input[name='band3']").val('');
+        $("input[name='gamma']").val('');
         $("input[name='dateFrom']").val('');
         $("input[name='dateTo']").val('');
     });
@@ -230,6 +235,8 @@
             max: $("input[name='max']").val(),
             bands: bands
         };
+        var gamma = $("input[name='gamma']").val();
+        if (gamma != '') visParams['gamma'] = gamma;
         var dateFrom = $("input[name='dateFrom']").val();
         var dateTo = $("input[name='dateTo']").val();
         var collectionNameTimeSeries = $("select[name='collectionNameTimeSeries']").val();
