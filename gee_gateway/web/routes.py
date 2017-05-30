@@ -119,7 +119,7 @@ def imageByMosaicCollection():
 @gee_gateway.route('/timeSeriesIndex', methods=['POST'])
 def timeSeriesIndex():
     """
-    .. :quickref: TimeSeries; Get the timeseries for a specific ImageCollection index, date range and polygon
+    .. :quickref: TimeSeries; Get the timeseries for a specific ImageCollection index, date range and a polygon OR a point
 
     **Example request**:
 
@@ -129,10 +129,10 @@ def timeSeriesIndex():
             collectionName: "XX",
             indexName: "XX"
             scale: 0.0,
-            polygon: [
+            geometry: [
                 [0.0, 0.0],
                 [...]
-            ],
+            ] OR [0.0, 0.0],
             dateFrom: "YYYY-MM-DD",
             dateTo: "YYYY-MM-DD"
         }
@@ -162,13 +162,15 @@ def timeSeriesIndex():
         json = request.get_json()
         if json:
             collectionName = json.get('collectionNameTimeSeries', None)
-            polygon = json.get('polygon', None)
-            if collectionName and polygon:
+            geometry = json.get('polygon', None) #deprecated
+            if not geometry:
+                geometry = json.get('geometry', None)
+            if collectionName and geometry:
                 indexName = json.get('indexName', 'NDVI')
                 scale = float(json.get('scale', 30))
                 dateFrom = json.get('dateFromTimeSeries', None)
                 dateTo = json.get('dateToTimeSeries', None)
-                timeseries = getTimeSeriesByIndex(collectionName, indexName, scale, polygon, dateFrom, dateTo)
+                timeseries = getTimeSeriesByIndex(collectionName, indexName, scale, geometry, dateFrom, dateTo)
                 values = {
                     'timeseries': timeseries
                 }

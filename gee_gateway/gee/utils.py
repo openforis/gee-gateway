@@ -29,14 +29,18 @@ def firstImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateT
         raise GEEException(e.message)
     return values
 
-def getTimeSeriesByIndex(collectionName, indexName, scale, polygon=[], dateFrom=None, dateTo=None):
+def getTimeSeriesByIndex(collectionName, indexName, scale, coords=[], dateFrom=None, dateTo=None):
     """  """
     try:
-        plot = ee.Geometry.Polygon(polygon)
+        geometry = None
+        if isinstance(coords[0], list):
+            geometry = ee.Geometry.Polygon(coords)
+        else:
+            geometry = ee.Geometry.Point(coords)
         indexCollection = ee.ImageCollection(collectionName).filterDate(dateFrom, dateTo).select(indexName)
         def getIndex(image):
             """  """
-            indexValue = image.reduceRegion(ee.Reducer.mean(), plot, scale).get(indexName)
+            indexValue = image.reduceRegion(ee.Reducer.mean(), geometry, scale).get(indexName)
             date = image.get('system:time_start')
             indexImage = ee.Image().set('indexValue', [indexValue, ee.Number(date)])
             return indexImage
@@ -46,6 +50,7 @@ def getTimeSeriesByIndex(collectionName, indexName, scale, polygon=[], dateFrom=
     except EEException as e:
         raise GEEException(e.message)
     return values
+
 def getStatistics(paramType, aOIPoly):
     values = {}
     if (paramType == 'basin'):

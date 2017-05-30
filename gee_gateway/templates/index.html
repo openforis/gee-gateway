@@ -101,8 +101,8 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Polygon</label>
-                                    <input class="form-control" name="polygon" value="[[-85.25507948537992, 40.10371721058706],[-85.25425851083126, 40.103717207677605],[-85.25425851083126, 40.10308678503157],[-85.25507948537992, 40.10308678794103],[-85.25507948537992, 40.10371721058706]]"></input>
+                                    <label>Geometry (Polygon or Point)</label>
+                                    <input class="form-control" name="geometry" value="[[-85.25507948537992, 40.10371721058706],[-85.25425851083126, 40.103717207677605],[-85.25425851083126, 40.10308678503157],[-85.25507948537992, 40.10308678794103],[-85.25507948537992, 40.10371721058706]]"></input>
                                 </div>
                                 <div class="form-group">
                                     <label>Scale</label>
@@ -241,7 +241,7 @@
         var dateTo = $("input[name='dateTo']").val();
         var collectionNameTimeSeries = $("select[name='collectionNameTimeSeries']").val();
         var indexName = $("select[name='indexName']").val();
-        var polygon = $("input[name='polygon']").val();
+        var geometry = $("input[name='geometry']").val();
         var scale = $("input[name='scale']").val();
         var dateFromTimeSeries = $("input[name='dateFromTimeSeries']").val();
         var dateToTimeSeries = $("input[name='dateToTimeSeries']").val();
@@ -260,7 +260,7 @@
                 dateTo: dateTo,
                 collectionNameTimeSeries: collectionNameTimeSeries,
                 indexName: indexName,
-                polygon: JSON.parse(polygon),
+                geometry: JSON.parse(geometry),
                 scale: scale,
                 dateToTimeSeries: dateToTimeSeries,
                 dateFromTimeSeries: dateFromTimeSeries
