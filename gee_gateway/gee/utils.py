@@ -42,7 +42,7 @@ def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[
             """  """
             indexValue = image.reduceRegion(ee.Reducer.mean(), geometry, scale).get(indexName)
             date = image.get('system:time_start')
-            indexImage = ee.Image().set('indexValue', [indexValue, ee.Number(date)])
+            indexImage = ee.Image().set('indexValue', [ee.Number(date), indexValue])
             return indexImage
         indexCollection1 = indexCollection.map(getIndex)
         indexCollection2 = indexCollection1.aggregate_array('indexValue')
@@ -84,7 +84,7 @@ def getTimeSeriesByIndex(indexName, scale, coords=[]):
             time = row.get(3)
             index = row.get(4)
             cfmask = row.get(5)
-            return ee.Algorithms.If(cfmask, ee.Algorithms.If(ee.Number(cfmask).eq(1), ee.List([index, time]), None), None)
+            return ee.Algorithms.If(cfmask, ee.Algorithms.If(ee.Number(cfmask).eq(1), ee.List([time, index]), None), None)
         collectionNames = bandsByCollection.keys()
         collectionName = collectionNames[0]
         collection = ee.ImageCollection(collectionNames[0]).sort('system:time_start').filterBounds(geometry).map(getExpression)

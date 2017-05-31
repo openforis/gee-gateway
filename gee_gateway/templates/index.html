@@ -306,8 +306,8 @@
                     //
                     timeseriesData = [];
                     $.each(data.timeseries, function(index, value) {
-                        if (value[0] != null) {
-                            timeseriesData.push([value[1], value[0]]);
+                        if (value[1] != null) {
+                            timeseriesData.push(value);
                         }
                     });
                     //

@@ -143,7 +143,7 @@ def timeSeriesIndex():
 
         {
             timeseries: [
-                [0, 0],
+                [0, 0.0],
                 ...
             ]
         }
