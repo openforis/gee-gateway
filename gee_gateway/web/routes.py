@@ -170,7 +170,31 @@ def timeSeriesIndex():
                 scale = float(json.get('scale', 30))
                 dateFrom = json.get('dateFromTimeSeries', None)
                 dateTo = json.get('dateToTimeSeries', None)
-                timeseries = getTimeSeriesByIndex(collectionName, indexName, scale, geometry, dateFrom, dateTo)
+                timeseries = getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, geometry, dateFrom, dateTo)
+                values = {
+                    'timeseries': timeseries
+                }
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
+
+@gee_gateway.route('/timeSeriesIndex2', methods=['POST'])
+def timeSeriesIndex2():
+    """  """
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            geometry = json.get('polygon', None) #deprecated
+            if not geometry:
+                geometry = json.get('geometry', None)
+            if geometry:
+                indexName = json.get('indexName', 'NDVI')
+                scale = float(json.get('scale', 30))
+                timeseries = getTimeSeriesByIndex(indexName, scale, geometry)
                 values = {
                     'timeseries': timeseries
                 }
