@@ -71,7 +71,8 @@ def getTimeSeriesByIndex(indexName, scale, coords=[]):
             'NDVI': '(i.nir - i.red) / (i.nir + i.red)',
             'EVI': '2.5 * (i.nir - i.red) / (i.nir + 6.0 * i.red - 7.5 * i.blue + 1)',
             'EVI2': '2.5 * (i.nir - i.red) / (i.nir + 2.4 * i.red + 1)',
-            'NDWI': '(i.nir - i.swir1) / (i.nir + i.swir1)'
+            'NDMI': '(i.nir - i.swir1) / (i.nir + i.swir1)',
+            'NDWI': '(i.green - i.nir) / (i.green + i.nir)'
         }
         def getExpression(image):
             """  """
