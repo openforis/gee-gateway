@@ -3,7 +3,7 @@ import logging, argparse
 from flask import Flask
 from flask_cors import CORS
 
-from gee_gateway import gee_gateway
+from gee_gateway import gee_gateway, gee_initialize
 
 if __name__ == '__main__':
 
@@ -19,6 +19,7 @@ if __name__ == '__main__':
 
     app.config['GMAPS_API_KEY'] = args.gmaps_api_key
 
+    gee_initialize(ee_account=args.ee_account, ee_key_path=args.ee_key_path)
     gee_gateway_cors = CORS(gee_gateway, origins=app.config['CO_ORIGINS'])
     app.register_blueprint(gee_gateway)
 
