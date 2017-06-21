@@ -245,3 +245,20 @@ def getStats():
             'errMsg': e.message
         }
     return jsonify(values), 200
+
+@gee_gateway.route('/asterMosaic', methods=['POST'])
+def asterMosaic():
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            visParams = json.get('visParams', None)
+            dateFrom = json.get('dateFrom', None)
+            dateTo = json.get('dateTo', None)
+            values = getAsterMosaic(visParams, dateFrom, dateTo)
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200

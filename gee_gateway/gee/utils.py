@@ -137,3 +137,31 @@ def getStatistics(paramType, aOIPoly):
         'pop': pop
     }
     return values
+
+def getAsterMosaic(visParams={}, dateFrom=None, dateTo=None):
+    """  """
+    try:
+        def normalize(image):
+            """  """
+            bands = ['B01', 'B02', 'B3N', 'B04', 'B05', 'B10']
+            coefficients = [ee.Image(ee.Number(image.get('GAIN_COEFFICIENT_' + band))).float().rename([band]) for band in bands]
+            coefficients = ee.Image.cat(coefficients)
+            cloudCover = ee.Image(ee.Number(image.get('CLOUDCOVER'))).float().multiply(-1).add(100).rename(['cloudCover'])
+            image = image.select(bands).subtract(1).multiply(coefficients)
+            image = image.select(bands, ['green', 'red', 'nir', 'swir1', 'swir2', 'thermal'])
+            return image.addBands(cloudCover)
+        collection = ee.ImageCollection('ASTER/AST_L1T_003') \
+            .filterDate(dateFrom, dateTo) \
+            .filter(ee.Filter.listContains('ORIGINAL_BANDS_PRESENT', 'B01')) \
+            .filter(ee.Filter.listContains('ORIGINAL_BANDS_PRESENT', 'B02')) \
+            .filter(ee.Filter.listContains('ORIGINAL_BANDS_PRESENT', 'B3N')) \
+            .filter(ee.Filter.listContains('ORIGINAL_BANDS_PRESENT', 'B04')) \
+            .filter(ee.Filter.listContains('ORIGINAL_BANDS_PRESENT', 'B05')) \
+            .filter(ee.Filter.listContains('ORIGINAL_BANDS_PRESENT', 'B10')) \
+            .map(normalize)
+        mosaic = collection.qualityMosaic('cloudCover')
+        #visParams = {'bands': 'nir, swir1, red', 'min': 0, 'max': '110, 25, 90', 'gamma': 1.7}
+        values = imageToMapId(mosaic, visParams)
+    except EEException as e:
+        raise GEEException(e.message)
+    return values
