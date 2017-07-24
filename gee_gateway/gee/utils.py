@@ -40,7 +40,60 @@ def firstImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateT
     except EEException as e:
         raise GEEException(e.message)
     return values
-
+def firstCloudFreeImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None):
+    """  """
+    try:
+        print('collectionName ' + collectionName)
+        skipCloudMask = False
+        eeCollection = ee.ImageCollection(collectionName)
+        if("b2" not in visParams["bands"].lower()):
+            skipCloudMask = True
+        elif ("lc8" in collectionName.lower()):
+            skipCloudMask = False
+        elif ("le7" in collectionName.lower()):
+            skipCloudMask = False
+        elif ("lt5" in collectionName.lower()):
+            skipCloudMask = False 
+        else:
+            skipCloudMask = True
+        if (dateFrom and dateTo):
+            eeFilterDate = ee.Filter.date(dateFrom, dateTo)
+            eeCollection = eeCollection.filter(eeFilterDate)
+        eeFirstImage = ee.Image(eeCollection.first());
+        try:
+            if(skipCloudMask == False):
+                sID = ''
+                if ("lc8" in collectionName.lower()):
+                    sID = 'OLI_TIRS'
+                elif ("le7" in collectionName.lower()):
+                   sID = 'ETM'
+                elif ("lt5" in collectionName.lower()):
+                    sID = 'TM'            
+                scored = ee.Algorithms.Landsat.simpleCloudScore(eeFirstImage.set('SENSOR_ID', sID))
+                mask = scored.select(['cloud']).lte(20)
+                masked = eeFirstImage.updateMask(mask)
+                
+                values = imageToMapId(masked, visParams)
+            else:
+                values = imageToMapId(eeFirstImage, visParams)
+        except EEException as ine:
+            imageToMapId(eeFirstImage, visParams)
+    except EEException as e:
+        print(visParams)
+        raise GEEException(e.message)
+    return values
+def filteredImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None):
+    """  """
+    try:
+        eeCollection = ee.ImageCollection(collectionName)
+        if (dateFrom and dateTo):
+            eeFilterDate = ee.Filter.date(dateFrom, dateTo)
+            eeCollection = eeCollection.filter(eeFilterDate)
+        eeFirstImage = ee.Image(eeCollection.mean());
+        values = imageToMapId(eeFirstImage, visParams)
+    except EEException as e:
+        raise GEEException(e.message)
+    return values
 def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[], dateFrom=None, dateTo=None):
     """  """
     try:
@@ -52,7 +105,14 @@ def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[
         indexCollection = ee.ImageCollection(collectionName).filterDate(dateFrom, dateTo).select(indexName)
         def getIndex(image):
             """  """
-            indexValue = image.reduceRegion(ee.Reducer.mean(), geometry, scale).get(indexName)
+            theReducer = None;
+            if(reducer == 'min'):
+                theReducer = ee.Reducer.min()
+            elif (reducer == 'max'):
+                theReducer = ee.Reducer.max()
+            else:
+                theReducer = ee.Reducer.mean()
+            indexValue = image.reduceRegion(theReducer, geometry, scale).get(indexName)
             date = image.get('system:time_start')
             indexImage = ee.Image().set('indexValue', [ee.Number(date), indexValue])
             return indexImage

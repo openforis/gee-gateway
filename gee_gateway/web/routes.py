@@ -115,7 +115,112 @@ def imageByMosaicCollection():
             'errMsg': e.message
         }
     return jsonify(values), 200
+@gee_gateway.route('/cloudMaskImageByMosaicCollection', methods=['POST'])
+def cloudMaskImageByMosaicCollection():
+    """
+    .. :quickref: ImageCollection; Get the MapID of a EE ImageCollection.
 
+    **Example request**:
+
+    .. code-block:: javascript
+
+        {
+            collectionName: "XX",
+            visParams: {
+                min: 0.0,
+                max: 0.0,
+                bands: "XX,XX,XX"
+            },
+            dateFrom: "YYYY-MM-DD",
+            dateTo: "YYYY-MM-DD"
+        }
+
+    **Example response**:
+
+    .. code-block:: javascript
+
+        {
+            mapid: "XXX",
+            token: "XXX"
+        }
+
+    :reqheader Accept: application/json
+    :<json String collectionName: name of the image collection
+    :<json Object visParams: visualization parameters
+    :<json String dateFrom: start date
+    :<json String dateTo: end date
+    :resheader Content-Type: application/json
+    """
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            collectionName = json.get('collectionName', None)
+            if collectionName:
+                visParams = json.get('visParams', None)
+                dateFrom = json.get('dateFrom', None)
+                dateTo = json.get('dateTo', None)
+                values = firstCloudFreeImageInMosaicToMapId(collectionName, visParams, dateFrom, dateTo)
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
+	
+@gee_gateway.route('/meanImageByMosaicCollection', methods=['POST'])
+def meanImageByMosaicCollection():
+    """
+    .. :quickref: ImageCollection; Get the MapID of a EE ImageCollection.
+
+    **Example request**:
+
+    .. code-block:: javascript
+
+        {
+            collectionName: "XX",
+            visParams: {
+                min: 0.0,
+                max: 0.0,
+                bands: "XX,XX,XX"
+            },
+            dateFrom: "YYYY-MM-DD",
+            dateTo: "YYYY-MM-DD"
+        }
+
+    **Example response**:
+
+    .. code-block:: javascript
+
+        {
+            mapid: "XXX",
+            token: "XXX"
+        }
+
+    :reqheader Accept: application/json
+    :<json String collectionName: name of the image collection
+    :<json Object visParams: visualization parameters
+    :<json String dateFrom: start date
+    :<json String dateTo: end date
+    :resheader Content-Type: application/json
+    """
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            collectionName = json.get('collectionName', None)
+            if collectionName:
+                visParams = json.get('visParams', None)
+                dateFrom = json.get('dateFrom', None)
+                dateTo = json.get('dateTo', None)
+                values = filteredImageInMosaicToMapId(collectionName, visParams, dateFrom, dateTo)
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
+	
 @gee_gateway.route('/timeSeriesIndex', methods=['POST'])
 def timeSeriesIndex():
     """
@@ -204,7 +309,67 @@ def timeSeriesIndex2():
             'errMsg': e.message
         }
     return jsonify(values), 200
+@gee_gateway.route('/timeSeriesIndexGet', methods=['GET'])
+def timeSeriesIndexGet():
+    """
+    .. :quickref: TimeSeries; Get the timeseries for a specific ImageCollection index, date range and polygon
 
+    **Example request**:
+
+    .. code-block:: javascript
+
+        {
+            collectionName: "XX",
+            indexName: "XX"
+            scale: 0.0,
+            polygon: [
+                [0.0, 0.0],
+                [...]
+            ],
+            dateFrom: "YYYY-MM-DD",
+            dateTo: "YYYY-MM-DD"
+        }
+
+    **Example response**:
+
+    .. code-block:: javascript
+
+        {
+            timeseries: [
+                [0, 0],
+                ...
+            ]
+        }
+
+    :reqheader Accept: application/json
+    :<json String collectionName: name of the image collection
+    :<json String index: name of the index:  (e.g. NDVI, NDWI, NVI)
+    :<json Float scale: scale in meters of the projection
+    :<json Array polygon: the region over which to reduce data
+    :<json String dateFrom: start date
+    :<json String dateTo: end date
+    :resheader Content-Type: application/json
+    """
+    values = {}
+    try:
+        collectionName = request.args.get('collectionNameTimeSeries', None)
+        polygon = ast.literal_eval(urllib.unquote(request.args.get('polygon', None)).decode('utf8'))
+        indexName = request.args.get('indexName', 'NDVI')
+        scale = float(request.args.get('scale', 30))
+        dateFrom = request.args.get('dateFromTimeSeries', None)
+        dateTo = request.args.get('dateToTimeSeries', None)
+        reducer = request.args.get('reducer', None)
+        timeseries = getTimeSeriesByIndex(collectionName, indexName, scale, polygon, dateFrom, dateTo, reducer)
+        values = {
+                    'timeseries': timeseries
+                }
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
+	
 @gee_gateway.route('/getStats', methods=['POST'])
 def getStats():
     """
