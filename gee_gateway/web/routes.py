@@ -3,17 +3,22 @@ import logging
 from flask import request, jsonify, render_template
 from flask_cors import CORS, cross_origin
 
-from .. import gee_gateway
+from .. import app
 from ..gee.gee_exception import GEEException
 from ..gee.utils import *
+import urllib
+import ast
+
 
 logger = logging.getLogger(__name__)
 
-@gee_gateway.route('/', methods=['GET'])
+@app.route('/', methods=['GET'])
+@cross_origin(origins=app.config['CO_ORIGINS'])
 def index():
     return render_template('index.html')
 
-@gee_gateway.route('/image', methods=['POST'])
+@app.route('/image', methods=['POST'])
+@cross_origin(origins=app.config['CO_ORIGINS'])
 def image():
     """ Return
 
@@ -28,8 +33,7 @@ def image():
             visParams: {
                 min: 0.0,
                 max: 0.0,
-                bands: "XX,XX,XX",
-                gamma: 0.0
+                bands: "XX,XX,XX"
            }
         }
 
@@ -62,7 +66,8 @@ def image():
         }
     return jsonify(values), 200
 
-@gee_gateway.route('/imageByMosaicCollection', methods=['POST'])
+@app.route('/imageByMosaicCollection', methods=['POST'])
+@cross_origin(origins=app.config['CO_ORIGINS'])
 def imageByMosaicCollection():
     """
     .. :quickref: ImageCollection; Get the MapID of a EE ImageCollection.
@@ -76,8 +81,7 @@ def imageByMosaicCollection():
             visParams: {
                 min: 0.0,
                 max: 0.0,
-                bands: "XX,XX,XX",
-                gamma: 0.0
+                bands: "XX,XX,XX"
             },
             dateFrom: "YYYY-MM-DD",
             dateTo: "YYYY-MM-DD"
@@ -115,7 +119,9 @@ def imageByMosaicCollection():
             'errMsg': e.message
         }
     return jsonify(values), 200
-@gee_gateway.route('/cloudMaskImageByMosaicCollection', methods=['POST'])
+    
+@app.route('/cloudMaskImageByMosaicCollection', methods=['POST'])
+@cross_origin(origins=app.config['CO_ORIGINS'])
 def cloudMaskImageByMosaicCollection():
     """
     .. :quickref: ImageCollection; Get the MapID of a EE ImageCollection.
@@ -167,8 +173,9 @@ def cloudMaskImageByMosaicCollection():
             'errMsg': e.message
         }
     return jsonify(values), 200
-	
-@gee_gateway.route('/meanImageByMosaicCollection', methods=['POST'])
+    
+@app.route('/meanImageByMosaicCollection', methods=['POST'])
+@cross_origin(origins=app.config['CO_ORIGINS'])
 def meanImageByMosaicCollection():
     """
     .. :quickref: ImageCollection; Get the MapID of a EE ImageCollection.
@@ -220,11 +227,12 @@ def meanImageByMosaicCollection():
             'errMsg': e.message
         }
     return jsonify(values), 200
-	
-@gee_gateway.route('/timeSeriesIndex', methods=['POST'])
+
+@app.route('/timeSeriesIndex', methods=['POST'])
+@cross_origin(origins=app.config['CO_ORIGINS'])
 def timeSeriesIndex():
     """
-    .. :quickref: TimeSeries; Get the timeseries for a specific ImageCollection index, date range and a polygon OR a point
+    .. :quickref: TimeSeries; Get the timeseries for a specific ImageCollection index, date range and polygon
 
     **Example request**:
 
@@ -234,10 +242,10 @@ def timeSeriesIndex():
             collectionName: "XX",
             indexName: "XX"
             scale: 0.0,
-            geometry: [
+            polygon: [
                 [0.0, 0.0],
                 [...]
-            ] OR [0.0, 0.0],
+            ],
             dateFrom: "YYYY-MM-DD",
             dateTo: "YYYY-MM-DD"
         }
@@ -248,7 +256,7 @@ def timeSeriesIndex():
 
         {
             timeseries: [
-                [0, 0.0],
+                [0, 0],
                 ...
             ]
         }
@@ -267,15 +275,17 @@ def timeSeriesIndex():
         json = request.get_json()
         if json:
             collectionName = json.get('collectionNameTimeSeries', None)
-            geometry = json.get('polygon', None) #deprecated
-            if not geometry:
-                geometry = json.get('geometry', None)
-            if collectionName and geometry:
+            polygon = json.get('polygon', None)
+            logger.error(polygon)
+            if collectionName and polygon:
                 indexName = json.get('indexName', 'NDVI')
+                if len(indexName) <= 0:
+                    indexName = 'NDVI'
                 scale = float(json.get('scale', 30))
                 dateFrom = json.get('dateFromTimeSeries', None)
                 dateTo = json.get('dateToTimeSeries', None)
-                timeseries = getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, geometry, dateFrom, dateTo)
+                reducer = json.get('reducer', None)
+                timeseries = getTimeSeriesByIndex(collectionName, indexName, scale, polygon, dateFrom, dateTo, reducer)
                 values = {
                     'timeseries': timeseries
                 }
@@ -285,21 +295,65 @@ def timeSeriesIndex():
             'errMsg': e.message
         }
     return jsonify(values), 200
+    
+@app.route('/cloudMaskTimeSeriesIndex', methods=['POST'])
+@cross_origin(origins=app.config['CO_ORIGINS'])
+def cloudMaskTimeSeriesIndex():
+    """
+    .. :quickref: TimeSeries; Get the timeseries for a specific ImageCollection index, date range and polygon
 
-@gee_gateway.route('/timeSeriesIndex2', methods=['POST'])
-def timeSeriesIndex2():
-    """  """
+    **Example request**:
+
+    .. code-block:: javascript
+
+        {
+            collectionName: "XX",
+            indexName: "XX"
+            scale: 0.0,
+            polygon: [
+                [0.0, 0.0],
+                [...]
+            ],
+            dateFrom: "YYYY-MM-DD",
+            dateTo: "YYYY-MM-DD"
+        }
+
+    **Example response**:
+
+    .. code-block:: javascript
+
+        {
+            timeseries: [
+                [0, 0],
+                ...
+            ]
+        }
+
+    :reqheader Accept: application/json
+    :<json String collectionName: name of the image collection
+    :<json String index: name of the index:  (e.g. NDVI, NDWI, NVI)
+    :<json Float scale: scale in meters of the projection
+    :<json Array polygon: the region over which to reduce data
+    :<json String dateFrom: start date
+    :<json String dateTo: end date
+    :resheader Content-Type: application/json
+    """
     values = {}
     try:
         json = request.get_json()
         if json:
-            geometry = json.get('polygon', None) #deprecated
-            if not geometry:
-                geometry = json.get('geometry', None)
-            if geometry:
+            collectionName = json.get('collectionNameTimeSeries', None)
+            polygon = json.get('polygon', None)
+            logger.error(polygon)
+            if collectionName and polygon:
                 indexName = json.get('indexName', 'NDVI')
+                if len(indexName) <= 0:
+                    indexName = 'NDVI'
                 scale = float(json.get('scale', 30))
-                timeseries = getTimeSeriesByIndex(indexName, scale, geometry)
+                dateFrom = json.get('dateFromTimeSeries', None)
+                dateTo = json.get('dateToTimeSeries', None)
+                reducer = json.get('reducer', None)
+                timeseries = cloudMaskGetTimeSeriesByIndex(collectionName, indexName, scale, polygon, dateFrom, dateTo, reducer)
                 values = {
                     'timeseries': timeseries
                 }
@@ -308,8 +362,10 @@ def timeSeriesIndex2():
         values = {
             'errMsg': e.message
         }
-    return jsonify(values), 200
-@gee_gateway.route('/timeSeriesIndexGet', methods=['GET'])
+    return jsonify(values), 200    
+    
+@app.route('/timeSeriesIndexGet', methods=['GET'])
+@cross_origin(origins=app.config['CO_ORIGINS'])
 def timeSeriesIndexGet():
     """
     .. :quickref: TimeSeries; Get the timeseries for a specific ImageCollection index, date range and polygon
@@ -369,8 +425,8 @@ def timeSeriesIndexGet():
             'errMsg': e.message
         }
     return jsonify(values), 200
-	
-@gee_gateway.route('/getStats', methods=['POST'])
+@app.route('/getStats', methods=['POST'])
+@cross_origin(origins=app.config['CO_ORIGINS'])
 def getStats():
     """
     .. :quickref: getStats; Get the population and elevation for a polygon
@@ -403,27 +459,11 @@ def getStats():
         json = request.get_json()
         paramType = json.get('paramType', None)
         paramValue = json.get('paramValue', None)
+    
         values = getStatistics(paramType, paramValue)
     except GEEException as e:
         logger.error(e.message)
         values = {
             'errMsg': e.message
-        }
-    return jsonify(values), 200
-
-@gee_gateway.route('/asterMosaic', methods=['POST'])
-def asterMosaic():
-    values = {}
-    try:
-        json = request.get_json()
-        if json:
-            visParams = json.get('visParams', None)
-            dateFrom = json.get('dateFrom', None)
-            dateTo = json.get('dateTo', None)
-            values = getAsterMosaic(visParams, dateFrom, dateTo)
-    except GEEException as e:
-        logger.error(e.message)
-        values = {
-            'errMsg': e.message
-        }
+        }    
     return jsonify(values), 200
