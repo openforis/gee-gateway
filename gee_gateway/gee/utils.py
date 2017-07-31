@@ -3,6 +3,18 @@ from ee.ee_exception import EEException
 
 from gee_exception import GEEException
 
+def initialize(ee_account='', ee_key_path=''):
+    try:
+        ee.Initialize()
+    except EEException:
+        from oauth2client.service_account import ServiceAccountCredentials
+        credentials = ServiceAccountCredentials.from_p12_keyfile(
+            service_account_email=ee_account,
+            filename=ee_key_path,
+            private_key_password='notasecret',
+            scopes=ee.oauth.SCOPE + ' https://www.googleapis.com/auth/drive ')
+        ee.Initialize(credentials)
+
 def imageToMapId(imageName, visParams={}):
     """  """
     try:
@@ -82,11 +94,14 @@ def filteredImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, da
     except EEException as e:
         raise GEEException(e.message)
     return values
-
-def getTimeSeriesByIndex(collectionName, indexName, scale, polygon=[], dateFrom=None, dateTo=None, reducer=None):
+def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[], dateFrom=None, dateTo=None, reducer=None):
     """  """
     try:
-        plot = ee.Geometry.Polygon(polygon)
+        geometry = None
+        if isinstance(coords[0], list):
+            geometry = ee.Geometry.Polygon(coords)
+        else:
+            geometry = ee.Geometry.Point(coords)
         indexCollection = ee.ImageCollection(collectionName).filterDate(dateFrom, dateTo).select(indexName)
         def getIndex(image):
             """  """
@@ -97,9 +112,9 @@ def getTimeSeriesByIndex(collectionName, indexName, scale, polygon=[], dateFrom=
                 theReducer = ee.Reducer.max()
             else:
                 theReducer = ee.Reducer.mean()
-            indexValue = image.reduceRegion(theReducer, plot, scale).get(indexName)
+            indexValue = image.reduceRegion(theReducer, geometry, scale).get(indexName)
             date = image.get('system:time_start')
-            indexImage = ee.Image().set('indexValue', [indexValue, ee.Number(date)])
+            indexImage = ee.Image().set('indexValue', [ee.Number(date), indexValue])
             return indexImage
         indexCollection1 = indexCollection.map(getIndex)
         indexCollection2 = indexCollection1.aggregate_array('indexValue')
@@ -107,40 +122,55 @@ def getTimeSeriesByIndex(collectionName, indexName, scale, polygon=[], dateFrom=
     except EEException as e:
         raise GEEException(e.message)
     return values
-def cloudMaskGetTimeSeriesByIndex(collectionName, indexName, scale, polygon=[], dateFrom=None, dateTo=None, reducer=None):
+
+def getTimeSeriesByIndex(indexName, scale, coords=[]):
     """  """
     try:
-        plot = ee.Geometry.Polygon(polygon)
-        indexCollection = ee.ImageCollection(collectionName).filterDate(dateFrom, dateTo).select(indexName)
-        def getIndex(image):
+        geometry = None
+        if isinstance(coords[0], list):
+            geometry = ee.Geometry.Polygon(coords)
+        else:
+            geometry = ee.Geometry.Point(coords)
+        bands = ['blue', 'green', 'red', 'nir', 'swir1', 'swir2', 'cfmask']
+        bandsByCollection = {
+            'LANDSAT/LC8_SR': ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'cfmask'],
+            'LANDSAT/LC8_SR': ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'cfmask'],
+            'LANDSAT/LE7_SR': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'cfmask'],
+            'LANDSAT/LT5_SR': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'cfmask'],
+            'LANDSAT/LT4_SR': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'cfmask']
+        }
+        indexes = {
+            'NDVI': '(i.nir - i.red) / (i.nir + i.red)',
+            'EVI': '2.5 * (i.nir - i.red) / (i.nir + 6.0 * i.red - 7.5 * i.blue + 1)',
+            'EVI2': '2.5 * (i.nir - i.red) / (i.nir + 2.4 * i.red + 1)',
+            'NDMI': '(i.nir - i.swir1) / (i.nir + i.swir1)',
+            'NDWI': '(i.green - i.nir) / (i.green + i.nir)'
+        }
+        def getExpression(image):
             """  """
-            theReducer = None;
-            if(reducer == 'min'):
-                theReducer = ee.Reducer.min()
-            elif (reducer == 'max'):
-                theReducer = ee.Reducer.max()
-            else:
-                theReducer = ee.Reducer.mean()
-            sID = ''
-            if ("lc8" in collectionName.lower()):
-               sID = 'OLI_TIRS'
-            elif ("le7" in collectionName.lower()):
-               sID = 'ETM'
-            elif ("lt5" in collectionName.lower()):
-                sID = 'TM'            
-            scored = ee.Algorithms.Landsat.simpleCloudScore(image.set('SENSOR_ID', sID))
-            mask = scored.select(['cloud']).lte(20)
-            masked = image.updateMask(mask)                
-            indexValue = masked.reduceRegion(theReducer, plot, scale).get(indexName)
-            date = masked.get('system:time_start')
-            indexImage = ee.Image().set('indexValue', [indexValue, ee.Number(date)])
-            return indexImage
-        indexCollection1 = indexCollection.map(getIndex)
-        indexCollection2 = indexCollection1.aggregate_array('indexValue')
-        values = indexCollection2.getInfo()
+            time = ee.Number(image.get('system:time_start'))
+            image = image.select(bandsByCollection[collectionName], bands).divide(10000)
+            return image.expression(indexes[indexName], {'i': image}).rename(['index']).addBands(image.select(['cfmask']).add(1)).set('system:time_start', time)
+        def transformRow(row):
+            """  """
+            row = ee.List(row)
+            time = row.get(3)
+            index = row.get(4)
+            cfmask = row.get(5)
+            return ee.Algorithms.If(cfmask, ee.Algorithms.If(ee.Number(cfmask).eq(1), ee.List([time, index]), None), None)
+        collectionNames = bandsByCollection.keys()
+        collectionName = collectionNames[0]
+        collection = ee.ImageCollection(collectionNames[0]).sort('system:time_start').filterBounds(geometry).map(getExpression)
+        for i, val in enumerate(collectionNames[1:], start=1):
+            collectionName = collectionNames[i]
+            collectionToMerge = ee.ImageCollection(collectionNames[i]).sort('system:time_start').filterBounds(geometry).map(getExpression)
+            collection = ee.ImageCollection(collection.merge(collectionToMerge))
+        values = ee.ImageCollection(collection.sort('system:time_start').distinct('system:time_start')).getRegion(geometry, 30).slice(1).map(transformRow).removeAll([None])
+        values = values.getInfo()
     except EEException as e:
         raise GEEException(e.message)
     return values
+
 def getStatistics(paramType, aOIPoly):
     values = {}
     if (paramType == 'basin'):
@@ -151,10 +181,8 @@ def getStatistics(paramType, aOIPoly):
       lscapeFC = ee.FeatureCollection('ft:1XuZH2r-oai_knDgWiOUxyDjlHZQKsEZChOjGsTjr')
       landscape = lscapeFC.filter(ee.Filter.eq('NAME', aOIPoly)).first();
       poly = landscape.geometry()
-      
     else:
       poly = ee.Geometry.Polygon(aOIPoly)
-
     elev = ee.Image('USGS/GTOPO30')
     minmaxElev = elev.reduceRegion(ee.Reducer.minMax(), poly, 1000, maxPixels=500000000)
     minElev = minmaxElev.get('elevation_min').getInfo()
@@ -163,11 +191,37 @@ def getStatistics(paramType, aOIPoly):
     popDict = ciesinPopGrid.reduceRegion(ee.Reducer.sum(), poly, maxPixels=500000000)
     pop = popDict.get('population-count').getInfo()
     pop = int(pop) 
-    
     values = {
         'minElev': minElev,
         'maxElev': maxElev,
-        'pop': pop       
-                 
+        'pop': pop
     }
+    return values
+
+def getAsterMosaic(visParams={}, dateFrom=None, dateTo=None):
+    """  """
+    try:
+        def normalize(image):
+            """  """
+            bands = ['B01', 'B02', 'B3N', 'B04', 'B05', 'B10']
+            coefficients = [ee.Image(ee.Number(image.get('GAIN_COEFFICIENT_' + band))).float().rename([band]) for band in bands]
+            coefficients = ee.Image.cat(coefficients)
+            cloudCover = ee.Image(ee.Number(image.get('CLOUDCOVER'))).float().multiply(-1).add(100).rename(['cloudCover'])
+            image = image.select(bands).subtract(1).multiply(coefficients)
+            image = image.select(bands, ['green', 'red', 'nir', 'swir1', 'swir2', 'thermal'])
+            return image.addBands(cloudCover)
+        collection = ee.ImageCollection('ASTER/AST_L1T_003') \
+            .filterDate(dateFrom, dateTo) \
+            .filter(ee.Filter.listContains('ORIGINAL_BANDS_PRESENT', 'B01')) \
+            .filter(ee.Filter.listContains('ORIGINAL_BANDS_PRESENT', 'B02')) \
+            .filter(ee.Filter.listContains('ORIGINAL_BANDS_PRESENT', 'B3N')) \
+            .filter(ee.Filter.listContains('ORIGINAL_BANDS_PRESENT', 'B04')) \
+            .filter(ee.Filter.listContains('ORIGINAL_BANDS_PRESENT', 'B05')) \
+            .filter(ee.Filter.listContains('ORIGINAL_BANDS_PRESENT', 'B10')) \
+            .map(normalize)
+        mosaic = collection.qualityMosaic('cloudCover')
+        #visParams = {'bands': 'nir, swir1, red', 'min': 0, 'max': '110, 25, 90', 'gamma': 1.7}
+        values = imageToMapId(mosaic, visParams)
+    except EEException as e:
+        raise GEEException(e.message)
     return values
