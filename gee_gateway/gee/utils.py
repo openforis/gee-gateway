@@ -94,6 +94,59 @@ def filteredImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, da
     except EEException as e:
         raise GEEException(e.message)
     return values
+	
+def filteredImageNDVIToMapId(iniDate=None, endDate=None):
+    """  """
+    try:
+        sensorBandDictLandsatTOA = {'L8': [1,2,3,4,5,9,6],
+                                    'L7': [0,1,2,3,4,5,7],
+                                    'L5': [0,1,2,3,4,5,6],
+                                    'L4': [0,1,2,3,4,5,6]}
+        bandNamesLandsatTOA = ['blue','green','red','nir','swir1','temp','swir2']
+        metadataCloudCoverMax = 100
+        region = ee.Geometry.Point([5.2130126953125,15.358356179450585])
+            #.filterBounds(region).filterDate(iniDate,endDate)\
+        lt4 = ee.ImageCollection('LANDSAT/LT4_L1T_TOA')\
+			.filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
+			.select(sensorBandDictLandsatTOA['L4'],bandNamesLandsatTOA)
+        lt5 = ee.ImageCollection('LANDSAT/LT5_L1T_TOA')\
+            .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
+            .select(sensorBandDictLandsatTOA['L5'],bandNamesLandsatTOA)
+        le7 = ee.ImageCollection('LANDSAT/LE7_L1T_TOA')\
+            .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
+            .select(sensorBandDictLandsatTOA['L7'],bandNamesLandsatTOA)
+        lc8 = ee.ImageCollection('LANDSAT/LC8_L1T_TOA')\
+            .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
+            .select(sensorBandDictLandsatTOA['L8'],bandNamesLandsatTOA)
+
+        eeCollection = ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        colorPalette='c9c0bf,435ebf,eee8aa,006400'
+        visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
+
+        eeFirstImage = ee.Image(eeCollection.mean())
+        ndviImage = eeFirstImage.normalizedDifference(['nir', 'red'])	
+        values = imageToMapId(ndviImage, visParams)
+    except EEException as e:
+        raise GEEException(e.message)
+    return values
+
+def filteredImageInCHIRPSToMapId(dateFrom=None, dateTo=None):
+    """  """
+    try:
+        eeCollection = ee.ImageCollection("UCSB-CHG/CHIRPS/PENTAD")
+        geometry = ee.Geometry.Point([5.2130126953125,15.358356179450585])
+        colorPalette='ffffff,307b00,5a9700,86b400,b4cf00,e4f100,ffef00,ffc900,ffa200,ff7f00,ff5500'
+        visParams={'opacity':1,'max':188.79177856445312,'palette':colorPalette}
+        if (dateFrom and dateTo):
+            eeFilterDate = ee.Filter.date(dateFrom, dateTo)
+            eeCollection=eeCollection.filterBounds(geometry)
+            eeCollection = eeCollection.filter(eeFilterDate)
+        eeFirstImage = ee.Image(eeCollection.mean());
+        values = imageToMapId(eeFirstImage, visParams)
+    except EEException as e:
+        raise GEEException(e.message)
+    return values
+	
 def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[], dateFrom=None, dateTo=None, reducer=None):
     """  """
     try:

@@ -220,6 +220,36 @@ def meanImageByMosaicCollection():
             'errMsg': e.message
         }
     return jsonify(values), 200
+@gee_gateway.route('/getCHIRPSImage', methods=['POST'])
+def getCHIRPSImage():
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+           dateFrom = json.get('dateFrom', None)
+           dateTo = json.get('dateTo', None)
+           values = filteredImageInCHIRPSToMapId(dateFrom, dateTo)
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200	
+@gee_gateway.route('/ndviImageCollection', methods=['POST'])
+def ndviImageCollection():
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+           dateFrom = json.get('dateFrom', None)
+           dateTo = json.get('dateTo', None)
+           values = filteredImageNDVIToMapId(dateFrom, dateTo)
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200		
 	
 @gee_gateway.route('/timeSeriesIndex', methods=['POST'])
 def timeSeriesIndex():
