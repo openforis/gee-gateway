@@ -235,15 +235,16 @@ def getCHIRPSImage():
             'errMsg': e.message
         }
     return jsonify(values), 200	
-@gee_gateway.route('/ndviImageCollection', methods=['POST'])
-def ndviImageCollection():
+@gee_gateway.route('/ImageCollectionbyIndex', methods=['POST'])
+def ImageCollectionbyIndex():
     values = {}
     try:
         json = request.get_json()
         if json:
            dateFrom = json.get('dateFrom', None)
            dateTo = json.get('dateTo', None)
-           values = filteredImageNDVIToMapId(dateFrom, dateTo)
+           index = json.get('index', 'ndvi')
+           values = filteredImageByIndexToMapId(dateFrom, dateTo, index)
     except GEEException as e:
         logger.error(e.message)
         values = {

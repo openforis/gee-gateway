@@ -94,9 +94,94 @@ def filteredImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, da
     except EEException as e:
         raise GEEException(e.message)
     return values
-	
+def filteredImageByIndexToMapId(iniDate=None, endDate=None, index='ndvi'):
+    """  """
+    try:
+		if (index == 'ndvi'): 
+			values = filteredImageNDVIToMapId(iniDate, endDate)
+		elif(index == 'evi'): 
+			values = filteredImageEVIToMapId(iniDate, endDate)
+		elif(index == 'evi2'): 
+			values = filteredImageEVI2ToMapId(iniDate, endDate)
+		elif(index == 'ndmi'): 
+			values = filteredImageNDMIToMapId(iniDate, endDate)
+		elif(index == 'ndwi'): 
+			values = filteredImageNDWIToMapId(iniDate, endDate)
+    except EEException as e:
+        raise GEEException(e.message)
+    return values	
 def filteredImageNDVIToMapId(iniDate=None, endDate=None):
     """  """
+    try:
+        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        colorPalette='c9c0bf,435ebf,eee8aa,006400'
+        visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
+
+        eeFirstImage = ee.Image(eeCollection.mean())
+        ndviImage = eeFirstImage.normalizedDifference(['nir', 'red'])	
+        values = imageToMapId(ndviImage, visParams)
+    except EEException as e:
+        raise GEEException(e.message)
+    return values
+
+def filteredImageEVIToMapId(iniDate=None, endDate=None):
+    """  """
+    try:
+        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        colorPalette='F5F5F5,E6D3C5,C48472,B9CF63,94BF3D,6BB037,42A333,00942C,008729,007824,004A16'
+        visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
+
+        eeFirstImage = ee.Image(eeCollection.mean())
+        eviImage = eeFirstImage.expression('2.5 * (i.nir - i.red) / (i.nir + 6.0 * i.red - 7.5 * i.blue + 1)',  {'i': eeFirstImage})	
+        values = imageToMapId(eviImage, visParams)
+    except EEException as e:
+        raise GEEException(e.message)
+    return values
+
+def filteredImageEVI2ToMapId(iniDate=None, endDate=None):
+    """  """
+    try:
+        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        colorPalette='F5F5F5,E6D3C5,C48472,B9CF63,94BF3D,6BB037,42A333,00942C,008729,007824,004A16'
+        visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
+
+        eeFirstImage = ee.Image(eeCollection.mean())
+        eviImage = eeFirstImage.expression('2.5 * (i.nir - i.red) / (i.nir + 2.4 * i.red + 1)',  {'i': eeFirstImage})	
+        values = imageToMapId(eviImage, visParams)
+    except EEException as e:
+        raise GEEException(e.message)
+    return values
+
+def filteredImageNDMIToMapId(iniDate=None, endDate=None):
+    """  """
+    try:
+        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        colorPalette='0000FE,2E60FD,31B0FD,00FEFE,50FE00,DBFE66,FEFE00,FFBB00,FF6F00,FE0000'
+        visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
+
+        eeFirstImage = ee.Image(eeCollection.mean())
+        eviImage = eeFirstImage.expression('(i.nir - i.swir1) / (i.nir + i.swir1)',  {'i': eeFirstImage})	
+        values = imageToMapId(eviImage, visParams)
+    except EEException as e:
+        raise GEEException(e.message)
+    return values
+
+def filteredImageNDWIToMapId(iniDate=None, endDate=None):
+    """  """
+    try:
+        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        colorPalette='505050,E8E8E8,00FF33,003300'
+        visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
+
+        eeFirstImage = ee.Image(eeCollection.mean())
+        eviImage = eeFirstImage.expression('(i.green - i.nir) / (i.green + i.nir)',  {'i': eeFirstImage})	
+        values = imageToMapId(eviImage, visParams)
+    except EEException as e:
+        raise GEEException(e.message)
+    return values
+
+def getLandSatMergedCollection():
+    eeCollection = None
     try:
         sensorBandDictLandsatTOA = {'L8': [1,2,3,4,5,9,6],
                                     'L7': [0,1,2,3,4,5,7],
@@ -105,7 +190,7 @@ def filteredImageNDVIToMapId(iniDate=None, endDate=None):
         bandNamesLandsatTOA = ['blue','green','red','nir','swir1','temp','swir2']
         metadataCloudCoverMax = 100
         region = ee.Geometry.Point([5.2130126953125,15.358356179450585])
-            #.filterBounds(region).filterDate(iniDate,endDate)\
+        #.filterBounds(region).filterDate(iniDate,endDate)\
         lt4 = ee.ImageCollection('LANDSAT/LT4_L1T_TOA')\
 			.filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
 			.select(sensorBandDictLandsatTOA['L4'],bandNamesLandsatTOA)
@@ -120,15 +205,9 @@ def filteredImageNDVIToMapId(iniDate=None, endDate=None):
             .select(sensorBandDictLandsatTOA['L8'],bandNamesLandsatTOA)
 
         eeCollection = ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
-        colorPalette='c9c0bf,435ebf,eee8aa,006400'
-        visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
-
-        eeFirstImage = ee.Image(eeCollection.mean())
-        ndviImage = eeFirstImage.normalizedDifference(['nir', 'red'])	
-        values = imageToMapId(ndviImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
-    return values
+    return eeCollection
 
 def filteredImageInCHIRPSToMapId(dateFrom=None, dateTo=None):
     """  """
