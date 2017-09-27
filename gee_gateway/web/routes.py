@@ -115,6 +115,7 @@ def imageByMosaicCollection():
             'errMsg': e.message
         }
     return jsonify(values), 200
+
 @gee_gateway.route('/cloudMaskImageByMosaicCollection', methods=['POST'])
 def cloudMaskImageByMosaicCollection():
     """
@@ -167,7 +168,7 @@ def cloudMaskImageByMosaicCollection():
             'errMsg': e.message
         }
     return jsonify(values), 200
-	
+
 @gee_gateway.route('/meanImageByMosaicCollection', methods=['POST'])
 def meanImageByMosaicCollection():
     """
@@ -220,6 +221,7 @@ def meanImageByMosaicCollection():
             'errMsg': e.message
         }
     return jsonify(values), 200
+
 @gee_gateway.route('/getCHIRPSImage', methods=['POST'])
 def getCHIRPSImage():
     values = {}
@@ -234,7 +236,8 @@ def getCHIRPSImage():
         values = {
             'errMsg': e.message
         }
-    return jsonify(values), 200	
+    return jsonify(values), 200
+
 @gee_gateway.route('/ImageCollectionbyIndex', methods=['POST'])
 def ImageCollectionbyIndex():
     values = {}
@@ -250,8 +253,8 @@ def ImageCollectionbyIndex():
         values = {
             'errMsg': e.message
         }
-    return jsonify(values), 200		
-	
+    return jsonify(values), 200
+
 @gee_gateway.route('/timeSeriesIndex', methods=['POST'])
 def timeSeriesIndex():
     """
@@ -341,6 +344,7 @@ def timeSeriesIndex2():
             'errMsg': e.message
         }
     return jsonify(values), 200
+
 @gee_gateway.route('/timeSeriesIndexGet', methods=['GET'])
 def timeSeriesIndexGet():
     """
@@ -401,7 +405,7 @@ def timeSeriesIndexGet():
             'errMsg': e.message
         }
     return jsonify(values), 200
-	
+
 @gee_gateway.route('/getStats', methods=['POST'])
 def getStats():
     """
@@ -453,6 +457,23 @@ def asterMosaic():
             dateFrom = json.get('dateFrom', None)
             dateTo = json.get('dateTo', None)
             values = getAsterMosaic(visParams, dateFrom, dateTo)
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
+
+@gee_gateway.route('/ndviChange', methods=['POST'])
+def ndviChange():
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            visParams = json.get('visParams', None)
+            yearFrom = json.get('yearFrom', None)
+            yearTo = json.get('yearTo', None)
+            values = getNdviChange(visParams, yearFrom, yearTo)
     except GEEException as e:
         logger.error(e.message)
         values = {

@@ -44,6 +44,7 @@
                             <li class="active"><a href="#tab1primary" data-toggle="tab">/image</a></li>
                             <li><a href="#tab2primary" data-toggle="tab">/imageByMosaicCollection</a></li>
                             <li><a href="#tab3primary" data-toggle="tab">/timeSeriesIndex</a></li>
+                            <li><a href="#tab4primary" data-toggle="tab">/ndviChange</a></li>
                         </ul>
                     </div>
                     <div class="col-md-6">
@@ -79,6 +80,7 @@
                                   <label>To (YYYY-MM-DD)</label>
                                   <input type="text" class="form-control" name="dateTo" />
                                 </div>
+                                <button type="button" class="btn btn-primary" name="test">ASTER</button>
                                 <button type="button" class="btn btn-primary" name="imageByMosaicCollection">Send</button>
                             </div>
                             <div class="tab-pane fade" id="tab3primary">
@@ -120,6 +122,17 @@
                                 </div>
                                 <button type="button" class="btn btn-primary" name="timeSeriesIndex">Send</button>
                                 <button type="button" class="btn btn-primary" name="timeSeriesIndex2">Send2</button>
+                            </div>
+                            <div class="tab-pane fade" id="tab4primary">
+                                <div class="form-group">
+                                  <label>From (YYYY)</label>
+                                  <input type="text" class="form-control" name="yearFrom" />
+                                </div>
+                                <div class="form-group">
+                                  <label>To (YYYY)</label>
+                                  <input type="text" class="form-control" name="yearTo" />
+                                </div>
+                                <button type="button" class="btn btn-primary" name="ndviChange">Send</button>
                             </div>
                         </div>
                     </div>
@@ -168,6 +181,10 @@
                 <div class="form-group">
                     <label>Gamma</label>
                     <input type="text" class="form-control" name="gamma" />
+                </div>
+                <div class="form-group">
+                    <label>Palette</label>
+                    <input type="text" class="form-control" name="palette" />
                 </div>
                 <button type="button" class="btn btn-warning">RESET</button>
             </div>
@@ -240,6 +257,8 @@
         };
         var gamma = $("input[name='gamma']").val();
         if (gamma != '') visParams['gamma'] = gamma;
+        var palette = $("input[name='palette']").val();
+        if (palette != '') visParams['palette'] = palette;
         var dateFrom = $("input[name='dateFrom']").val();
         var dateTo = $("input[name='dateTo']").val();
         var collectionNameTimeSeries = $("select[name='collectionNameTimeSeries']").val();
@@ -248,6 +267,8 @@
         var scale = $("input[name='scale']").val();
         var dateFromTimeSeries = $("input[name='dateFromTimeSeries']").val();
         var dateToTimeSeries = $("input[name='dateToTimeSeries']").val();
+        var yearFrom = $("input[name='yearFrom']").val();
+        var yearTo = $("input[name='yearTo']").val();
         var url = "/" + serviceName;
         $.ajax({
             url: url,
@@ -266,7 +287,9 @@
                 geometry: JSON.parse(geometry),
                 scale: scale,
                 dateToTimeSeries: dateToTimeSeries,
-                dateFromTimeSeries: dateFromTimeSeries
+                dateFromTimeSeries: dateFromTimeSeries,
+                yearFrom: yearFrom,
+                yearTo: yearTo
             })
         }).fail(function(jqXHR, textStatus, errorThrown) {
             alert(textStatus);
