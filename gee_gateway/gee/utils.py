@@ -3,17 +3,24 @@ from ee.ee_exception import EEException
 
 from gee_exception import GEEException
 
-def initialize(ee_account='', ee_key_path=''):
+def initialize(ee_account='', ee_key_path='', ee_user_token=''):
     try:
+        if ee_user_token:
+            from oauth2client.client import OAuth2Credentials
+            credentials = OAuth2Credentials(ee_user_token, None, None, None, None, None, None)
+            ee.InitializeThread(credentials)
+        elif ee_account and ee_key_path:
+            from oauth2client.service_account import ServiceAccountCredentials
+            credentials = ServiceAccountCredentials.from_p12_keyfile(
+                service_account_email=ee_account,
+                filename=ee_key_path,
+                private_key_password='notasecret',
+                scopes=ee.oauth.SCOPE + ' https://www.googleapis.com/auth/drive')
+            ee.Initialize(credentials)
+        else:
+            raise GEEException('')
+    except (EEException, GEEException, TypeError):
         ee.Initialize()
-    except EEException:
-        from oauth2client.service_account import ServiceAccountCredentials
-        credentials = ServiceAccountCredentials.from_p12_keyfile(
-            service_account_email=ee_account,
-            filename=ee_key_path,
-            private_key_password='notasecret',
-            scopes=ee.oauth.SCOPE + ' https://www.googleapis.com/auth/drive ')
-        ee.Initialize(credentials)
 
 def imageToMapId(imageName, visParams={}):
     """  """

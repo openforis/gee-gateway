@@ -29,7 +29,8 @@ def image():
                 min: 0.0,
                 max: 0.0,
                 bands: "XX,XX,XX",
-                gamma: 0.0
+                gamma: 0.0,
+                palette: "XX"
            }
         }
 
