@@ -1,6 +1,6 @@
 import logging
 
-from flask import request, jsonify, render_template
+from flask import request, jsonify, render_template, json, current_app
 from flask_cors import CORS, cross_origin
 
 from .. import gee_gateway
@@ -8,6 +8,23 @@ from ..gee.gee_exception import GEEException
 from ..gee.utils import *
 
 logger = logging.getLogger(__name__)
+
+@gee_gateway.before_request
+def before():
+    ee_user_token = None
+    ee_account = current_app.config.get('EE_ACCOUNT')
+    ee_key_path = current_app.config.get('EE_KEY_PATH')
+    if current_app.config.get('EE_TOKEN_ENABLED'):
+        if 'sepal-user' in request.headers:
+            user = json.loads(request.headers['sepal-user'])
+            googleTokens = user.get('googleTokens', None)
+            if googleTokens:
+                ee_user_token = googleTokens['accessToken']
+                initialize(ee_user_token=ee_user_token, ee_account=ee_account, ee_key_path=ee_key_path)
+        else:
+            initialize(ee_account=ee_account, ee_key_path=ee_key_path)
+    else:
+        initialize(ee_account=ee_account, ee_key_path=ee_key_path)
 
 @gee_gateway.route('/', methods=['GET'])
 def index():
