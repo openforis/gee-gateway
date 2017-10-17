@@ -11,14 +11,22 @@ def initialize(ee_account='', ee_key_path='', ee_user_token=''):
     try:
         if ee_user_token:
             credentials = OAuth2Credentials(ee_user_token, None, None, None, None, None, None)
+<<<<<<< HEAD
             ee.Initialize(credentials)
+=======
+            ee.InitializeThread(credentials)
+>>>>>>> 30b2e77e81341052eef6daa4c58106bc56bb07aa
         elif ee_account and ee_key_path:
             credentials = ServiceAccountCredentials.from_p12_keyfile(
                 service_account_email=ee_account,
                 filename=ee_key_path,
                 private_key_password='notasecret',
                 scopes=ee.oauth.SCOPE + ' https://www.googleapis.com/auth/drive')
+<<<<<<< HEAD
             ee.Initialize(credentials)
+=======
+            ee.InitializeThread(credentials)
+>>>>>>> 30b2e77e81341052eef6daa4c58106bc56bb07aa
         else:
             ee.Initialize()
     except (EEException, TypeError):
@@ -235,7 +243,11 @@ def getLandSatMergedCollection():
         raise GEEException(e.message)
     return eeCollection
 
+<<<<<<< HEAD
 def lsMaskClouds(img,cloudThresh=10):
+=======
+def lsMaskClouds(self,img,cloudThresh=10):
+>>>>>>> 30b2e77e81341052eef6daa4c58106bc56bb07aa
     score = ee.Image(1.0);
     # Clouds are reasonably bright in the blue band.
     blue_rescale = img.select('blue').subtract(ee.Number(0.1)).divide(ee.Number(0.3).subtract(ee.Number(0.1)))
@@ -263,6 +275,7 @@ def lsMaskClouds(img,cloudThresh=10):
     img = img.updateMask(mask);
     return img.addBands(score);
 
+<<<<<<< HEAD
 def s2MaskClouds(img):
   qa = img.select('QA60');
 
@@ -272,6 +285,17 @@ def s2MaskClouds(img):
 
   # clear if both flags set to zero.
   clear = qa.bitwiseAnd(cloudBitMask).eq(0).And(
+=======
+def s2CloudMask(img):
+  qa = img.select('QA60');
+
+  # Bits 10 and 11 are clouds and cirrus, respectively.
+  cloudBitMask = Math.pow(2, 10);
+  cirrusBitMask = Math.pow(2, 11);
+
+  # clear if both flags set to zero.
+  clear = qa.bitwiseAnd(cloudBitMask).eq(0).and(
+>>>>>>> 30b2e77e81341052eef6daa4c58106bc56bb07aa
              qa.bitwiseAnd(cirrusBitMask).eq(0));
 
   return img.divide(10000).updateMask(clear).set('system:time_start',img.get('system:time_start'))

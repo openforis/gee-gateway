@@ -23,5 +23,13 @@ setup(
     url='https://github.com/openforis/gee-gateway',
     packages=['gee_gateway', 'gee_gateway.gee', 'gee_gateway.web'],
     include_package_data=True,
-    install_requires=getInstallRequires()
+    install_requires=[
+        "Flask>=0.12.2",
+        "Flask-Cors==3.0.3",
+        "google-api-python-client>=1.6.2",
+        "pyCrypto>=2.6.1"
+    ],
+    dependency_links=[
+        "git+git://github.com/openforis/earthengine-api.git@v0.1.124.1#egg=earthengine-api&subdirectory=python"
+    ]
 )
