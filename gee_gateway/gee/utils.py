@@ -41,6 +41,19 @@ def firstImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateT
         raise GEEException(e.message)
     return values
 
+def meanImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None):
+    """  """
+    try:
+        eeCollection = ee.ImageCollection(collectionName)
+        if (dateFrom and dateTo):
+            eeFilterDate = ee.Filter.date(dateFrom, dateTo)
+            eeCollection = eeCollection.filter(eeFilterDate)
+        eeFirstImage = ee.Image(eeCollection.mean());
+        values = imageToMapId(eeFirstImage, visParams)
+    except EEException as e:
+        raise GEEException(e.message)
+    return values
+
 def firstCloudFreeImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None):
     """  """
     try:
