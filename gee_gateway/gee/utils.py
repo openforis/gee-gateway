@@ -208,30 +208,33 @@ def getLandSatMergedCollection():
         sensorBandDictLandsatTOA = {'L8': [1,2,3,4,5,9,6],
                                     'L7': [0,1,2,3,4,5,7],
                                     'L5': [0,1,2,3,4,5,6],
-                                    'L4': [0,1,2,3,4,5,6]}
+                                    'L4': [0,1,2,3,4,5,6],
+                                    'S2': [1,2,3,7,11,10,12]}
         bandNamesLandsatTOA = ['blue','green','red','nir','swir1','temp','swir2']
         metadataCloudCoverMax = 100
         #region = ee.Geometry.Point([5.2130126953125,15.358356179450585])
         #.filterBounds(region).filterDate(iniDate,endDate)\
         lt4 = ee.ImageCollection('LANDSAT/LT4_L1T_TOA')\
             .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
-            .select(sensorBandDictLandsatTOA['L4'],bandNamesLandsatTOA)
+            .select(sensorBandDictLandsatTOA['L4'],bandNamesLandsatTOA).map(lsMaskClouds)
         lt5 = ee.ImageCollection('LANDSAT/LT5_L1T_TOA')\
             .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
-            .select(sensorBandDictLandsatTOA['L5'],bandNamesLandsatTOA)
+            .select(sensorBandDictLandsatTOA['L5'],bandNamesLandsatTOA).map(lsMaskClouds)
         le7 = ee.ImageCollection('LANDSAT/LE7_L1T_TOA')\
             .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
-            .select(sensorBandDictLandsatTOA['L7'],bandNamesLandsatTOA)
+            .select(sensorBandDictLandsatTOA['L7'],bandNamesLandsatTOA).map(lsMaskClouds)
         lc8 = ee.ImageCollection('LANDSAT/LC8_L1T_TOA')\
             .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
-            .select(sensorBandDictLandsatTOA['L8'],bandNamesLandsatTOA)
-        eeCollection = ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))\
-                        .map(maskClouds)
+            .select(sensorBandDictLandsatTOA['L8'],bandNamesLandsatTOA).map(lsMaskClouds)
+        s2 = ee.ImageCollection('COPERNICUS/S2')\
+            .filterMetadata('CLOUDY_PIXEL_PERCENTAGE','less_than',metadataCloudCoverMax)\
+            .map(s2MaskClouds).select(sensorBandDictLandsatTOA['S2'],bandNamesLandsatTOA)
+        eeCollection = ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8).merge(s2))
     except EEException as e:
         raise GEEException(e.message)
     return eeCollection
 
-def maskClouds(self,img,cloudThresh=10):
+def lsMaskClouds(self,img,cloudThresh=10):
     score = ee.Image(1.0);
     # Clouds are reasonably bright in the blue band.
     blue_rescale = img.select('blue').subtract(ee.Number(0.1)).divide(ee.Number(0.3).subtract(ee.Number(0.1)))
@@ -259,6 +262,18 @@ def maskClouds(self,img,cloudThresh=10):
     img = img.updateMask(mask);
     return img.addBands(score);
 
+def s2CloudMask(img):
+  qa = img.select('QA60');
+
+  # Bits 10 and 11 are clouds and cirrus, respectively.
+  cloudBitMask = Math.pow(2, 10);
+  cirrusBitMask = Math.pow(2, 11);
+
+  # clear if both flags set to zero.
+  clear = qa.bitwiseAnd(cloudBitMask).eq(0).and(
+             qa.bitwiseAnd(cirrusBitMask).eq(0));
+
+  return img.divide(10000).updateMask(clear).set('system:time_start',img.get('system:time_start'))
 
 def filteredImageInCHIRPSToMapId(dateFrom=None, dateTo=None):
     """  """
