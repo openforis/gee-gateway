@@ -247,7 +247,7 @@ def maskClouds(self,img,cloudThresh=10):
     ndsi = img.normalizedDifference(['green', 'swir1']);
     ndsi_rescale = ndsi.subtract(ee.Number(0.8)).divide(ee.Number(0.6).subtract(ee.Number(0.8)))
     score =  score.min(ndsi_rescale).multiply(100).byte();
-    mask = score.lt(self.cloudThresh).rename(['cloudMask']);
+    mask = score.lt(cloudThresh).rename(['cloudMask']);
     img = img.updateMask(mask);
     return img.addBands(score);
 
