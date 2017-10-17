@@ -53,7 +53,7 @@ def firstCloudFreeImageInMosaicToMapId(collectionName, visParams={}, dateFrom=No
         elif ("le7" in collectionName.lower()):
             skipCloudMask = False
         elif ("lt5" in collectionName.lower()):
-            skipCloudMask = False 
+            skipCloudMask = False
         else:
             skipCloudMask = True
         if (dateFrom and dateTo):
@@ -97,15 +97,15 @@ def filteredImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, da
 def filteredImageByIndexToMapId(iniDate=None, endDate=None, index='ndvi'):
     """  """
     try:
-        if (index == 'ndvi'): 
+        if (index == 'ndvi'):
             values = filteredImageNDVIToMapId(iniDate, endDate)
-        elif (index == 'evi'): 
+        elif (index == 'evi'):
             values = filteredImageEVIToMapId(iniDate, endDate)
-        elif (index == 'evi2'): 
+        elif (index == 'evi2'):
             values = filteredImageEVI2ToMapId(iniDate, endDate)
-        elif (index == 'ndmi'): 
+        elif (index == 'ndmi'):
             values = filteredImageNDMIToMapId(iniDate, endDate)
-        elif (index == 'ndwi'): 
+        elif (index == 'ndwi'):
             values = filteredImageNDWIToMapId(iniDate, endDate)
     except EEException as e:
         raise GEEException(e.message)
@@ -188,7 +188,7 @@ def getLandSatMergedCollection():
                                     'L4': [0,1,2,3,4,5,6]}
         bandNamesLandsatTOA = ['blue','green','red','nir','swir1','temp','swir2']
         metadataCloudCoverMax = 100
-        region = ee.Geometry.Point([5.2130126953125,15.358356179450585])
+        #region = ee.Geometry.Point([5.2130126953125,15.358356179450585])
         #.filterBounds(region).filterDate(iniDate,endDate)\
         lt4 = ee.ImageCollection('LANDSAT/LT4_L1T_TOA')\
             .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
@@ -206,6 +206,35 @@ def getLandSatMergedCollection():
     except EEException as e:
         raise GEEException(e.message)
     return eeCollection
+
+def maskClouds(self,img,cloudThresh=10):
+    score = ee.Image(1.0);
+    # Clouds are reasonably bright in the blue band.
+    blue_rescale = img.select('blue').subtract(ee.Number(0.1)).divide(ee.Number(0.3).subtract(ee.Number(0.1)))
+    score = score.min(blue_rescale);
+
+    # Clouds are reasonably bright in all visible bands.
+    visible = img.select('red').add(img.select('green')).add(img.select('blue'))
+    visible_rescale = visible.subtract(ee.Number(0.2)).divide(ee.Number(0.8).subtract(ee.Number(0.2)))
+    score = score.min(visible_rescale);
+
+    # Clouds are reasonably bright in all infrared bands.
+    infrared = img.select('nir').add(img.select('swir1')).add(img.select('swir2'))
+    infrared_rescale = infrared.subtract(ee.Number(0.3)).divide(ee.Number(0.8).subtract(ee.Number(0.3)))
+    score = score.min(infrared_rescale);
+
+    # Clouds are reasonably cool in temperature.
+    temp_rescale = img.select('temp').subtract(ee.Number(300)).divide(ee.Number(290).subtract(ee.Number(300)))
+    score = score.min(temp_rescale);
+
+    # However, clouds are not snow.
+    ndsi = img.normalizedDifference(['green', 'swir1']);
+    ndsi_rescale = ndsi.subtract(ee.Number(0.8)).divide(ee.Number(0.6).subtract(ee.Number(0.8)))
+    score =  score.min(ndsi_rescale).multiply(100).byte();
+    mask = score.lt(self.cloudThresh).rename(['cloudMask']);
+    img = img.updateMask(mask);
+    return img.addBands(score);
+
 
 def filteredImageInCHIRPSToMapId(dateFrom=None, dateTo=None):
     """  """
@@ -320,7 +349,7 @@ def getStatistics(paramType, aOIPoly):
     ciesinPopGrid = ee.Image('CIESIN/GPWv4/population-count/2015')
     popDict = ciesinPopGrid.reduceRegion(ee.Reducer.sum(), poly, maxPixels=500000000)
     pop = popDict.get('population-count').getInfo()
-    pop = int(pop) 
+    pop = int(pop)
     values = {
         'minElev': minElev,
         'maxElev': maxElev,
