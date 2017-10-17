@@ -202,7 +202,8 @@ def getLandSatMergedCollection():
         lc8 = ee.ImageCollection('LANDSAT/LC8_L1T_TOA')\
             .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
             .select(sensorBandDictLandsatTOA['L8'],bandNamesLandsatTOA)
-        eeCollection = ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        eeCollection = ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))\
+                        .map(maskClouds)
     except EEException as e:
         raise GEEException(e.message)
     return eeCollection
