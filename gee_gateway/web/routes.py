@@ -126,7 +126,7 @@ def imageByMosaicCollection():
                 visParams = json.get('visParams', None)
                 dateFrom = json.get('dateFrom', None)
                 dateTo = json.get('dateTo', None)
-                values = filteredImageByIndexToMapId(dateFrom, dateTo,collectionName)
+                values = firstImageInMosaicToMapId(collectionName, visParams, dateFrom, dateTo)
     except GEEException as e:
         logger.error(e.message)
         values = {

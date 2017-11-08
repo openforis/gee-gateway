@@ -6,7 +6,7 @@ except ImportError:
   from distutils.core import setup
 
 def getVersion():
-    return '1.1'
+    return '1.0'
 
 def getInstallRequires():
     requirements = []
@@ -26,8 +26,8 @@ setup(
     install_requires=[
         'Flask>=0.12.2',
         'Flask-Cors==3.0.3',
-        'google-api-python-client>=1.6.2',
         'pyCrypto>=2.6.1',
+        'google-api-python-client>=1.6.2',
         'earthengine-api==0.1.125.1'
     ],
     dependency_links=[

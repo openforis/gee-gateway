@@ -18,7 +18,7 @@ def initialize(ee_account='', ee_key_path='', ee_user_token=''):
                 filename=ee_key_path,
                 private_key_password='notasecret',
                 scopes=ee.oauth.SCOPE + ' https://www.googleapis.com/auth/drive')
-            ee.InitializeThread(credentials)
+            ee.Initialize(credentials)
         else:
             ee.Initialize()
     except (EEException, TypeError):
@@ -37,7 +37,7 @@ def imageToMapId(imageName, visParams={}):
         raise GEEException(e.message)
     return values
 
-def firstImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None):
+def firstImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None): 
     """  """
     try:
         eeCollection = ee.ImageCollection(collectionName)

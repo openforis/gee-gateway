@@ -11,7 +11,7 @@ if __name__ == '__main__':
     parser.add_argument('--gmaps_api_key', action='store', default='', help='Google Maps API key')
     parser.add_argument('--ee_account', action='store', default='', help='Google Earth Engine account')
     parser.add_argument('--ee_key_path', action='store', default='', help='Google Earth Engine key path')
-    parser.add_argument('--ee_token_enabled', action='store_true')
+    parser.add_argument('--ee_token_enabled', action='store_false')
     args, unknown = parser.parse_known_args()
 
     app = Flask(__name__, instance_relative_config=True, static_url_path="/static", static_folder="./static")
