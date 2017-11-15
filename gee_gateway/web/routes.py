@@ -352,7 +352,9 @@ def timeSeriesIndex2():
             if geometry:
                 indexName = json.get('indexName', 'NDVI')
                 scale = float(json.get('scale', 30))
-                timeseries = getTimeSeriesByIndex(indexName, scale, geometry)
+                dateFrom = json.get('dateFromTimeSeries', None)
+                dateTo = json.get('dateToTimeSeries', None)
+                timeseries = getTimeSeriesByIndex(indexName, scale, geometry,dateFrom,dateTo)
                 values = {
                     'timeseries': timeseries
                 }
