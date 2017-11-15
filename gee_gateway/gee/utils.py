@@ -133,7 +133,7 @@ def filteredImageByIndexToMapId(iniDate=None, endDate=None, index='ndvi'):
         raise GEEException(e.message)
     return values
 
-def filteredImageNDVIToMapId(iniDate=None, endDate=None):
+def filteredImageNDVIToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcNDVI(img):
         return img.expression('(i.nir - i.red) / (i.nir + i.red)',  {'i': img}).rename(['NDVI'])\
@@ -142,13 +142,16 @@ def filteredImageNDVIToMapId(iniDate=None, endDate=None):
         eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='c9c0bf,435ebf,eee8aa,006400'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
-        ndviImage = ee.Image(eeCollection.map(calcNDVI).mean())
-        values = imageToMapId(ndviImage, visParams)
+        if outCollection:
+            values = eeCollection.map(calcNDVI)
+        else:
+            eviImage = ee.Image(eeCollection.map(calcNDVI).mean())
+            values = imageToMapId(eviImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
     return values
 
-def filteredImageEVIToMapId(iniDate=None, endDate=None):
+def filteredImageEVIToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcEVI(img):
         return img.expression('2.5 * (i.nir - i.red) / (i.nir + 6.0 * i.red - 7.5 * i.blue + 1)',  {'i': img}).rename(['EVI'])\
@@ -157,13 +160,16 @@ def filteredImageEVIToMapId(iniDate=None, endDate=None):
         eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='F5F5F5,E6D3C5,C48472,B9CF63,94BF3D,6BB037,42A333,00942C,008729,007824,004A16'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
-        eviImage = ee.Image(eeCollection.map(calcEVI).mean())
-        values = imageToMapId(eviImage, visParams)
+        if outCollection:
+            values = eeCollection.map(calcEVI)
+        else:
+            eviImage = ee.Image(eeCollection.map(calcEVI).mean())
+            values = imageToMapId(eviImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
     return values
 
-def filteredImageEVI2ToMapId(iniDate=None, endDate=None):
+def filteredImageEVI2ToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcEVI2(img):
         return img.expression('2.5 * (i.nir - i.red) / (i.nir + 2.4 * i.red + 1)',  {'i': img}).rename(['EVI2'])\
@@ -172,13 +178,16 @@ def filteredImageEVI2ToMapId(iniDate=None, endDate=None):
         eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='F5F5F5,E6D3C5,C48472,B9CF63,94BF3D,6BB037,42A333,00942C,008729,007824,004A16'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
-        eviImage = ee.Image(eeCollection.map(calcEVI2).mean())
-        values = imageToMapId(eviImage, visParams)
+        if outCollection:
+            values = eeCollection.map(calcEVI2)
+        else:
+            eviImage = ee.Image(eeCollection.map(calcEVI2).mean())
+            values = imageToMapId(eviImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
     return values
 
-def filteredImageNDMIToMapId(iniDate=None, endDate=None):
+def filteredImageNDMIToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcNDMI(img):
         return img.expression('(i.nir - i.swir1) / (i.nir + i.swir1)',  {'i': img}).rename(['NDMI'])\
@@ -187,13 +196,16 @@ def filteredImageNDMIToMapId(iniDate=None, endDate=None):
         eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='0000FE,2E60FD,31B0FD,00FEFE,50FE00,DBFE66,FEFE00,FFBB00,FF6F00,FE0000'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
-        eviImage = ee.Image(eeCollection.map(calcNDMI).mean())
-        values = imageToMapId(eviImage, visParams)
+        if outCollection:
+            values = eeCollection.map(calcNDMI)
+        else:
+            eviImage = ee.Image(eeCollection.map(calcNDMI).mean())
+            values = imageToMapId(eviImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
     return values
 
-def filteredImageNDWIToMapId(iniDate=None, endDate=None):
+def filteredImageNDWIToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcNDWI(img):
         return img.expression('(i.green - i.nir) / (i.green + i.nir)',  {'i': img}).rename(['NDWI'])\
@@ -202,8 +214,11 @@ def filteredImageNDWIToMapId(iniDate=None, endDate=None):
         eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='505050,E8E8E8,00FF33,003300'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
-        eviImage = ee.Image(eeCollection.map(calcNDWI).mean())
-        values = imageToMapId(eviImage, visParams)
+        if outCollection:
+            values = eeCollection.map(calcNDWI)
+        else:
+            eviImage = ee.Image(eeCollection.map(calcNDWI).mean())
+            values = imageToMapId(eviImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
     return values
