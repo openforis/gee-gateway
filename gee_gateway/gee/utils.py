@@ -253,7 +253,8 @@ def getLandSatMergedCollection():
             .select(sensorBandDictLandsatTOA['L8'],bandNamesLandsatTOA).map(lsMaskClouds)
         s2 = ee.ImageCollection('COPERNICUS/S2')\
             .filterMetadata('CLOUDY_PIXEL_PERCENTAGE','less_than',metadataCloudCoverMax)\
-            .map(s2MaskClouds).select(sensorBandDictLandsatTOA['S2'],bandNamesLandsatTOA)
+            .map(s2MaskClouds).select(sensorBandDictLandsatTOA['S2'],bandNamesLandsatTOA)\
+            .map(bandPassAdjustment)
         eeCollection = ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8).merge(s2))
     except EEException as e:
         raise GEEException(e.message)
@@ -299,6 +300,21 @@ def s2MaskClouds(img):
              qa.bitwiseAnd(cirrusBitMask).eq(0));
 
   return img.divide(10000).updateMask(clear).set('system:time_start',img.get('system:time_start'))
+
+def bandPassAdjustment(img):
+  keep = img.select(['temp'])
+  bands = ['blue','green','red','nir','swir1','swir2'];
+  # linear regression coefficients for adjustment
+  gain = ee.Array([[0.977], [1.005], [0.982], [1.001], [1.001], [0.996]]);
+  bias = ee.Array([[-0.00411],[-0.00093],[0.00094],[-0.00029],[-0.00015],[-0.00097]]);
+  # Make an Array Image, with a 2-D Array per pixel.
+  arrayImage2D = img.select(bands).toArray().toArray(1);
+
+  # apply correction factors and reproject array to geographic image
+  componentsImage = ee.Image(gain).multiply(arrayImage2D).add(ee.Image(bias))\
+    .arrayProject([0]).arrayFlatten([bands]).float();
+
+  return keep.addBands(componentsImage)#.set('system:time_start',img.get('system:time_start'));
 
 def filteredImageInCHIRPSToMapId(dateFrom=None, dateTo=None):
     """  """
@@ -392,7 +408,7 @@ def getTimeSeriesByIndex(indexName, scale, coords=[],dateFrom=None, dateTo=None,
 
     except EEException as e:
         raise GEEException(e.message)
-    return values
+    return out
 
 def getStatistics(paramType, aOIPoly):
     values = {}
