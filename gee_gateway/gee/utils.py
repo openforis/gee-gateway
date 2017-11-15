@@ -342,6 +342,28 @@ def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[
         raise GEEException(e.message)
     return values
 
+# helper function to take multiple values of region and aggregate to one value
+def aggRegion(regionList):
+    values = []
+    for i in range(len(regionList)):
+        if i != 0:
+            date = datetime.datetime.fromtimestamp(regionList[i][-2]/1000.).strftime("%Y-%m-%d")
+            values.append([date,regionList[i][-1]])
+
+    sort = sorted(values, key=lambda x: x[0])
+
+    out = []
+    for key, group in groupby(sort, key=lambda x: x[0][:10]):
+        data = list(group)
+        agg = sum(j for i, j in data if j != None)
+        dates = key.split('-')
+        timestamp = datetime.datetime(int(dates[0]),int(dates[1]),int(dates[2]))
+        if agg != 0:
+            out.append([int(timestamp.strftime('%s'))*1000,agg/float(len(data))])
+
+    #print(out)
+    return out
+
 def getTimeSeriesByIndex(indexName, scale, coords=[]):
     """  """
     try:
