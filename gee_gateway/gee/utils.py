@@ -364,7 +364,7 @@ def aggRegion(regionList):
     #print(out)
     return out
 
-def getTimeSeriesByIndex(indexName, scale, coords=[]):
+def getTimeSeriesByIndex(indexName, scale, coords=[],dateFrom=None, dateTo=None, reducer=None):
     """  """
     try:
         geometry = None
@@ -372,42 +372,20 @@ def getTimeSeriesByIndex(indexName, scale, coords=[]):
             geometry = ee.Geometry.Polygon(coords)
         else:
             geometry = ee.Geometry.Point(coords)
-        bands = ['blue', 'green', 'red', 'nir', 'swir1', 'swir2', 'cfmask']
-        bandsByCollection = {
-            'LANDSAT/LC8_SR': ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'cfmask'],
-            'LANDSAT/LC8_SR': ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'cfmask'],
-            'LANDSAT/LE7_SR': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'cfmask'],
-            'LANDSAT/LT5_SR': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'cfmask'],
-            'LANDSAT/LT4_SR': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'cfmask']
-        }
-        indexes = {
-            'NDVI': '(i.nir - i.red) / (i.nir + i.red)',
-            'EVI': '2.5 * (i.nir - i.red) / (i.nir + 6.0 * i.red - 7.5 * i.blue + 1)',
-            'EVI2': '2.5 * (i.nir - i.red) / (i.nir + 2.4 * i.red + 1)',
-            'NDMI': '(i.nir - i.swir1) / (i.nir + i.swir1)',
-            'NDWI': '(i.green - i.nir) / (i.green + i.nir)'
-        }
-        def getExpression(image):
-            """  """
-            time = ee.Number(image.get('system:time_start'))
-            image = image.select(bandsByCollection[collectionName], bands).divide(10000)
-            return image.expression(indexes[indexName], {'i': image}).rename(['index']).addBands(image.select(['cfmask']).add(1)).set('system:time_start', time)
-        def transformRow(row):
-            """  """
-            row = ee.List(row)
-            time = row.get(3)
-            index = row.get(4)
-            cfmask = row.get(5)
-            return ee.Algorithms.If(cfmask, ee.Algorithms.If(ee.Number(cfmask).eq(1), ee.List([time, index]), None), None)
-        collectionNames = bandsByCollection.keys()
-        collectionName = collectionNames[0]
-        collection = ee.ImageCollection(collectionNames[0]).sort('system:time_start').filterBounds(geometry).map(getExpression)
-        for i, val in enumerate(collectionNames[1:], start=1):
-            collectionName = collectionNames[i]
-            collectionToMerge = ee.ImageCollection(collectionNames[i]).sort('system:time_start').filterBounds(geometry).map(getExpression)
-            collection = ee.ImageCollection(collection.merge(collectionToMerge))
-        values = ee.ImageCollection(collection.sort('system:time_start').distinct('system:time_start')).getRegion(geometry, 30).slice(1).map(transformRow).removeAll([None])
-        values = values.getInfo()
+        if (indexName == 'NDVI'):
+            indexCollection = filteredImageNDVIToMapId(dateFrom, dateTo,True)
+        elif (indexName == 'EVI'):
+            indexCollection = filteredImageEVIToMapId(dateFrom, dateTo,True)
+        elif (indexName == 'EVI2'):
+            indexCollection = filteredImageEVI2ToMapId(dateFrom, dateTo,True)
+        elif (indexName == 'NDMI'):
+            indexCollection = filteredImageNDMIToMapId(dateFrom, dateTo,True)
+        elif (indexName == 'NDWI'):
+            indexCollection = filteredImageNDWIToMapId(dateFrom, dateTo,True)
+
+        values = indexCollection.getRegion(geometry, 30).getInfo()
+        out = aggRegion(values)
+
     except EEException as e:
         raise GEEException(e.message)
     return values
