@@ -139,7 +139,7 @@ def filteredImageNDVIToMapId(iniDate=None, endDate=None,outCollection=False):
         return img.expression('(i.nir - i.red) / (i.nir + i.red)',  {'i': img}).rename(['NDVI'])\
                 .set('system:time_start',img.get('system:time_start'))
     try:
-        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='c9c0bf,435ebf,eee8aa,006400'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
         if outCollection:
@@ -157,7 +157,7 @@ def filteredImageEVIToMapId(iniDate=None, endDate=None,outCollection=False):
         return img.expression('2.5 * (i.nir - i.red) / (i.nir + 6.0 * i.red - 7.5 * i.blue + 1)',  {'i': img}).rename(['EVI'])\
                 .set('system:time_start',img.get('system:time_start'))
     try:
-        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='F5F5F5,E6D3C5,C48472,B9CF63,94BF3D,6BB037,42A333,00942C,008729,007824,004A16'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
         if outCollection:
@@ -175,7 +175,7 @@ def filteredImageEVI2ToMapId(iniDate=None, endDate=None,outCollection=False):
         return img.expression('2.5 * (i.nir - i.red) / (i.nir + 2.4 * i.red + 1)',  {'i': img}).rename(['EVI2'])\
                 .set('system:time_start',img.get('system:time_start'))
     try:
-        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='F5F5F5,E6D3C5,C48472,B9CF63,94BF3D,6BB037,42A333,00942C,008729,007824,004A16'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
         if outCollection:
@@ -193,7 +193,7 @@ def filteredImageNDMIToMapId(iniDate=None, endDate=None,outCollection=False):
         return img.expression('(i.nir - i.swir1) / (i.nir + i.swir1)',  {'i': img}).rename(['NDMI'])\
                 .set('system:time_start',img.get('system:time_start'))
     try:
-        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='0000FE,2E60FD,31B0FD,00FEFE,50FE00,DBFE66,FEFE00,FFBB00,FF6F00,FE0000'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
         if outCollection:
@@ -211,7 +211,7 @@ def filteredImageNDWIToMapId(iniDate=None, endDate=None,outCollection=False):
         return img.expression('(i.green - i.nir) / (i.green + i.nir)',  {'i': img}).rename(['NDWI'])\
                 .set('system:time_start',img.get('system:time_start'))
     try:
-        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='505050,E8E8E8,00FF33,003300'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
         if outCollection:
@@ -383,7 +383,7 @@ def getTimeSeriesByIndex(indexName, scale, coords=[],dateFrom=None, dateTo=None,
         elif (indexName == 'NDWI'):
             indexCollection = filteredImageNDWIToMapId(dateFrom, dateTo,True)
 
-        values = indexCollection.getRegion(geometry, 30).getInfo()
+        values = indexCollection.getRegion(geometry, scale).getInfo()
         out = aggRegion(values)
 
     except EEException as e:
