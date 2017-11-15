@@ -5,7 +5,7 @@ from ee.ee_exception import EEException
 from gee_exception import GEEException
 
 from oauth2client.client import OAuth2Credentials
-from oauth2client.service_account import ServiceAccountCredentials
+#from oauth2client.service_account import ServiceAccountCredentials
 
 def initialize(ee_account='', ee_key_path='', ee_user_token=''):
     try:
@@ -116,18 +116,18 @@ def filteredImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, da
         raise GEEException(e.message)
     return values
 
-def filteredImageByIndexToMapId(iniDate=None, endDate=None, index='ndvi'):
+def filteredImageByIndexToMapId(iniDate=None, endDate=None, index='NDVI'):
     """  """
     try:
-        if (index == 'ndvi'):
+        if (index == 'NDVI'):
             values = filteredImageNDVIToMapId(iniDate, endDate)
-        elif (index == 'evi'):
+        elif (index == 'EVI'):
             values = filteredImageEVIToMapId(iniDate, endDate)
-        elif (index == 'evi2'):
+        elif (index == 'EVI2'):
             values = filteredImageEVI2ToMapId(iniDate, endDate)
-        elif (index == 'ndmi'):
+        elif (index == 'NDMI'):
             values = filteredImageNDMIToMapId(iniDate, endDate)
-        elif (index == 'ndwi'):
+        elif (index == 'NDWI'):
             values = filteredImageNDWIToMapId(iniDate, endDate)
     except EEException as e:
         raise GEEException(e.message)
