@@ -5,7 +5,7 @@ from ee.ee_exception import EEException
 from gee_exception import GEEException
 
 from oauth2client.client import OAuth2Credentials
-#from oauth2client.service_account import ServiceAccountCredentials
+from oauth2client.service_account import ServiceAccountCredentials
 
 from itertools import groupby
 import numpy as np
