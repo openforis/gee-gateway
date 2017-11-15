@@ -37,7 +37,7 @@ def imageToMapId(imageName, visParams={}):
         raise GEEException(e.message)
     return values
 
-def firstImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None): 
+def firstImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None):
     """  """
     try:
         eeCollection = ee.ImageCollection(collectionName)
@@ -136,7 +136,7 @@ def filteredImageByIndexToMapId(iniDate=None, endDate=None, index='ndvi'):
 def filteredImageNDVIToMapId(iniDate=None, endDate=None):
     """  """
     def calcNDVI(img):
-        return img.expression('(i.nir - i.red) / (i.nir + i.red)',  {'i': img})
+        return img.expression('(i.nir - i.red) / (i.nir + i.red)',  {'i': img}).rename(['NDVI])
     try:
         eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='c9c0bf,435ebf,eee8aa,006400'
@@ -150,7 +150,7 @@ def filteredImageNDVIToMapId(iniDate=None, endDate=None):
 def filteredImageEVIToMapId(iniDate=None, endDate=None):
     """  """
     def calcEVI(img):
-        return img.expression('2.5 * (i.nir - i.red) / (i.nir + 6.0 * i.red - 7.5 * i.blue + 1)',  {'i': img})
+        return img.expression('2.5 * (i.nir - i.red) / (i.nir + 6.0 * i.red - 7.5 * i.blue + 1)',  {'i': img}).rename(['EVI'])
     try:
         eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='F5F5F5,E6D3C5,C48472,B9CF63,94BF3D,6BB037,42A333,00942C,008729,007824,004A16'
@@ -164,7 +164,7 @@ def filteredImageEVIToMapId(iniDate=None, endDate=None):
 def filteredImageEVI2ToMapId(iniDate=None, endDate=None):
     """  """
     def calcEVI2(img):
-        return img.expression('2.5 * (i.nir - i.red) / (i.nir + 2.4 * i.red + 1)',  {'i': img})
+        return img.expression('2.5 * (i.nir - i.red) / (i.nir + 2.4 * i.red + 1)',  {'i': img}).rename(['EVI2'])
     try:
         eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='F5F5F5,E6D3C5,C48472,B9CF63,94BF3D,6BB037,42A333,00942C,008729,007824,004A16'
@@ -178,7 +178,7 @@ def filteredImageEVI2ToMapId(iniDate=None, endDate=None):
 def filteredImageNDMIToMapId(iniDate=None, endDate=None):
     """  """
     def calcNDMI(img):
-        return img.expression('(i.nir - i.swir1) / (i.nir + i.swir1)',  {'i': img})
+        return img.expression('(i.nir - i.swir1) / (i.nir + i.swir1)',  {'i': img}).rename(['NDMI'])
     try:
         eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='0000FE,2E60FD,31B0FD,00FEFE,50FE00,DBFE66,FEFE00,FFBB00,FF6F00,FE0000'
@@ -192,7 +192,7 @@ def filteredImageNDMIToMapId(iniDate=None, endDate=None):
 def filteredImageNDWIToMapId(iniDate=None, endDate=None):
     """  """
     def calcNDWI(img):
-        return img.expression('(i.green - i.nir) / (i.green + i.nir)',  {'i': img})
+        return img.expression('(i.green - i.nir) / (i.green + i.nir)',  {'i': img}).rename(['NDWI'])
     try:
         eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='505050,E8E8E8,00FF33,003300'
