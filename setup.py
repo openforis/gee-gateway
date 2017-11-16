@@ -6,7 +6,7 @@ except ImportError:
   from distutils.core import setup
 
 def getVersion():
-    return '1.0'
+    return '1.0.0'
 
 def getInstallRequires():
     requirements = []
@@ -17,7 +17,7 @@ def getInstallRequires():
 setup(
     name='gee-gateway',
     version=getVersion(),
-    description='Google Earth Engine Gateway',
+    description='A REST API designed to be used by CEO (Collect Earth Online) to interface with Google Earth Engine.',
     author='Roberto Fontanarosa',
     author_email='roberto.fontanarosa@fao.org',
     url='https://github.com/openforis/gee-gateway',
@@ -26,8 +26,8 @@ setup(
     install_requires=[
         'Flask>=0.12.2',
         'Flask-Cors==3.0.3',
-        'pyCrypto>=2.6.1',
         'google-api-python-client>=1.6.2',
+        'pyCrypto>=2.6.1',
         'earthengine-api==0.1.125.1'
     ],
     dependency_links=[

@@ -3,7 +3,7 @@
 [![Python: 2.7](https://img.shields.io/badge/python-2.7-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This is a REST API designed to be used by [CEO (Collect Earth Online)](https://github.com/openforis/collect-earth-online) to interface with Google Earth Engine.
+A REST API designed to be used by [CEO (Collect Earth Online)](https://github.com/openforis/collect-earth-online) to interface with Google Earth Engine.
 
 ## REQUIREMENTS
 
@@ -88,14 +88,14 @@ sphinx-build -aE -b html . static/docs
 
     ├── README.md
     ├── license.txt
-    ├── requirements.txt            third party libraries
+    ├── requirements.txt            list of third party packages to install
     ├── config.py                   configuration file
+    ├── setup.py                    setup script
     ├── run.py                      application start up
     ├── instance/                   (not in version control)
         ├── config.py               alternative configuration file (not in version control)
     ├── gee_gateway/                application folder
         ├── __init__.py             blueprint initialization
-        ├── utils.py
         ├── web/
             ├── __init__.py
             ├── errors.py           error handlers definition

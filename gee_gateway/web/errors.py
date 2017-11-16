@@ -12,7 +12,6 @@ def unauthorized(error):
     gee_gateway.logger.error('Unauthorized: %s', (request.path))
     return jsonify({'errCode': '401'}), 200
 
-
 @gee_gateway.errorhandler(403)
 def forbidden(error):
     gee_gateway.logger.error('Forbidden: %s', (request.path))

@@ -2,3 +2,6 @@ env
 instance
 *.pyc
 static/docs
+build
+gee_gateway.egg-info
+dist
