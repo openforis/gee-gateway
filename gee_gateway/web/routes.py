@@ -126,7 +126,7 @@ def imageByMosaicCollection():
                 visParams = json.get('visParams', None)
                 dateFrom = json.get('dateFrom', None)
                 dateTo = json.get('dateTo', None)
-                values = firstImageInMosaicToMapId(collectionName, visParams, dateFrom, dateTo)
+                values = filteredImageByIndexToMapId(dateFrom, dateTo,collectionName)
     except GEEException as e:
         logger.error(e.message)
         values = {
@@ -352,7 +352,9 @@ def timeSeriesIndex2():
             if geometry:
                 indexName = json.get('indexName', 'NDVI')
                 scale = float(json.get('scale', 30))
-                timeseries = getTimeSeriesByIndex(indexName, scale, geometry)
+                dateFrom = json.get('dateFromTimeSeries', None)
+                dateTo = json.get('dateToTimeSeries', None)
+                timeseries = getTimeSeriesByIndex(indexName, scale, geometry,dateFrom,dateTo)
                 values = {
                     'timeseries': timeseries
                 }

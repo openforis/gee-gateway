@@ -7,6 +7,10 @@ from gee_exception import GEEException
 from oauth2client.client import OAuth2Credentials
 from oauth2client.service_account import ServiceAccountCredentials
 
+from itertools import groupby
+import numpy as np
+import datetime
+
 def initialize(ee_account='', ee_key_path='', ee_user_token=''):
     try:
         if ee_user_token:
@@ -37,7 +41,7 @@ def imageToMapId(imageName, visParams={}):
         raise GEEException(e.message)
     return values
 
-def firstImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None): 
+def firstImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None):
     """  """
     try:
         eeCollection = ee.ImageCollection(collectionName)
@@ -116,89 +120,109 @@ def filteredImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, da
         raise GEEException(e.message)
     return values
 
-def filteredImageByIndexToMapId(iniDate=None, endDate=None, index='ndvi'):
+def filteredImageByIndexToMapId(iniDate=None, endDate=None, index='NDVI'):
     """  """
     try:
-        if (index == 'ndvi'):
+        if (index == 'NDVI'):
             values = filteredImageNDVIToMapId(iniDate, endDate)
-        elif (index == 'evi'):
+        elif (index == 'EVI'):
             values = filteredImageEVIToMapId(iniDate, endDate)
-        elif (index == 'evi2'):
+        elif (index == 'EVI2'):
             values = filteredImageEVI2ToMapId(iniDate, endDate)
-        elif (index == 'ndmi'):
+        elif (index == 'NDMI'):
             values = filteredImageNDMIToMapId(iniDate, endDate)
-        elif (index == 'ndwi'):
+        elif (index == 'NDWI'):
             values = filteredImageNDWIToMapId(iniDate, endDate)
     except EEException as e:
         raise GEEException(e.message)
     return values
 
-def filteredImageNDVIToMapId(iniDate=None, endDate=None):
+def filteredImageNDVIToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcNDVI(img):
-        return img.expression('(i.nir - i.red) / (i.nir + i.red)',  {'i': img})
+        return img.expression('(i.nir - i.red) / (i.nir + i.red)',  {'i': img}).rename(['NDVI'])\
+                .set('system:time_start',img.get('system:time_start'))
     try:
-        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='c9c0bf,435ebf,eee8aa,006400'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
-        ndviImage = ee.Image(eeCollection.map(calcNDVI).mean())
-        values = imageToMapId(ndviImage, visParams)
+        if outCollection:
+            values = eeCollection.map(calcNDVI)
+        else:
+            eviImage = ee.Image(eeCollection.map(calcNDVI).mean())
+            values = imageToMapId(eviImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
     return values
 
-def filteredImageEVIToMapId(iniDate=None, endDate=None):
+def filteredImageEVIToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcEVI(img):
-        return img.expression('2.5 * (i.nir - i.red) / (i.nir + 6.0 * i.red - 7.5 * i.blue + 1)',  {'i': img})
+        return img.expression('2.5 * (i.nir - i.red) / (i.nir + 6.0 * i.red - 7.5 * i.blue + 1)',  {'i': img}).rename(['EVI'])\
+                .set('system:time_start',img.get('system:time_start'))
     try:
-        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='F5F5F5,E6D3C5,C48472,B9CF63,94BF3D,6BB037,42A333,00942C,008729,007824,004A16'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
-        eviImage = ee.Image(eeCollection.map(calcEVI).mean())
-        values = imageToMapId(eviImage, visParams)
+        if outCollection:
+            values = eeCollection.map(calcEVI)
+        else:
+            eviImage = ee.Image(eeCollection.map(calcEVI).mean())
+            values = imageToMapId(eviImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
     return values
 
-def filteredImageEVI2ToMapId(iniDate=None, endDate=None):
+def filteredImageEVI2ToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcEVI2(img):
-        return img.expression('2.5 * (i.nir - i.red) / (i.nir + 2.4 * i.red + 1)',  {'i': img})
+        return img.expression('2.5 * (i.nir - i.red) / (i.nir + 2.4 * i.red + 1)',  {'i': img}).rename(['EVI2'])\
+                .set('system:time_start',img.get('system:time_start'))
     try:
-        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='F5F5F5,E6D3C5,C48472,B9CF63,94BF3D,6BB037,42A333,00942C,008729,007824,004A16'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
-        eviImage = ee.Image(eeCollection.map(calcEVI2).mean())
-        values = imageToMapId(eviImage, visParams)
+        if outCollection:
+            values = eeCollection.map(calcEVI2)
+        else:
+            eviImage = ee.Image(eeCollection.map(calcEVI2).mean())
+            values = imageToMapId(eviImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
     return values
 
-def filteredImageNDMIToMapId(iniDate=None, endDate=None):
+def filteredImageNDMIToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcNDMI(img):
-        return img.expression('(i.nir - i.swir1) / (i.nir + i.swir1)',  {'i': img})
+        return img.expression('(i.nir - i.swir1) / (i.nir + i.swir1)',  {'i': img}).rename(['NDMI'])\
+                .set('system:time_start',img.get('system:time_start'))
     try:
-        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='0000FE,2E60FD,31B0FD,00FEFE,50FE00,DBFE66,FEFE00,FFBB00,FF6F00,FE0000'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
-        eviImage = ee.Image(eeCollection.map(calcNDMI).mean())
-        values = imageToMapId(eviImage, visParams)
+        if outCollection:
+            values = eeCollection.map(calcNDMI)
+        else:
+            eviImage = ee.Image(eeCollection.map(calcNDMI).mean())
+            values = imageToMapId(eviImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
     return values
 
-def filteredImageNDWIToMapId(iniDate=None, endDate=None):
+def filteredImageNDWIToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcNDWI(img):
-        return img.expression('(i.green - i.nir) / (i.green + i.nir)',  {'i': img})
+        return img.expression('(i.green - i.nir) / (i.green + i.nir)',  {'i': img}).rename(['NDWI'])\
+                .set('system:time_start',img.get('system:time_start'))
     try:
-        eeCollection = getLandSatMergedCollection() #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
+        eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='505050,E8E8E8,00FF33,003300'
         visParams={'opacity':1,'max':1, 'min' : -1,'palette':colorPalette}
-        eviImage = ee.Image(eeCollection.map(calcNDWI).mean())
-        values = imageToMapId(eviImage, visParams)
+        if outCollection:
+            values = eeCollection.map(calcNDWI)
+        else:
+            eviImage = ee.Image(eeCollection.map(calcNDWI).mean())
+            values = imageToMapId(eviImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
     return values
@@ -229,7 +253,8 @@ def getLandSatMergedCollection():
             .select(sensorBandDictLandsatTOA['L8'],bandNamesLandsatTOA).map(lsMaskClouds)
         s2 = ee.ImageCollection('COPERNICUS/S2')\
             .filterMetadata('CLOUDY_PIXEL_PERCENTAGE','less_than',metadataCloudCoverMax)\
-            .map(s2MaskClouds).select(sensorBandDictLandsatTOA['S2'],bandNamesLandsatTOA)
+            .map(s2MaskClouds).select(sensorBandDictLandsatTOA['S2'],bandNamesLandsatTOA)\
+            .map(bandPassAdjustment)
         eeCollection = ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8).merge(s2))
     except EEException as e:
         raise GEEException(e.message)
@@ -275,6 +300,21 @@ def s2MaskClouds(img):
              qa.bitwiseAnd(cirrusBitMask).eq(0));
 
   return img.divide(10000).updateMask(clear).set('system:time_start',img.get('system:time_start'))
+
+def bandPassAdjustment(img):
+  keep = img.select(['temp'])
+  bands = ['blue','green','red','nir','swir1','swir2'];
+  # linear regression coefficients for adjustment
+  gain = ee.Array([[0.977], [1.005], [0.982], [1.001], [1.001], [0.996]]);
+  bias = ee.Array([[-0.00411],[-0.00093],[0.00094],[-0.00029],[-0.00015],[-0.00097]]);
+  # Make an Array Image, with a 2-D Array per pixel.
+  arrayImage2D = img.select(bands).toArray().toArray(1);
+
+  # apply correction factors and reproject array to geographic image
+  componentsImage = ee.Image(gain).multiply(arrayImage2D).add(ee.Image(bias))\
+    .arrayProject([0]).arrayFlatten([bands]).float();
+
+  return keep.addBands(componentsImage)#.set('system:time_start',img.get('system:time_start'));
 
 def filteredImageInCHIRPSToMapId(dateFrom=None, dateTo=None):
     """  """
@@ -322,7 +362,29 @@ def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[
         raise GEEException(e.message)
     return values
 
-def getTimeSeriesByIndex(indexName, scale, coords=[]):
+# helper function to take multiple values of region and aggregate to one value
+def aggRegion(regionList):
+    values = []
+    for i in range(len(regionList)):
+        if i != 0:
+            date = datetime.datetime.fromtimestamp(regionList[i][-2]/1000.).strftime("%Y-%m-%d")
+            values.append([date,regionList[i][-1]])
+
+    sort = sorted(values, key=lambda x: x[0])
+
+    out = []
+    for key, group in groupby(sort, key=lambda x: x[0][:10]):
+        data = list(group)
+        agg = sum(j for i, j in data if j != None)
+        dates = key.split('-')
+        timestamp = datetime.datetime(int(dates[0]),int(dates[1]),int(dates[2]))
+        if agg != 0:
+            out.append([int(timestamp.strftime('%s'))*1000,agg/float(len(data))])
+
+    #print(out)
+    return out
+
+def getTimeSeriesByIndex(indexName, scale, coords=[],dateFrom=None, dateTo=None, reducer=None):
     """  """
     try:
         geometry = None
@@ -330,45 +392,23 @@ def getTimeSeriesByIndex(indexName, scale, coords=[]):
             geometry = ee.Geometry.Polygon(coords)
         else:
             geometry = ee.Geometry.Point(coords)
-        bands = ['blue', 'green', 'red', 'nir', 'swir1', 'swir2', 'cfmask']
-        bandsByCollection = {
-            'LANDSAT/LC8_SR': ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'cfmask'],
-            'LANDSAT/LC8_SR': ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'cfmask'],
-            'LANDSAT/LE7_SR': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'cfmask'],
-            'LANDSAT/LT5_SR': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'cfmask'],
-            'LANDSAT/LT4_SR': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'cfmask']
-        }
-        indexes = {
-            'NDVI': '(i.nir - i.red) / (i.nir + i.red)',
-            'EVI': '2.5 * (i.nir - i.red) / (i.nir + 6.0 * i.red - 7.5 * i.blue + 1)',
-            'EVI2': '2.5 * (i.nir - i.red) / (i.nir + 2.4 * i.red + 1)',
-            'NDMI': '(i.nir - i.swir1) / (i.nir + i.swir1)',
-            'NDWI': '(i.green - i.nir) / (i.green + i.nir)'
-        }
-        def getExpression(image):
-            """  """
-            time = ee.Number(image.get('system:time_start'))
-            image = image.select(bandsByCollection[collectionName], bands).divide(10000)
-            return image.expression(indexes[indexName], {'i': image}).rename(['index']).addBands(image.select(['cfmask']).add(1)).set('system:time_start', time)
-        def transformRow(row):
-            """  """
-            row = ee.List(row)
-            time = row.get(3)
-            index = row.get(4)
-            cfmask = row.get(5)
-            return ee.Algorithms.If(cfmask, ee.Algorithms.If(ee.Number(cfmask).eq(1), ee.List([time, index]), None), None)
-        collectionNames = bandsByCollection.keys()
-        collectionName = collectionNames[0]
-        collection = ee.ImageCollection(collectionNames[0]).sort('system:time_start').filterBounds(geometry).map(getExpression)
-        for i, val in enumerate(collectionNames[1:], start=1):
-            collectionName = collectionNames[i]
-            collectionToMerge = ee.ImageCollection(collectionNames[i]).sort('system:time_start').filterBounds(geometry).map(getExpression)
-            collection = ee.ImageCollection(collection.merge(collectionToMerge))
-        values = ee.ImageCollection(collection.sort('system:time_start').distinct('system:time_start')).getRegion(geometry, 30).slice(1).map(transformRow).removeAll([None])
-        values = values.getInfo()
+        if (indexName == 'NDVI'):
+            indexCollection = filteredImageNDVIToMapId(dateFrom, dateTo,True)
+        elif (indexName == 'EVI'):
+            indexCollection = filteredImageEVIToMapId(dateFrom, dateTo,True)
+        elif (indexName == 'EVI2'):
+            indexCollection = filteredImageEVI2ToMapId(dateFrom, dateTo,True)
+        elif (indexName == 'NDMI'):
+            indexCollection = filteredImageNDMIToMapId(dateFrom, dateTo,True)
+        elif (indexName == 'NDWI'):
+            indexCollection = filteredImageNDWIToMapId(dateFrom, dateTo,True)
+
+        values = indexCollection.getRegion(geometry, scale).getInfo()
+        out = aggRegion(values)
+
     except EEException as e:
         raise GEEException(e.message)
-    return values
+    return out
 
 def getStatistics(paramType, aOIPoly):
     values = {}
