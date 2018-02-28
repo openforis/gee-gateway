@@ -80,8 +80,8 @@ def image():
         }
     return jsonify(values), 200
 
-@gee_gateway.route('/imageByMosaicCollection', methods=['POST'])
-def imageByMosaicCollection():
+@gee_gateway.route('/firstImageByMosaicCollection', methods=['POST'])
+def firstImageByMosaicCollection():
     """
     .. :quickref: ImageCollection; Get the MapID of a EE ImageCollection.
 
@@ -126,7 +126,54 @@ def imageByMosaicCollection():
                 visParams = json.get('visParams', None)
                 dateFrom = json.get('dateFrom', None)
                 dateTo = json.get('dateTo', None)
-                values = filteredImageByIndexToMapId(dateFrom, dateTo,collectionName)
+                values = firstImageInMosaicToMapId(collectionName, visParams, dateFrom, dateTo)
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
+
+@gee_gateway.route('/imageByMosaicCollection', methods=['POST'])
+def imageByMosaicCollection():
+    """
+    .. :quickref: ImageCollection; Get the MapID of a EE ImageCollection.
+
+    **Example request**:
+
+    .. code-block:: javascript
+
+        {
+            collectionName: "XX",
+            dateFrom: "YYYY-MM-DD",
+            dateTo: "YYYY-MM-DD"
+        }
+
+    **Example response**:
+
+    .. code-block:: javascript
+
+        {
+            mapid: "XXX",
+            token: "XXX"
+        }
+
+    :reqheader Accept: application/json
+    :<json String collectionName: name of the image collection
+    :<json String dateFrom: start date
+    :<json String dateTo: end date
+    :resheader Content-Type: application/json
+    """
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            collectionName = json.get('collectionName', None)
+            if collectionName:
+                visParams = json.get('visParams', None)
+                dateFrom = json.get('dateFrom', None)
+                dateTo = json.get('dateTo', None)
+                values = filteredImageByIndexToMapId(dateFrom, dateTo, collectionName)
     except GEEException as e:
         logger.error(e.message)
         values = {
@@ -355,6 +402,33 @@ def timeSeriesIndex2():
                 dateFrom = json.get('dateFromTimeSeries', None)
                 dateTo = json.get('dateToTimeSeries', None)
                 timeseries = getTimeSeriesByIndex(indexName, scale, geometry,dateFrom,dateTo)
+                values = {
+                    'timeseries': timeseries
+                }
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
+
+@gee_gateway.route('/timeSeriesIndex3', methods=['POST'])
+def timeSeriesIndex3():
+    """  """
+    logger.error("sasa")
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            geometry = json.get('polygon', None) #deprecated
+            if not geometry:
+                geometry = json.get('geometry', None)
+            if geometry:
+                indexName = json.get('indexName', 'NDVI')
+                scale = float(json.get('scale', 30))
+                dateFrom = json.get('dateFrom', None)
+                dateTo = json.get('dateTo', None)
+                timeseries = getTimeSeriesByIndex2(indexName, scale, geometry, dateFrom, dateTo)
                 values = {
                     'timeseries': timeseries
                 }
