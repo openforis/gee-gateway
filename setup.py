@@ -6,7 +6,7 @@ except ImportError:
   from distutils.core import setup
 
 def getVersion():
-    return '1.0.0'
+    return '1.1.0'
 
 def getInstallRequires():
     requirements = []
