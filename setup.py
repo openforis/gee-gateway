@@ -28,6 +28,7 @@ setup(
         'Flask-Cors==3.0.3',
         'google-api-python-client>=1.6.2',
         'pyCrypto>=2.6.1',
+        'numpy==1.14.1',
         'earthengine-api==0.1.125.1'
     ],
     dependency_links=[
