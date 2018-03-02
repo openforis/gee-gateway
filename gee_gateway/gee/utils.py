@@ -559,9 +559,6 @@ def getNdviChange(visParams={}, yearFrom=None, yearTo=None):
         def map3(image):
             """  """
             return addBands(image, ee.List(['B3', 'B4', 'B5'])).updateMask(landsatCollection1Mask(image))
-        def map4(image):
-            """  """
-            return addBands(image, ee.List(['B3', 'B4', 'B5'])).updateMask(image.select('fmask').lt(2))
         def maxNdvi(year):
             """  """
             from1 = ee.Date.fromYMD(int(year), 1, 1)
@@ -569,7 +566,7 @@ def getNdviChange(visParams={}, yearFrom=None, yearTo=None):
             s2 = ee.ImageCollection('COPERNICUS/S2').filterDate(from1, to).map(map1)
             l8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_TOA').filterDate(from1, to).map(map2)
             l7 = ee.ImageCollection('LANDSAT/LE07/C01/T1_TOA').filterDate(from1, to).map(map3)
-            l5 = ee.ImageCollection('LANDSAT/LT5_L1T_TOA_FMASK').filterDate(from1, to).map(map4)
+            l5 = ee.ImageCollection('LANDSAT/LT05/C01/T1_TOA').filterDate(from1, to).map(map3)
             return ee.ImageCollection(s2.merge(l8).merge(l7).merge(l5)).max()
         def addBands(image, bands):
             """  """
