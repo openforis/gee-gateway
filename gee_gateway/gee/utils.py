@@ -423,8 +423,8 @@ def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=Non
     }
     indexes = {
         'NDVI': '(nir - red) / (nir + red)',
-        'EVI': '2.5  (nir - red) / (nir + 6.0  red - 7.5  blue + 1)',
-        'EVI2': '2.5  (nir - red) / (nir + 2.4 * red + 1)',
+        'EVI': '2.5 * (nir - red) / (nir + 6.0 * red - 7.5 * blue + 1)',
+        'EVI2': '2.5 * (nir - red) / (nir + 2.4 * red + 1)',
         'NDMI': '(nir - swir1) / (nir + swir1)',
         'NDWI': '(green - nir) / (green + nir)',
         'NBR': '(nir - swir2) / (nir + swir2)',
