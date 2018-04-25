@@ -29,9 +29,9 @@ setup(
         'google-api-python-client>=1.6.2',
         'pyCrypto>=2.6.1',
         'numpy==1.14.1',
-        'earthengine-api==0.1.125.1'
+        'earthengine-api==0.1.137'
     ],
     dependency_links=[
-        'git+https://github.com/openforis/earthengine-api.git@79ecb2b3cd63f3fbd4afecce48432e8da04755d8#egg=earthengine-api-0.1.125.1'
+        'git+https://github.com/openforis/earthengine-api.git@79ecb2b3cd63f3fbd4afecce48432e8da04755d8#egg=earthengine-api-0.1.137'
     ]
 )

@@ -9,4 +9,4 @@ numpy==1.14.1
 
 # earthengine-api>=0.1.111
 # custom google earth engine
-git+git://github.com/openforis/earthengine-api.git@v0.1.124.1#egg=earthengine-api&subdirectory=python
+git+git://github.com/openforis/earthengine-api.git@v0.1.137#egg=earthengine-api&subdirectory=python
