@@ -494,6 +494,60 @@ def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=Non
         raise GEEException(e.message)
     return values
 
+def getTimeSeriesForPoint(point):
+    """ https://code.earthengine.google.com/49592558df4df130e9082f94a23a887f """
+
+    bandNames = ['blue', 'green', 'red', 'nir', 'swir1', 'swir2', 'temp', 'pixel_qa']
+    properties = bandNames + ['date']
+
+    def toValue(image):
+        image = ee.Image(image)
+        return ee.Feature(None, image.reduceRegion(
+            reducer=ee.Reducer.first(),
+            geometry=point,
+            scale=1
+        ).set('date', image.date()))
+
+    def mask(image):
+        image = ee.Image(image)
+        def isOneOf(types):
+            typeByValue = {'water': 4, 'shadow': 8, 'snow': 16, 'cloud': 32}
+            return reduce((lambda acc, Type: acc.Or(image.select(['pixel_qa']).bitwiseAnd(typeByValue[Type]).neq(0))), types, ee.Image(0))
+        return image.updateMask(isOneOf(['shadow', 'cloud']).Not())
+
+    def listToObject(values):
+        obj = dict()
+        for i, value in enumerate(values):
+            obj[properties[i]] = value
+        return obj
+
+    collectionBands = [{
+        'name': 'LANDSAT/LC08/C01/T1_SR',
+        'bands': ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'pixel_qa']
+    }, {
+        'name': 'LANDSAT/LE07/C01/T1_SR',
+        'bands': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'B6', 'pixel_qa']
+    }, {
+        'name': 'LANDSAT/LT05/C01/T1_SR',
+        'bands': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'B6', 'pixel_qa']
+    }, {
+        'name': 'LANDSAT/LT04/C01/T1_SR',
+        'bands': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'B6', 'pixel_qa']
+    }]
+
+    collectionBands = map(lambda collectionDef: ee.ImageCollection(collectionDef['name']).select(collectionDef['bands'], bandNames), collectionBands)
+    collectionBands = reduce((lambda acc, c: acc.merge(c)), collectionBands)
+    collectionBands = collectionBands.filterBounds(point)\
+        .map(mask)\
+        .map(toValue)\
+        .sort('date')\
+        .reduceColumns(ee.Reducer.toList(len(properties)), properties)\
+        .get('list')\
+        .getInfo()
+    collectionBands = map(listToObject, collectionBands)
+
+    return collectionBands
+
 def getStatistics(paramType, aOIPoly):
     values = {}
     if (paramType == 'basin'):

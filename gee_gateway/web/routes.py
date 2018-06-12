@@ -415,7 +415,6 @@ def timeSeriesIndex2():
 @gee_gateway.route('/timeSeriesIndex3', methods=['POST'])
 def timeSeriesIndex3():
     """  """
-    logger.error("sasa")
     values = {}
     try:
         json = request.get_json()
@@ -429,6 +428,26 @@ def timeSeriesIndex3():
                 dateFrom = json.get('dateFrom', None)
                 dateTo = json.get('dateTo', None)
                 timeseries = getTimeSeriesByIndex2(indexName, scale, geometry, dateFrom, dateTo)
+                values = {
+                    'timeseries': timeseries
+                }
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
+
+@gee_gateway.route('/timeSeriesForPoint', methods=['POST'])
+def timeSeriesForPoint():
+    """  """
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            geometry = json.get('point', None)
+            if geometry:
+                timeseries = getTimeSeriesForPoint(geometry)
                 values = {
                     'timeseries': timeseries
                 }
