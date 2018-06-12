@@ -29,6 +29,7 @@ setup(
         'google-api-python-client>=1.6.2',
         'pyCrypto>=2.6.1',
         'numpy==1.14.1',
+        'oauth2client>=4.1.2',
         'earthengine-api==0.1.137'
     ],
     dependency_links=[
