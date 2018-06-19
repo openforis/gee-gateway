@@ -494,7 +494,7 @@ def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=Non
         raise GEEException(e.message)
     return values
 
-def getTimeSeriesForPoint(point):
+def getTimeSeriesForPoint(point, dateFrom=None, dateTo=datetime.datetime.now()):
     """ https://code.earthengine.google.com/49592558df4df130e9082f94a23a887f """
 
     bandNames = ['blue', 'green', 'red', 'nir', 'swir1', 'swir2', 'temp', 'pixel_qa']
@@ -537,8 +537,10 @@ def getTimeSeriesForPoint(point):
 
     collectionBands = map(lambda collectionDef: ee.ImageCollection(collectionDef['name']).select(collectionDef['bands'], bandNames), collectionBands)
     collectionBands = reduce((lambda acc, c: acc.merge(c)), collectionBands)
-    collectionBands = collectionBands.filterBounds(point)\
-        .map(mask)\
+    collectionBands = collectionBands.filterBounds(point)
+    if dateFrom:
+        collectionBands = collectionBands.filterDate(dateFrom, dateTo)
+    collectionBands = collectionBands.map(mask)\
         .map(toValue)\
         .sort('date')\
         .reduceColumns(ee.Reducer.toList(len(properties)), properties)\
