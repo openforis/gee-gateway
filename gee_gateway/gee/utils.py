@@ -248,7 +248,7 @@ def getLandSatMergedCollection():
         le7 = ee.ImageCollection('LANDSAT/LE7_L1T_TOA')\
             .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
             .select(sensorBandDictLandsatTOA['L7'],bandNamesLandsatTOA).map(lsMaskClouds)
-        lc8 = ee.ImageCollection('LANDSAT/LC8_L1T_TOA')\
+        lc8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_TOA')\
             .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
             .select(sensorBandDictLandsatTOA['L8'],bandNamesLandsatTOA).map(lsMaskClouds)
         s2 = ee.ImageCollection('COPERNICUS/S2')\
