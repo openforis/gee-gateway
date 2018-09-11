@@ -657,7 +657,7 @@ def filteredImageCompositeToMapId(collectionName, visParams={}, dateFrom=None, d
     try:
         logger = logging.getLogger(__name__)
         logger.info('collectionName: ' + collectionName )
-        logger.info('visParams: ' + visParams )
+        logger.info('visParams: ' + str(visParams) )
         logger.info('dateFrom: ' + dateFrom )
         logger.info('dateTo: ' + dateTo )
         logger.info('metadataCloudCoverMax: ' + metadataCloudCoverMax )
