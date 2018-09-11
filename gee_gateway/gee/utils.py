@@ -655,10 +655,9 @@ def filteredImageCompositeToMapId(collectionName, visParams={}, dateFrom=None, d
     """  """
     try:
         eeCollection = ee.ImageCollection(collectionName)
-        if (dateFrom and dateTo):
-            eeFilterDate = ee.Filter.date(dateFrom, dateTo)
-            eeCollection = eeCollection.filter(eeFilterDate).filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)
-        eeMosaicImage = ee.Algorithms.Landsat.simpleComposite(eeCollection, 60, 10, 40, True)
+        eeFilterDate = ee.Filter.date(dateFrom, dateTo)
+        eeCollection = eeCollection.filter(eeFilterDate).filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)
+        eeMosaicImage = ee.Algorithms.Landsat.simpleComposite(eeCollection, simpleCompositeVariable, 10, 40, True)
         values = imageToMapId(eeMosaicImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
