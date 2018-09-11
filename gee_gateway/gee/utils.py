@@ -654,6 +654,12 @@ def getNdviChange(visParams={}, yearFrom=None, yearTo=None):
 def filteredImageCompositeToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None, metadataCloudCoverMax=90, simpleCompositeVariable=60):
     """  """
     try:
+        print('collectionName: ' + collectionName )
+        print('visParams: ' + visParams )
+        print('dateFrom: ' + dateFrom )
+        print('dateTo: ' + dateTo )
+        print('metadataCloudCoverMax: ' + metadataCloudCoverMax )
+        print('simpleCompositeVariable: ' + simpleCompositeVariable )
         eeCollection = ee.ImageCollection(collectionName)
         eeFilterDate = ee.Filter.date(dateFrom, dateTo)
         eeCollection = eeCollection.filter(eeFilterDate).filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)
