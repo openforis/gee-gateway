@@ -650,3 +650,16 @@ def getNdviChange(visParams={}, yearFrom=None, yearTo=None):
     except EEException as e:
         raise GEEException(e.message)
     return values
+
+def filteredImageCompositeToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None, metadataCloudCoverMax=90, simpleCompositeVariable=60):
+    """  """
+    try:
+        eeCollection = ee.ImageCollection(collectionName)
+        if (dateFrom and dateTo):
+            eeFilterDate = ee.Filter.date(dateFrom, dateTo)
+            eeCollection = eeCollection.filter(eeFilterDate).filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)
+        eeMosaicImage = ee.Algorithms.Landsat.simpleComposite(eeCollection, 60, 10, 40, True)
+        values = imageToMapId(eeMosaicImage, visParams)
+    except EEException as e:
+        raise GEEException(e.message)
+    return values

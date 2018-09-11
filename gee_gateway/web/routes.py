@@ -593,3 +593,31 @@ def ndviChange():
             'errMsg': e.message
         }
     return jsonify(values), 200
+
+@gee_gateway.route('/Landsat7Filtered', methods=['POST'])
+def Landsat7Filtered():
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            values = getFiltered('LANDSAT/LE07/C01/T1', json, 60)
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
+
+def getFiltered(collectionName, json, simpleCompositVariable):
+    dateFrom = json.get('dateFrom', None)
+    dateTo = json.get('dateTo', None)
+    cloudLessThan = json.get('cloudLessThan', '90')
+    bands = json.get('bands', 'B4,B5,B3')
+    min = json.get('min', '0.03,0.01,0.05')
+    max = json.get('max', '0.45, 0.5, 0.4')
+    visParams = {
+        'min': min,
+        'max': max,
+        'bands': bands
+    }
+    return filteredImageCompositeToMapId(collectionName, visParams, dateFrom, dateTo, cloudLessThan, simpleCompositVariable)
