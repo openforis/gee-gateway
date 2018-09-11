@@ -10,6 +10,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from itertools import groupby
 import numpy as np
 import datetime
+import logging
 
 def initialize(ee_account='', ee_key_path='', ee_user_token=''):
     try:
@@ -654,12 +655,13 @@ def getNdviChange(visParams={}, yearFrom=None, yearTo=None):
 def filteredImageCompositeToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None, metadataCloudCoverMax=90, simpleCompositeVariable=60):
     """  """
     try:
-        print('collectionName: ' + collectionName )
-        print('visParams: ' + visParams )
-        print('dateFrom: ' + dateFrom )
-        print('dateTo: ' + dateTo )
-        print('metadataCloudCoverMax: ' + metadataCloudCoverMax )
-        print('simpleCompositeVariable: ' + simpleCompositeVariable )
+        logger = logging.getLogger(__name__)
+        logger.info('collectionName: ' + collectionName )
+       # print('visParams: ' + visParams )
+       # print('dateFrom: ' + dateFrom )
+       # print('dateTo: ' + dateTo )
+       # print('metadataCloudCoverMax: ' + metadataCloudCoverMax )
+       # print('simpleCompositeVariable: ' + simpleCompositeVariable )
         eeCollection = ee.ImageCollection(collectionName)
         eeFilterDate = ee.Filter.date(dateFrom, dateTo)
         eeCollection = eeCollection.filter(eeFilterDate).filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)
