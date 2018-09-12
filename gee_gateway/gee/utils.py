@@ -655,18 +655,32 @@ def getNdviChange(visParams={}, yearFrom=None, yearTo=None):
 def filteredImageCompositeToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None, metadataCloudCoverMax=90, simpleCompositeVariable=60):
     """  """
     try:
-        logger = logging.getLogger(__name__)
-        logger.info('collectionName: ' + collectionName )
-        #logger.info('visParams: ' + str(visParams) )
-        logger.info('dateFrom: ' + dateFrom )
-        logger.info('dateTo: ' + dateTo )
-        logger.info('metadataCloudCoverMax: ' + str(metadataCloudCoverMax) )
-        logger.info('simpleCompositeVariable: ' + str(simpleCompositeVariable) )
         eeCollection = ee.ImageCollection(collectionName)
-        eeFilterDate = ee.Filter.date(dateFrom, dateTo)
-        eeCollection = eeCollection.filter(eeFilterDate).filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)
+        if (dateFrom and dateTo):
+            eeFilterDate = ee.Filter.date(dateFrom, dateTo)
+            eeCollection = eeCollection.filter(eeFilterDate).filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)
         eeMosaicImage = ee.Algorithms.Landsat.simpleComposite(eeCollection, simpleCompositeVariable, 10, 40, True)
         values = imageToMapId(eeMosaicImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
     return values
+
+def filteredSentinelComposite(visParams={}, dateFrom=None, dateTo=None, metadataCloudCoverMax=10):
+    def cloudScore(img):
+        def rescale(img, exp, thresholds):
+            return img.expression(exp, {'img': img}).subtract(thresholds[0]).divide(thresholds[1] - thresholds[0])
+        score = ee.Image(1.0)
+        score = score.min(rescale(img, 'img.B2', [0.1, 0.3]))
+        score = score.min(rescale(img, 'img.B4 + img.B3 + img.B2', [0.2, 0.8]))
+        score = score.min(rescale(img, 'img.B8 + img.B11 + img.B12', [0.3, 0.8]))
+        ndsi = img.normalizedDifference(['B3', 'B11'])
+        return score.min(rescale(ndsi, 'img', [0.8, 0.6]))
+    def cloudScoreS2(img):
+        rescale = img.divide(10000)
+        score = cloudScore(rescale).multiply(100).rename('cloudscore')
+        return img.addBands(score)
+    sentinel2 = ee.ImageCollection('COPERNICUS/S2')
+    f2017s2 = sentinel2.filterDate(dateFrom, dateTo).filterMetadata('CLOUDY_PIXEL_PERCENTAGE', 'less_than', metadataCloudCoverMax)
+    m2017s2 = f2017s2.map(cloudScoreS2)
+    m2017s3 = m2017s2.median()
+    return imageToMapId(m2017s3, visParams)
