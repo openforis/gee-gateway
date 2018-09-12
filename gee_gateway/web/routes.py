@@ -600,13 +600,13 @@ def Landsat7Filtered():
     try:
         json = request.get_json()
         if json:
-            #values = getFiltered('LANDSAT/LE07/C01/T1', json, 60)
-            visParams = {
-                'min': "0.03,0.01,0.05",
-                'max': "0.45, 0.5, 0.4",
-                'bands': "B4,B5,B3"
-            }
-            values = filteredImageCompositeToMapId('LANDSAT/LE07/C01/T1', visParams, '2000-01-01', '2001-12-31', 89)
+            values = getFiltered('LANDSAT/LE07/C01/T1', json, 60)
+            # visParams = {
+            #     'min': "0.03,0.01,0.05",
+            #     'max': "0.45, 0.5, 0.4",
+            #     'bands': "B4,B5,B3"
+            # }
+            # values = filteredImageCompositeToMapId('LANDSAT/LE07/C01/T1', visParams, '2000-01-01', '2001-12-31', 89)
     except GEEException as e:
         logger.error(e.message)
         values = {
