@@ -134,6 +134,60 @@ def firstImageByMosaicCollection():
         }
     return jsonify(values), 200
 
+@gee_gateway.route('/meanImageByMosaicCollection', methods=['POST'])
+def meanImageByMosaicCollection():
+    """
+    .. :quickref: ImageCollection; Get the MapID of a EE ImageCollection.
+
+    **Example request**:
+
+    .. code-block:: javascript
+
+        {
+            collectionName: "XX",
+            visParams: {
+                min: 0.0,
+                max: 0.0,
+                bands: "XX,XX,XX",
+                gamma: 0.0
+            },
+            dateFrom: "YYYY-MM-DD",
+            dateTo: "YYYY-MM-DD"
+        }
+
+    **Example response**:
+
+    .. code-block:: javascript
+
+        {
+            mapid: "XXX",
+            token: "XXX"
+        }
+
+    :reqheader Accept: application/json
+    :<json String collectionName: name of the image collection
+    :<json Object visParams: visualization parameters
+    :<json String dateFrom: start date
+    :<json String dateTo: end date
+    :resheader Content-Type: application/json
+    """
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            collectionName = json.get('collectionName', None)
+            if collectionName:
+                visParams = json.get('visParams', None)
+                dateFrom = json.get('dateFrom', None)
+                dateTo = json.get('dateTo', None)
+                values = meanImageInMosaicToMapId(collectionName, visParams, dateFrom, dateTo)
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
+
 @gee_gateway.route('/imageByMosaicCollection', methods=['POST'])
 def imageByMosaicCollection():
     """
