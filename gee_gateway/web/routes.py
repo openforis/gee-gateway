@@ -134,7 +134,7 @@ def firstImageByMosaicCollection():
         }
     return jsonify(values), 200
 
-@gee_gateway.route('/meanImageByMosaicCollection', methods=['POST'])
+@gee_gateway.route('/meanImageByMosaicCollections', methods=['POST'])
 def meanImageByMosaicCollection():
     """
     .. :quickref: ImageCollection; Get the MapID of a EE ImageCollection.
