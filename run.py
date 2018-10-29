@@ -2,6 +2,7 @@ import logging, argparse
 
 from flask import Flask
 from flask_cors import CORS
+from flask_sslify import SSLify
 
 from gee_gateway import gee_gateway, gee_initialize
 
@@ -31,6 +32,6 @@ if __name__ == '__main__':
     logging.basicConfig(level=app.config['LOGGING_LEVEL'])
     logging.getLogger('flask_cors').level = app.config['LOGGING_LEVEL']
     logging.getLogger('gee_gateway').level = app.config['LOGGING_LEVEL']
-
-    app.run(debug=app.config['DEBUG'], port=app.config['PORT'], host=app.config['HOST'])
+    sslify = SSLify(app)
+    #app.run(debug=app.config['DEBUG'], port=app.config['PORT'], host=app.config['HOST'])
     #app.run(debug=app.config['DEBUG'], port=app.config['PORT'], host=app.config['HOST'], ssl_context='adhoc')
