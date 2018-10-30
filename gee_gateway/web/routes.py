@@ -67,11 +67,11 @@ def image():
     """
     values = {}
     try:
-        json = request.get_json()
-        if json:
-            imageName = json.get('imageName', None)
+        jsonp = request.get_json()
+        if jsonp:
+            imageName = jsonp.get('imageName', None)
             if imageName:
-                visParams = json.get('visParams', None)
+                visParams = jsonp.get('visParams', None)
                 try:
                     print "in try"
                     max = visParams.max
