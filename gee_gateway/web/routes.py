@@ -72,6 +72,10 @@ def image():
             imageName = json.get('imageName', None)
             if imageName:
                 visParams = json.get('visParams', None)
+                try:
+                    max = visParams.max
+                except:
+                    visParams = json.loads(visParams)
                 values = imageToMapId(imageName, visParams)
     except GEEException as e:
         logger.error(e.message)
