@@ -684,3 +684,219 @@ def filteredSentinelComposite(visParams={}, dateFrom=None, dateTo=None, metadata
     m2017s2 = f2017s2.map(cloudScoreS2)
     m2017s3 = m2017s2.median()
     return imageToMapId(m2017s3, visParams)
+
+########################## TimeSync Related Functions ##########################
+
+#due to saturation, bruce updated the stretch parameters to
+VIS_743 = {"bands": ["B7", "B4", "B3"], "min": [-904, 151, -300], "max": [3696, 4951, 2500]}
+VIS_432 = {"bands": ["B4", "B3", "B2"], "min": [151, -300, 50], "max": [4951, 2500, 1150]}
+VIS_543 = {"bands": ["B5", "B4", "B3"], "min": [-804, 151, -300], "max": [3800, 4951, 2500]}
+VIS_BGW = {"bands": ["B", "G", "W"], "min": [604, 49, -2245], "max": [5592, 3147, 843]}
+
+VIS_SET = {'tc': VIS_BGW, 'b743': VIS_743, 'b432': VIS_432, 'b543': VIS_543}
+
+BAND_NAMES = ["B1", "B2", "B3", "B4", "B5", "B7", 'cfmask']
+BAND_SET = {'LT04': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'pixel_qa'],
+            'LT05': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'pixel_qa'],
+            'LE07': ['B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'pixel_qa'],
+            'LC08': ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'pixel_qa']}
+
+def tcTransform(image):
+    b = ee.Image(image).select(["B1", "B2", "B3", "B4", "B5", "B7"])
+    brt_coeffs = ee.Image([0.2043, 0.4158, 0.5524, 0.5741, 0.3124, 0.2303])
+    grn_coeffs = ee.Image([-0.1603, -0.2819, -0.4934, 0.7940, -0.0002, -0.1446])
+    wet_coeffs = ee.Image([0.0315, 0.2021, 0.3102, 0.1594, -0.6806, -0.6109])
+
+    sum = ee.call("Reducer.sum")
+    brightness = b.multiply(brt_coeffs).reduce(sum)
+    greenness = b.multiply(grn_coeffs).reduce(sum)
+    wetness = b.multiply(wet_coeffs).reduce(sum)
+
+    return ee.Image(brightness).addBands(greenness).addBands(wetness).select([0,1,2], ['B','G','W'])
+
+def parseQA2FMask(image):
+    qa = ee.Image(image).select(['cfmask'])
+    cloud = qa.bitwiseAnd(32)
+    snow = qa.bitwiseAnd(16)
+    shadow = qa.bitwiseAnd(8)
+    water = qa.bitwiseAnd(4)
+    clear = qa.bitwiseAnd(2)
+
+    #cfmask:    {0: clear, 1: water, 2: shadow, 3: snow, 4: cloud}
+    #modified fmask: {0: clear, 1: water, 3: shadow, 2: snow, 4: cloud}
+    cfmask = (clear.eq(0)
+              .where(water.gt(0), 1)
+              .where(snow.gt(0), 2)
+              .where(shadow.gt(0), 3)
+              .where(cloud.gt(0), 4)
+              .rename('cfmask'))
+
+    return ee.Image(image).select(['B1', 'B2', 'B3', 'B4', 'B5', 'B7']) \
+        .addBands(cfmask) \
+        .set('YYYYDDD', ee.Date(image.get('system:time_start')).format('YYYYDDD'))
+
+def getImageCollection(point, year=None):
+    '''
+    Get collection 1 images
+    :param point:
+    :return:
+    '''
+    aoi = ee.Geometry.Point(point)
+
+    lc8_collection = ee.ImageCollection('LANDSAT/LC08/C01/T1_SR').filterBounds(aoi).select(BAND_SET['LC08'], BAND_NAMES)
+    le7_collection = ee.ImageCollection('LANDSAT/LE07/C01/T1_SR').filterBounds(aoi).select(BAND_SET['LE07'], BAND_NAMES)
+    lt5_collection = ee.ImageCollection('LANDSAT/LT05/C01/T1_SR').filterBounds(aoi).select(BAND_SET['LT05'], BAND_NAMES)
+    lt4_collection = ee.ImageCollection('LANDSAT/LT04/C01/T1_SR').filterBounds(aoi).select(BAND_SET['LT04'], BAND_NAMES)
+
+    all = (lt4_collection.merge(lt5_collection)
+           .merge(le7_collection)
+           .merge(lc8_collection)
+           .map(parseQA2FMask)
+           .map(lambda image: image.set('YYYYDDD', ee.Date(image.get('system:time_start')).format('YYYYDDD')))
+           .distinct('YYYYDDD')
+           .sort('system:time_start'))
+
+    if year:
+        d1 = ee.Date.fromYMD(year, 1, 1)
+        d2 = ee.Date.fromYMD(year, 12, 31)
+        all = all.filterDate(d1, d2)
+
+    return all
+
+def getLandsatImages(point, year=None):
+    all = getImageCollection(point, year)
+    ids = all.toList(all.size()).map(lambda image: ee.Image(image).get('system:id'))
+    return ids.getInfo()
+
+def createChip(image, point, vis, size=255):
+    '''
+    generate a chip for an image
+    '''
+    this_image = ee.Image(image)
+    iid = this_image.get('system:id').getInfo()
+    doy = ee.Date(this_image.get('system:time_start')).getRelative('day', 'year').getInfo()
+
+    pixelSize = ee.Image(image).projection().nominalScale()
+    box = ee.Geometry.Point(point).buffer(pixelSize.multiply(size / 2.0), 5).bounds(5)
+
+    if vis == 'tc':
+        image = tcTransform(ee.Image(image))
+
+    rgb = ee.Image(image).visualize(**VIS_SET[vis]).unmask()
+
+    thumbID = ee.data.getThumbId({'image': rgb.serialize(),
+                                  'dimensions': '%dx%d' % (size, size),
+                                  'region': box.getInfo()['coordinates'],
+                                  'format': 'png'})
+    chip_url = ee.data.makeThumbUrl(thumbID)
+
+    return {"iid": iid, "doy": doy, "chip_url": chip_url}
+
+def qaTargetDay(point, day):
+    def qa(img):
+        #cfmask:    {0: clear, 1: water, 2: shadow, 3: snow, 4: cloud}
+        #modified fmask: {0: clear, 1: water, 3: shadow, 2: snow, 4: cloud, 9: nodata}
+        cfmask = ee.Image(img).select(['cfmask']).unmask(9) \
+            .reduceRegion(reducer=ee.Reducer.first(),
+                          geometry=ee.Geometry.Point(point),
+                          scale=30,
+                          tileScale=16) \
+            .get('cfmask')
+        offset = ee.Number(cfmask).multiply(1000).add(img.date().getRelative('day', 'year').subtract(day).abs())
+        return img.set('offset', offset)
+    return qa
+
+def getLandsatChipForYearByTargetDay(point, year, day, vis):
+
+    images = ee.ImageCollection(getImageCollection(point, year))
+    image = images.map(qaTargetDay(point, day)).sort('offset').first()
+    # image = images.map(lambda img: img.set('offset', (ee.Date(img.get('system:time_start'))
+    #                                                         .getRelative('day', 'year')
+    #                                                         .subtract(day)
+    #                                                         .abs()))).sort('offset').first()
+
+    chip = None
+    if image:
+        chip = createChip(image, point, vis)
+
+    return chip
+
+
+def getSpectralsForPoint(collection, point):
+    """ https://code.earthengine.google.com/49592558df4df130e9082f94a23a887f """
+
+    # bandNames = ['blue', 'green', 'red', 'nir', 'swir1', 'swir2', 'cfmask']
+    bandNames = ["B1", "B2", "B3", "B4", "B5", "B7", 'cfmask']
+    #TODO: implement image_year and image_julday on the client side. Keep it for now for TimeSync
+    properties = bandNames + ['image_year', 'image_julday', 'iid']
+
+    def toValue(image):
+        image = ee.Image(image)
+        image_date = ee.Date(image.date())
+        year = image_date.get('year')
+        doy = image_date.getRelative('day', 'year')
+        return (ee.Feature(None, image.reduceRegion(
+            reducer=ee.Reducer.first(),
+            geometry=point,
+            scale=30,
+            tileScale=16
+        )).set('image_year', year)
+                .set('image_julday', doy)
+                .set('iid', image.get('system:id'))
+                )
+
+    def listToObject(values):
+        obj = dict()
+        for i, value in enumerate(values):
+            obj[properties[i]] = value
+        return obj
+
+    collectionBands = collection.map(toValue) \
+        .reduceColumns(ee.Reducer.toList(len(properties)), properties) \
+        .get('list') \
+        .getInfo()
+
+    collectionBands = map(listToObject, collectionBands)
+
+    return collectionBands
+
+
+def getTsTimeSeriesForPoint(point):
+    collection = ee.ImageCollection(getImageCollection(point))#.map(parseQA2FMask)
+    return getSpectralsForPoint(collection, ee.Geometry.Point(point))
+    # return getTimeSeriesForPoint(ee.Geometry.Point(point))
+
+def getTsTimeSeriesForPointByYear(point, year):
+    collection = ee.ImageCollection(getImageCollection(point)) \
+        .filterDate(ee.Date.fromYMD(year, 1, 1), ee.Date.fromYMD(year, 12, 31)) \
+        .map(parseQA2FMask)
+
+    return getSpectralsForPoint(collection, ee.Geometry.Point(point))
+    # return getTimeSeriesForPoint(ee.Geometry.Point(point))
+
+def getTsTimeSeriesForPointByTargetDay(point, day, startYear=1985, endYear=None):
+    '''
+        retrieve time series for specified year range using target day.
+    '''
+    #by default assume the end year is the year before current date.
+    if endYear == None:
+        endYear = datetime.date.today().year - 1
+
+    # collection = (ee.ImageCollection(getImageCollection(point))
+    #                     # .map(parseQA2FMask)
+    #                     .map(lambda img: img.set('offset', (img.date().getRelative('day', 'year')
+    #                                                         .subtract(day)
+    #                                                         .abs())))
+    # )
+
+    collection = (ee.ImageCollection(getImageCollection(point))
+                  .map(qaTargetDay(point, day))
+                  )
+
+    images = ee.List.sequence(startYear, endYear).map(
+        lambda y: collection.filterDate(ee.Date.fromYMD(y, 1, 1), ee.Date.fromYMD(y, 12, 31)).sort('offset').first()
+    )
+
+    return getSpectralsForPoint(ee.ImageCollection(images), ee.Geometry.Point(point))
+    # return getTimeSeriesForPoint(ee.Geometry.Point(point))
+
