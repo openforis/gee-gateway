@@ -75,6 +75,7 @@ def image():
                 try:
                     print "in try"
                     visParams = json.loads(visParams)
+                    visParams = json.dumps(visParams)
                     print "it made it through"
                 except:
                     print "in except"
