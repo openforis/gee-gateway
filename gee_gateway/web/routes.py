@@ -72,13 +72,13 @@ def image():
             imageName = jsonp.get('imageName', None)
             if imageName:
                 visParams = jsonp.get('visParams', None)
-                # try:
-                #     print "in try"
-                #     max = visParams.max
-                #     print "it made it through"
-                # except:
-                #     print "in except"
-                #     visParams = json.loads(visParams)
+                try:
+                    print "in try"
+                    visParams = json.loads(visParams)
+                    print "it made it through"
+                except:
+                    print "in except"
+
                 values = imageToMapId(imageName, visParams)
     except GEEException as e:
         logger.error(e.message)
