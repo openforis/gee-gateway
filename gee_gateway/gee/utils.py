@@ -338,11 +338,15 @@ def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[
     """  """
     try:
         geometry = None
+        indexCollection = None
         if isinstance(coords[0], list):
             geometry = ee.Geometry.Polygon(coords)
         else:
             geometry = ee.Geometry.Point(coords)
-        indexCollection = ee.ImageCollection(collectionName).filterDate(dateFrom, dateTo).select(indexName)
+        if indexName != None:
+            indexCollection = ee.ImageCollection(collectionName).filterDate(dateFrom, dateTo).select(indexName)
+        else:
+            indexCollection = ee.ImageCollection(collectionName).filterDate(dateFrom, dateTo)
         def getIndex(image):
             """  """
             theReducer = None;
@@ -352,7 +356,10 @@ def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[
                 theReducer = ee.Reducer.max()
             else:
                 theReducer = ee.Reducer.mean()
-            indexValue = image.reduceRegion(theReducer, geometry, scale).get(indexName)
+            if indexName != None:
+                indexValue = image.reduceRegion(theReducer, geometry, scale).get(indexName)
+            else:
+                indexValue = image.reduceRegion(theReducer, geometry, scale)
             date = image.get('system:time_start')
             indexImage = ee.Image().set('indexValue', [ee.Number(date), indexValue])
             return indexImage

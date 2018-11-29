@@ -432,7 +432,8 @@ def timeSeriesIndex():
             if not geometry:
                 geometry = json.get('geometry', None)
             if collectionName and geometry:
-                indexName = json.get('indexName', 'NDVI')
+                #indexName = json.get('indexName', 'NDVI')
+                indexName = json.get('indexName', None)
                 scale = float(json.get('scale', 30))
                 dateFrom = json.get('dateFromTimeSeries', None)
                 dateTo = json.get('dateToTimeSeries', None)
