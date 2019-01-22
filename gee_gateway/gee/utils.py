@@ -124,7 +124,7 @@ def filteredImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, da
 def getImageCollectionAsset(collectionName, visParams={}):
     try:
         eeCollection = ee.ImageCollection(collectionName)
-        values = imageToMapId(eeCollection, visParams)
+        values = imageToMapId(eeCollection.first(), visParams)
     except EEException as e:
         raise GEEException(e.message)
     return values
