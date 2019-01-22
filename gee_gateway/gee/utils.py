@@ -121,6 +121,14 @@ def filteredImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, da
         raise GEEException(e.message)
     return values
 
+def getImageCollectionAsset(collectionName, visParams={}):
+    try:
+        eeCollection = ee.ImageCollection(collectionName)
+        values = imageToMapId(eeCollection, visParams)
+    except EEException as e:
+        raise GEEException(e.message)
+    return values
+
 def filteredImageByIndexToMapId(iniDate=None, endDate=None, index='NDVI'):
     """  """
     try:

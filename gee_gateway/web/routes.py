@@ -723,6 +723,22 @@ def FilteredSentinel():
         }
     return jsonify(values), 200
 
+@gee_gateway.route('/ImageCollectionAsset', methods=['POST'])
+def ImageCollectionAsset():
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            collection = json.get('imageName', '')
+            visParams = json.get('visParams', {})
+            values = getImageCollectionAsset(collection, visParams)
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
+
 def getFiltered(collectionName, json, simpleCompositVariable):
     dateFrom = json.get('dateFrom', None)
     dateTo = json.get('dateTo', None)
