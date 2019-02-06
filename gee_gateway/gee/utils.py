@@ -12,6 +12,8 @@ import numpy as np
 import datetime
 import logging
 
+logger = logging.getLogger(__name__)
+
 def initialize(ee_account='', ee_key_path='', ee_user_token=''):
     try:
         if ee_user_token:
@@ -26,14 +28,17 @@ def initialize(ee_account='', ee_key_path='', ee_user_token=''):
             ee.Initialize(credentials)
         else:
             ee.Initialize()
-    except (EEException, TypeError):
+    except (EEException, TypeError) as e:
+        logger.error('******EE initialize error************' + e.message)	
         pass
 
 def imageToMapId(imageName, visParams={}):
     """  """
     try:
+        logger.error('******imageToMapId************')
         eeImage = ee.Image(imageName)
         mapId = eeImage.getMapId(visParams)
+        logger.error('******imageToMapId complete************')
         values = {
             'mapid': mapId['mapid'],
             'token': mapId['token']
@@ -670,11 +675,14 @@ def getNdviChange(visParams={}, yearFrom=None, yearTo=None):
 def filteredImageCompositeToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None, metadataCloudCoverMax=90, simpleCompositeVariable=60):
     """  """
     try:
+        logger.error('******filteredImageCompositeToMapId************')
         eeCollection = ee.ImageCollection(collectionName)
+        logger.error('******eeCollection ************')
         if (dateFrom and dateTo):
             eeFilterDate = ee.Filter.date(dateFrom, dateTo)
             eeCollection = eeCollection.filter(eeFilterDate).filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)
         eeMosaicImage = ee.Algorithms.Landsat.simpleComposite(eeCollection, simpleCompositeVariable, 10, 40, True)
+        logger.error('******eeMosaicImage************')
         values = imageToMapId(eeMosaicImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
