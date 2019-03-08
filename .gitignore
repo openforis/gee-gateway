@@ -13,3 +13,4 @@ server.key
 f2e10466515b3b73.crt
 wildcardservirglobalkey.pem
 wildcardservirglobalcert.pem
+*.log
