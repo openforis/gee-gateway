@@ -120,7 +120,7 @@ def filteredImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, da
         if (dateFrom and dateTo):
             eeFilterDate = ee.Filter.date(dateFrom, dateTo)
             eeCollection = eeCollection.filter(eeFilterDate)
-        eeFirstImage = ee.Image(eeCollection.mean());
+        eeFirstImage = ee.Image(eeCollection.mosaic());
         values = imageToMapId(eeFirstImage, visParams)
     except EEException as e:
         raise GEEException(e.message)
@@ -129,7 +129,7 @@ def filteredImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, da
 def getImageCollectionAsset(collectionName, visParams={}):
     try:
         eeCollection = ee.ImageCollection(collectionName)
-        values = imageToMapId(eeCollection.first(), visParams)
+        values = imageToMapId(eeCollection.mosaic(), visParams)
     except EEException as e:
         raise GEEException(e.message)
     return values
