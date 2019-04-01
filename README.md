@@ -17,6 +17,7 @@ A REST API designed to be used by [CEO (Collect Earth Online)](https://github.co
 From project root directory
 
 ```bash
+sudo pacman -S uwsgi uwsgi-plugin-python nginx
 pip install -r requirements.txt
 ```
 
@@ -33,13 +34,9 @@ pip install -r requirements.txt
 Edit the configuration file (`config.py` or `instance/config.py`)
 
 
-```python
-DEBUG = False # {True|False}
-PORT = 8888 # flask server running port
-HOST = '0.0.0.0' # flask server running host
-CO_ORIGINS = '*' # origin or list of origins to allow requests from
-import logging
-LOGGING_LEVEL = logging.INFO # {NOTSET|DEBUG|INFO|WARNING|ERROR|CRITICAL}
+```code
+create /etc/uwsgi/vassals/gee-gateway.ini (template found in nginx directory)
+create /etc/nginx/nginx.config {path to gateway instance}
 ```
 
 ## EXECUTION
@@ -47,14 +44,22 @@ LOGGING_LEVEL = logging.INFO # {NOTSET|DEBUG|INFO|WARNING|ERROR|CRITICAL}
 From project root directory
 
 ```bash
-python run.py
+sudo systemctl enable nginx emperor.uwsgi
+sudo systemctl start nginx emperor.uwsgi
+```
+
+Note: to stop
+
+```bash
+sudo systemctl stop nginx emperor.uwsgi
 ```
 
 OR using **virtualenv** (Optional)
 
 ```bash
 source env/bin/activate
-python run.py
+sudo systemctl enable nginx emperor.uwsgi
+sudo systemctl start nginx emperor.uwsgi
 ```
 
 ```bash
@@ -89,25 +94,19 @@ sphinx-build -aE -b html . static/docs
     ├── README.md
     ├── license.txt
     ├── requirements.txt            list of third party packages to install
-    ├── config.py                   configuration file
-    ├── setup.py                    setup script
-    ├── run.py                      application start up
+    ├── routes.py                      application start up and routing
     ├── instance/                   (not in version control)
-        ├── config.py               alternative configuration file (not in version control)
-    ├── gee_gateway/                application folder
-        ├── __init__.py             blueprint initialization
-        ├── web/
-            ├── __init__.py
-            ├── errors.py           error handlers definition
-            ├── routes.py           blueprint routes definition
-        ├── gee/
-            ├── __init__.py
-            ├── gee_exception.py
-            ├── utils.py
-        ├── templates/              blueprint templates
-            ├── index.html          playground
-        ├── static/                 blueprint static files
-            ├── assets/             css, images, js, libs and fonts
+	├── config.py               alternative configuration file (not in version control)
+
+	├── __init__.py             blueprint initialization
+	├── gee/
+		├── __init__.py
+		├── gee_exception.py
+		├── utils.py
+	├── templates/              blueprint templates
+		├── index.html          playground
+	├── static/                 blueprint static files
+		├── assets/             css, images, js, libs and fonts
     ├── conf.py                     sphinx (documentation) configuration file
     ├── index.rst                   sphinx index file
     ├── static/                     static resources folder
