@@ -1,13 +1,17 @@
 import logging
 
-from flask import request, jsonify, render_template, json, current_app
+from flask import Flask, request, jsonify, render_template, json, current_app
 from flask_cors import CORS, cross_origin
 
-from .. import gee_gateway
-from ..gee.gee_exception import GEEException
-from ..gee.utils import *
+from gee.gee_exception import GEEException
+from gee.utils import *
+
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(filename='example.log',level=logging.DEBUG)
+
+
+gee_gateway = Flask(__name__)
 
 @gee_gateway.before_request
 def before():
@@ -26,9 +30,11 @@ def before():
     else:
         initialize(ee_account=ee_account, ee_key_path=ee_key_path)
 
+
 @gee_gateway.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
+
 
 @gee_gateway.route('/image', methods=['POST'])
 def image():
@@ -72,13 +78,15 @@ def image():
             imageName = jsonp.get('imageName', None)
             if imageName:
                 visParams = jsonp.get('visParams', None)
-                try:
-                    print "in try"
-                    visParams = json.loads(visParams)
-                    visParams = json.dumps(visParams)
-                    print "it made it through"
-                except:
-                    print "in except"
+                if visParams:
+                    try:
+                        #visParams = json.loads(visParams)
+                        if type(visParams) is str and visParams.replace(" ", "") != "{}": 
+                            visParams = json.dumps(visParams)
+                        else:
+                             visParams = None
+                    except:
+                        logger.error("visParams broke: " + visParams)
 
                 values = imageToMapId(imageName, visParams)
     except GEEException as e:
@@ -372,7 +380,11 @@ def ImageCollectionbyIndex():
         json = request.get_json()
         if json:
            dateFrom = json.get('dateFrom', None)
+           if not dateFrom:
+               dateFrom = None
            dateTo = json.get('dateTo', None)
+           if not dateTo:
+               dateTo = None
            index = json.get('index', 'ndvi')
            values = filteredImageByIndexToMapId(dateFrom, dateTo, index)
     except GEEException as e:
@@ -911,3 +923,4 @@ def getPlotSpectralsByJulday(julday, lng, lat):
             'errMsg': e.message
         }
         return jsonify(values), 500
+
