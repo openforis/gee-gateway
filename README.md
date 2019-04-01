@@ -1,13 +1,13 @@
 # gee-gateway
 
-[![Python: 2.7](https://img.shields.io/badge/python-2.7-blue.svg)](https://www.python.org/)
+[![Python: 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A REST API designed to be used by [CEO (Collect Earth Online)](https://github.com/openforis/collect-earth-online) to interface with Google Earth Engine.
 
 ## REQUIREMENTS
 
-1. [Python 2.7](https://www.python.org/)
+1. [Python 3.7](https://www.python.org/)
 2. [pip (package manager)](https://github.com/pypa/pip)
 3. [Earth Engine Python API](https://developers.google.com/earth-engine/python_install)
 4. [virtualenv](https://pypi.python.org/pypi/virtualenv) (Optional)
