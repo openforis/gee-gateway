@@ -11,7 +11,9 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(filename='example.log',level=logging.DEBUG)
 
 
-gee_gateway = Flask(__name__)
+gee_gateway = Flask(__name__, instance_relative_config=True, static_url_path="/static", static_folder="./static")
+gee_gateway.config.from_object('config')
+gee_gateway.config.from_pyfile('config.py', silent=True)
 
 @gee_gateway.before_request
 def before():
