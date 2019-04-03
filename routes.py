@@ -78,19 +78,8 @@ def image():
         jsonp = request.get_json()
         if jsonp:
             imageName = jsonp.get('imageName', None)
-            if imageName:
-                visParams = jsonp.get('visParams', None)
-                if visParams:
-                    try:
-                        #visParams = json.loads(visParams)
-                        if type(visParams) is str and visParams.replace(" ", "") != "{}": 
-                            visParams = json.dumps(visParams)
-                        else:
-                             visParams = None
-                    except:
-                        logger.error("visParams broke: " + visParams)
-
-                values = imageToMapId(imageName, visParams)
+            visParams = jsonp.get('visParams', {})
+            values = imageToMapId(imageName, visParams)
     except GEEException as e:
         logger.error(e.message)
         values = {
