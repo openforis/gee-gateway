@@ -5,14 +5,18 @@ from gee_exception import GEEException
 from itertools import groupby
 import logging
 import logging.config
+from logging.handlers import RotatingFileHandler
 import math
 import numpy as np
 from oauth2client.client import OAuth2Credentials
 from oauth2client.service_account import ServiceAccountCredentials
 import sys
 
-#logging.basicConfig(filename='/srv/gee-gateway/appdata/gee-gateway.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+handler = RotatingFileHandler('gee-gateway-nginx.log', maxBytes=2000, backupCount=10)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
+
 
 def initialize(ee_account='', ee_key_path='', ee_user_token=''):
     try:
