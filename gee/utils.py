@@ -1,20 +1,21 @@
+import datetime
 import ee
-import math
 from ee.ee_exception import EEException
-
 from gee_exception import GEEException
-
+from itertools import groupby
+import logging
+from logging.handlers import RotatingFileHandler
+import logging.config
+import math
+import numpy as np
 from oauth2client.client import OAuth2Credentials
 from oauth2client.service_account import ServiceAccountCredentials
+import sys
 
-from itertools import groupby
-import numpy as np
-import datetime
-import logging
-import logging.config
-
-logging.basicConfig(filename='/srv/gee-gateway/appdata/gee-gateway.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s') 
+#logging.basicConfig(filename='/srv/gee-gateway/appdata/gee-gateway.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+handler = RotatingFileHandler('gee-gateway.log', maxBytes=2000, backupCount=10)
+logger.addHandler(handler)
 
 def initialize(ee_account='', ee_key_path='', ee_user_token=''):
     try:
@@ -31,7 +32,7 @@ def initialize(ee_account='', ee_key_path='', ee_user_token=''):
         else:
             ee.Initialize()
     except (EEException, TypeError) as e:
-        logger.error('******EE initialize error************' + e.message)	
+        logger.error("******EE initialize error************", sys.exc_info()[0])
         pass
 
 def imageToMapId(imageName, visParams={}):
@@ -46,7 +47,7 @@ def imageToMapId(imageName, visParams={}):
             'token': mapId['token']
         }
     except EEException as e:
-        raise GEEException(e.message)
+        logger.error("******imageToMapId error************", sys.exc_info()[0])
     return values
 
 def firstImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None):
@@ -59,7 +60,7 @@ def firstImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateT
         eeFirstImage = ee.Image(eeCollection.first());
         values = imageToMapId(eeFirstImage, visParams)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def meanImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None):
@@ -72,7 +73,7 @@ def meanImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo
         eeMeanImage = ee.Image(eeCollection.mean());
         values = imageToMapId(eeMeanImage, visParams)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def firstCloudFreeImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None):
@@ -112,7 +113,7 @@ def firstCloudFreeImageInMosaicToMapId(collectionName, visParams={}, dateFrom=No
         except EEException as ine:
             imageToMapId(eeFirstImage, visParams)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def filteredImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None):
@@ -125,7 +126,7 @@ def filteredImageInMosaicToMapId(collectionName, visParams={}, dateFrom=None, da
         eeFirstImage = ee.Image(eeCollection.mosaic());
         values = imageToMapId(eeFirstImage, visParams)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def getImageCollectionAsset(collectionName, visParams={}):
@@ -133,7 +134,7 @@ def getImageCollectionAsset(collectionName, visParams={}):
         eeCollection = ee.ImageCollection(collectionName)
         values = imageToMapId(eeCollection.mosaic(), visParams)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def filteredImageByIndexToMapId(iniDate=None, endDate=None, index='NDVI'):
@@ -150,7 +151,7 @@ def filteredImageByIndexToMapId(iniDate=None, endDate=None, index='NDVI'):
         elif (index == 'NDWI'):
             values = filteredImageNDWIToMapId(iniDate, endDate)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def filteredImageNDVIToMapId(iniDate=None, endDate=None,outCollection=False):
@@ -168,7 +169,7 @@ def filteredImageNDVIToMapId(iniDate=None, endDate=None,outCollection=False):
             eviImage = ee.Image(eeCollection.map(calcNDVI).mean())
             values = imageToMapId(eviImage, visParams)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def filteredImageEVIToMapId(iniDate=None, endDate=None,outCollection=False):
@@ -186,7 +187,7 @@ def filteredImageEVIToMapId(iniDate=None, endDate=None,outCollection=False):
             eviImage = ee.Image(eeCollection.map(calcEVI).mean())
             values = imageToMapId(eviImage, visParams)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def filteredImageEVI2ToMapId(iniDate=None, endDate=None,outCollection=False):
@@ -204,7 +205,7 @@ def filteredImageEVI2ToMapId(iniDate=None, endDate=None,outCollection=False):
             eviImage = ee.Image(eeCollection.map(calcEVI2).mean())
             values = imageToMapId(eviImage, visParams)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def filteredImageNDMIToMapId(iniDate=None, endDate=None,outCollection=False):
@@ -222,7 +223,7 @@ def filteredImageNDMIToMapId(iniDate=None, endDate=None,outCollection=False):
             eviImage = ee.Image(eeCollection.map(calcNDMI).mean())
             values = imageToMapId(eviImage, visParams)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def filteredImageNDWIToMapId(iniDate=None, endDate=None,outCollection=False):
@@ -240,7 +241,7 @@ def filteredImageNDWIToMapId(iniDate=None, endDate=None,outCollection=False):
             eviImage = ee.Image(eeCollection.map(calcNDWI).mean())
             values = imageToMapId(eviImage, visParams)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def getLandSatMergedCollection():
@@ -273,7 +274,7 @@ def getLandSatMergedCollection():
             .map(bandPassAdjustment)
         eeCollection = ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8).merge(s2))
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return eeCollection
 
 def lsMaskClouds(img,cloudThresh=10):
@@ -346,7 +347,7 @@ def filteredImageInCHIRPSToMapId(dateFrom=None, dateTo=None):
         eeFirstImage = ee.Image(eeCollection.mean());
         values = imageToMapId(eeFirstImage, visParams)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[], dateFrom=None, dateTo=None, reducer=None):
@@ -382,7 +383,7 @@ def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[
         indexCollection2 = indexCollection1.aggregate_array('indexValue')
         values = indexCollection2.getInfo()
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def aggRegion(regionList):
@@ -429,7 +430,7 @@ def getTimeSeriesByIndex(indexName, scale, coords=[], dateFrom=None, dateTo=None
         out = aggRegion(values)
 
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return out
 
 def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=None):
@@ -514,7 +515,7 @@ def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=Non
             .aggregate_array('timeIndex')
         values = values.getInfo()
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def getTimeSeriesForPoint(point, dateFrom=None, dateTo=datetime.datetime.now()):
@@ -625,7 +626,7 @@ def getAsterMosaic(visParams={}, dateFrom=None, dateTo=None):
         #visParams = {'bands': 'nir, swir1, red', 'min': 0, 'max': '110, 25, 90', 'gamma': 1.7}
         values = imageToMapId(mosaic, visParams)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def getNdviChange(visParams={}, yearFrom=None, yearTo=None):
@@ -671,7 +672,7 @@ def getNdviChange(visParams={}, yearFrom=None, yearTo=None):
             return change
         values = imageToMapId(change(yearFrom, yearTo), visParams)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def filteredImageCompositeToMapId(collectionName, visParams={}, dateFrom=None, dateTo=None, metadataCloudCoverMax=90, simpleCompositeVariable=60):
@@ -687,7 +688,7 @@ def filteredImageCompositeToMapId(collectionName, visParams={}, dateFrom=None, d
         logger.error('******eeMosaicImage************')
         values = imageToMapId(eeMosaicImage, visParams)
     except EEException as e:
-        raise GEEException(e.message)
+        raise GEEException(sys.exc_info()[0])
     return values
 
 def filteredSentinelComposite(visParams={}, dateFrom=None, dateTo=None, metadataCloudCoverMax=10):
