@@ -1,0 +1,16 @@
+env
+instance
+*.pyc
+static/docs
+build
+gee_gateway.egg-info
+dist
+/.idea
+.vs/
+0.1.111
+venv/
+server.key
+f2e10466515b3b73.crt
+wildcardservirglobalkey.pem
+wildcardservirglobalcert.pem
+*.log

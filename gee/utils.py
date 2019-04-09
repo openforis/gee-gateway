@@ -4,7 +4,6 @@ from ee.ee_exception import EEException
 from gee_exception import GEEException
 from itertools import groupby
 import logging
-from logging.handlers import RotatingFileHandler
 import logging.config
 import math
 import numpy as np
@@ -14,8 +13,6 @@ import sys
 
 #logging.basicConfig(filename='/srv/gee-gateway/appdata/gee-gateway.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-handler = RotatingFileHandler('gee-gateway.log', maxBytes=2000, backupCount=10)
-logger.addHandler(handler)
 
 def initialize(ee_account='', ee_key_path='', ee_user_token=''):
     try:

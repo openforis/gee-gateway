@@ -1,14 +1,13 @@
-import logging
-
-from flask import Flask, request, jsonify, render_template, json, current_app
-from flask_cors import CORS, cross_origin
-
 from gee.gee_exception import GEEException
 from gee.utils import *
-
+from flask import Flask, request, jsonify, render_template, json, current_app
+from flask_cors import CORS, cross_origin
+import logging
+from logging.handlers import RotatingFileHandler
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(filename='example.log',level=logging.DEBUG)
+handler = RotatingFileHandler('gee-gateway.log', maxBytes=2000, backupCount=10)
+logger.addHandler(handler)
 
 
 gee_gateway = Flask(__name__, instance_relative_config=True, static_url_path="/static", static_folder="./static")
