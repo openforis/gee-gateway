@@ -6,7 +6,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 logger = logging.getLogger(__name__)
-handler = RotatingFileHandler('gee-gateway-nginx.log', maxBytes=2000, backupCount=10)
+handler = RotatingFileHandler('gee-gateway-nginx.log', maxBytes=10485760, backupCount=10)
 logger.addHandler(handler)
 logger.setLevel(logging.DEBUG)
 
