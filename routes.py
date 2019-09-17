@@ -731,7 +731,11 @@ def ImageCollectionAsset():
     try:
         json = request.get_json()
         if json:
-            collection = json.get('imageName', '')
+            collection = ''
+            if 'imageName' in json:
+                collection = json.get('imageName', '')
+            else:
+                collection = json.get('ImageCollectionAsset', '')
             visParams = json.get('visParams', {})
             values = getImageCollectionAsset(collection, visParams)
     except GEEException as e:
