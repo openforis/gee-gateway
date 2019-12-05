@@ -431,7 +431,10 @@ def getTimeSeriesByIndex(indexName, scale, coords=[], dateFrom=None, dateTo=None
         out = aggRegion(values)
 
     except EEException as e:
-        raise GEEException(sys.exc_info()[0])
+        try:
+            getTimeSeriesByIndex(indexName, scale * 2, coords, dateFrom, dateTo, reducer);
+        except EEException as e:
+            raise GEEException(sys.exc_info()[0])
     return out
 
 def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=None):
