@@ -523,6 +523,28 @@ def timeSeriesForPoint():
         }
     return jsonify(values), 200
 
+@gee_gateway.route('/timeSeriesAssetForPoint', methods=['POST'])
+def timeSeriesForPoint():
+    """  """
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            geometry = json.get('point', None)
+            dateFrom = json.get('dateFrom', None)
+            dateTo = json.get('dateTo', None)
+            if geometry:
+                timeseries = getTimeSeriesAssetForPoint(geometry, dateFrom, dateTo)
+                values = {
+                    'timeseries': timeseries
+                }
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
+
 @gee_gateway.route('/timeSeriesIndexGet', methods=['GET'])
 def timeSeriesIndexGet():
     """
