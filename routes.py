@@ -526,6 +526,7 @@ def timeSeriesForPoint():
 @gee_gateway.route('/timeSeriesAssetForPoint', methods=['POST'])
 def timeSeriesAssetForPoint():
     """  """
+    logger.error("I have arrived!")
     values = {}
     try:
         json = request.get_json()
@@ -539,6 +540,8 @@ def timeSeriesAssetForPoint():
             values = {
                 'timeseries': timeseries
             }
+        else:
+            logger.error("i didn't have json")
     except GEEException as e:
         logger.error(e.message)
         values = {
