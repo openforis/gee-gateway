@@ -539,10 +539,10 @@ def timeSeriesAssetForPoint():
             }
         else:
             logger.error("i didn't have json")
-    except Exception as e:
-        logger.error(str(e))
+    except GEEException as e:
+        logger.error(e)
         values = {
-            'errMsg': str(e)
+            'errMsg': e
         }
     return jsonify(values), 200
 
