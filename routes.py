@@ -523,7 +523,7 @@ def timeSeriesForPoint():
         }
     return jsonify(values), 200
 
-@gee_gateway.route('/timeSeriesAssetForPoint', methods=['POST'])
+@gee_gateway.route('/getTimeSeriesAssetForPoint', methods=['POST'])
 def timeSeriesForPoint():
     """  """
     values = {}
