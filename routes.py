@@ -526,16 +526,13 @@ def timeSeriesForPoint():
 @gee_gateway.route('/timeSeriesAssetForPoint', methods=['POST'])
 def timeSeriesAssetForPoint():
     """  """
-    logger.error("I have arrived!")
     values = {}
     try:
         json = request.get_json()
         if json:
             geometry = json.get('point', None)
-            dateFrom = json.get('dateFrom', None)
-            dateTo = json.get('dateTo', None)
-            #if geometry:
-            logger.error("going out to getTimeSeriesAssetForPoint")
+            dateFrom = json.get('dateFromTimeSeries', None)
+            dateTo = json.get('dateToTimeSeries', None)
             timeseries = getTimeSeriesAssetForPoint(geometry, dateFrom, dateTo)
             values = {
                 'timeseries': timeseries

@@ -575,7 +575,7 @@ def getTimeSeriesForPoint(point, dateFrom=None, dateTo=datetime.datetime.now()):
 
     return collectionBands
 
-def getTimeSeriesAssetForPoint(point=[103.966459, 18.73361], dateFrom=None, dateTo=datetime.datetime.now()):
+def getTimeSeriesAssetForPoint(point, dateFrom=None, dateTo=datetime.datetime.now()):
     def sampleUsingPoint(image):
         image = ee.Image(image)
         timestamp = image.get("system:time_start")
