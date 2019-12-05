@@ -533,6 +533,7 @@ def timeSeriesAssetForPoint():
             geometry = json.get('point', None)
             dateFrom = json.get('dateFromTimeSeries', None)
             dateTo = json.get('dateToTimeSeries', None)
+            logger.error("going to getTimeSeriesAssetForPoint")
             timeseries = getTimeSeriesAssetForPoint(geometry, dateFrom, dateTo)
             values = {
                 'timeseries': timeseries
