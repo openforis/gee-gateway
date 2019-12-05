@@ -539,7 +539,7 @@ def timeSeriesAssetForPoint():
             }
         else:
             logger.error("i didn't have json")
-    except GEEException as e:
+    except Exception as e:
         logger.error(str(e))
         values = {
             'errMsg': str(e)
