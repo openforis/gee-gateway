@@ -533,49 +533,6 @@ def getTimeSeriesForPoint(point, dateFrom=None, dateTo=datetime.datetime.now()):
             scale=1
         ).set('date', image.date()))
 
-    def getTimeSeriesAssetForPoint(point=ee.Geometry.Point([103.966459, 18.73361]), dateFrom=None, dateTo=datetime.datetime.now()):
-        def sampleUsingPoint(image):
-            image = ee.Image(image)
-            timestamp = image.get("system:time_start")
-            sampledValue = image.sample(point,30).first().get(image.bandNames().get(0));
-            return [timestamp, sampledValue]
-
-        def toDict(array):
-            d = {}
-            for pair in array:
-                d[pair[0]] = pair[1]
-            return d
-
-        try:
-            tcc = ee.ImageCollection("projects/servir-mekong/UMD/tree_canopy")
-            tcc = toDict(tcc.toList(tcc.size()).map(sampleUsingPoint).getInfo())
-            loss = ee.ImageCollection("projects/servir-mekong/UMD/loss")
-            loss = toDict(loss.toList(loss.size()).map(sampleUsingPoint).getInfo())
-            croplands = ee.ImageCollection("projects/servir-mekong/yearly_primitives_smoothed/cropland")
-            croplands = toDict(croplands.toList(croplands.size()).map(sampleUsingPoint).getInfo())
-            # alltimestamps = reduce(lambda x, y: x.union(y.keys()), [tcc,loss,croplands], set())
-            alltimestamps = list(set().union(tcc.keys(),loss.keys(),croplands.keys()))
-            alltimestamps.sort()
-            timeseries = []
-            for timestamp in alltimestamps:
-                tempdict = {}
-                if (timestamp in tcc):
-                    tempdict["tcc"] = tcc[timestamp]
-                else:
-                    tempdict["tcc"] = None
-                if (timestamp in loss):
-                    tempdict["loss"] = loss[timestamp]
-                else:
-                    tempdict["loss"] = None
-                if (timestamp in croplands):
-                    tempdict["croplands"] = croplands[timestamp]
-                else:
-                    tempdict["croplands"] = None
-                timeseries.append([timestamp, tempdict])
-        except EEException as e:
-            raise GEEException(sys.exc_info()[0])
-        print({"success":"success","timeseries":timeseries})
-
     def mask(image):
         image = ee.Image(image)
         def isOneOf(types):
@@ -617,6 +574,49 @@ def getTimeSeriesForPoint(point, dateFrom=None, dateTo=datetime.datetime.now()):
     collectionBands = map(listToObject, collectionBands)
 
     return collectionBands
+
+def getTimeSeriesAssetForPoint(point=ee.Geometry.Point([103.966459, 18.73361]), dateFrom=None, dateTo=datetime.datetime.now()):
+    def sampleUsingPoint(image):
+        image = ee.Image(image)
+        timestamp = image.get("system:time_start")
+        sampledValue = image.sample(point,30).first().get(image.bandNames().get(0));
+        return [timestamp, sampledValue]
+
+    def toDict(array):
+        d = {}
+        for pair in array:
+            d[pair[0]] = pair[1]
+        return d
+
+    try:
+        tcc = ee.ImageCollection("projects/servir-mekong/UMD/tree_canopy")
+        tcc = toDict(tcc.toList(tcc.size()).map(sampleUsingPoint).getInfo())
+        loss = ee.ImageCollection("projects/servir-mekong/UMD/loss")
+        loss = toDict(loss.toList(loss.size()).map(sampleUsingPoint).getInfo())
+        croplands = ee.ImageCollection("projects/servir-mekong/yearly_primitives_smoothed/cropland")
+        croplands = toDict(croplands.toList(croplands.size()).map(sampleUsingPoint).getInfo())
+        # alltimestamps = reduce(lambda x, y: x.union(y.keys()), [tcc,loss,croplands], set())
+        alltimestamps = list(set().union(tcc.keys(),loss.keys(),croplands.keys()))
+        alltimestamps.sort()
+        timeseries = []
+        for timestamp in alltimestamps:
+            tempdict = {}
+            if (timestamp in tcc):
+                tempdict["tcc"] = tcc[timestamp]
+            else:
+                tempdict["tcc"] = None
+            if (timestamp in loss):
+                tempdict["loss"] = loss[timestamp]
+            else:
+                tempdict["loss"] = None
+            if (timestamp in croplands):
+                tempdict["croplands"] = croplands[timestamp]
+            else:
+                tempdict["croplands"] = None
+            timeseries.append([timestamp, tempdict])
+    except EEException as e:
+        raise GEEException(sys.exc_info()[0])
+    print({"success":"success","timeseries":timeseries})
 
 def getStatistics(paramType, aOIPoly):
     values = {}

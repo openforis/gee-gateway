@@ -534,6 +534,7 @@ def timeSeriesAssetForPoint():
             dateFrom = json.get('dateFrom', None)
             dateTo = json.get('dateTo', None)
             #if geometry:
+            logger.error("going out to getTimeSeriesAssetForPoint")
             timeseries = getTimeSeriesAssetForPoint(geometry, dateFrom, dateTo)
             values = {
                 'timeseries': timeseries
