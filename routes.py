@@ -533,11 +533,11 @@ def timeSeriesAssetForPoint():
             geometry = json.get('point', None)
             dateFrom = json.get('dateFrom', None)
             dateTo = json.get('dateTo', None)
-            if geometry:
-                timeseries = getTimeSeriesAssetForPoint(geometry, dateFrom, dateTo)
-                values = {
-                    'timeseries': timeseries
-                }
+            #if geometry:
+            timeseries = getTimeSeriesAssetForPoint(geometry, dateFrom, dateTo)
+            values = {
+                'timeseries': timeseries
+            }
     except GEEException as e:
         logger.error(e.message)
         values = {
