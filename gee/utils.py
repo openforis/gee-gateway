@@ -589,10 +589,6 @@ def getTimeSeriesAssetForPoint(point, dateFrom=None, dateTo=datetime.datetime.no
         return d
 
     try:
-        logger.error("I am here at getTimeSeriesAssetForPoint")
-        logger.error(str(point))
-        logger.error(str(dateFrom))
-        logger.error(str(dateTo))
         tcc = ee.ImageCollection("projects/servir-mekong/UMD/tree_canopy")
         tcc = toDict(tcc.toList(tcc.size()).map(sampleUsingPoint).getInfo())
         loss = ee.ImageCollection("projects/servir-mekong/UMD/loss")
