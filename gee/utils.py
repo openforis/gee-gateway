@@ -616,7 +616,7 @@ def getTimeSeriesAssetForPoint(point=[103.966459, 18.73361], dateFrom=None, date
             timeseries.append([timestamp, tempdict])
     except EEException as e:
         raise GEEException(sys.exc_info()[0])
-    print({"success":"success","timeseries":timeseries})
+    return timeseries
 
 def getStatistics(paramType, aOIPoly):
     values = {}
