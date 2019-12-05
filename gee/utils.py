@@ -529,7 +529,7 @@ def getTimeSeriesForPoint(point, dateFrom=None, dateTo=datetime.datetime.now()):
         image = ee.Image(image)
         return ee.Feature(None, image.reduceRegion(
             reducer=ee.Reducer.first(),
-            geometry=point,
+            geometry=ee.Geometry.Point(point),
             scale=1
         ).set('date', image.date()))
 
