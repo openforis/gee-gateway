@@ -529,7 +529,7 @@ def getTimeSeriesForPoint(point, dateFrom=None, dateTo=datetime.datetime.now()):
         image = ee.Image(image)
         return ee.Feature(None, image.reduceRegion(
             reducer=ee.Reducer.first(),
-            geometry=ee.Geometry.Point(point),
+            geometry=point,
             scale=1
         ).set('date', image.date()))
 
@@ -579,7 +579,7 @@ def getTimeSeriesAssetForPoint(point=[103.966459, 18.73361], dateFrom=None, date
     def sampleUsingPoint(image):
         image = ee.Image(image)
         timestamp = image.get("system:time_start")
-        sampledValue = image.sample(point,30).first().get(image.bandNames().get(0));
+        sampledValue = image.sample(ee.Geometry.Point(point),30).first().get(image.bandNames().get(0));
         return [timestamp, sampledValue]
 
     def toDict(array):
