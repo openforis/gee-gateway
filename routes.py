@@ -466,7 +466,7 @@ def timeSeriesIndex2():
                 scale = float(json.get('scale', 30))
                 dateFrom = json.get('dateFromTimeSeries', None)
                 dateTo = json.get('dateToTimeSeries', None)
-                timeseries = getTimeSeriesByIndex(indexName, scale, geometry,dateFrom,dateTo)
+                timeseries = getTimeSeriesByIndex2(indexName, scale, geometry,dateFrom,dateTo)
                 values = {
                     'timeseries': timeseries
                 }

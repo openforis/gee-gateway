@@ -590,7 +590,6 @@ def getTimeSeriesAssetForPoint(point, dateFrom=None, dateTo=datetime.datetime.no
         for pair in array:
             d[pair[0]] = pair[1]
         return d
-
     try:
         tcc = ee.ImageCollection("projects/servir-mekong/UMD/tree_canopy")
         tcc = toDict(tcc.toList(tcc.size()).map(sampleUsingPoint).getInfo())
