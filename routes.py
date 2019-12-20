@@ -1,5 +1,6 @@
 from gee.gee_exception import GEEException
 from gee.utils import *
+from planet.utils import *
 from flask import Flask, request, jsonify, render_template, json, current_app
 from flask_cors import CORS, cross_origin
 import logging
@@ -781,6 +782,25 @@ def getFiltered(collectionName, json, simpleCompositVariable):
         'bands': bands
     }
     return filteredImageCompositeToMapId(collectionName, visParams, dateFrom, dateTo, cloudLessThan, simpleCompositVariable)
+@gee_gateway.route('/getPlanetTile', methods=['POST'])
+def getPlanetTile():
+    values = {}
+    try:
+        json = request.get_json()
+        apiKey = json.get('apiKey')
+        geometry = json.get('geometry')
+        start = json.get('dateFrom')
+        end = json.get('dateTo', None)
+        layerCount = json.get('layerCount', 1)
+        itemTypes = json.get('itemTypes', ['PSScene3Band', 'PSScene4Band'])
+        values = getPlanetMapID(apiKey, geometry, start, end, layerCount, itemTypes)
+    except Exception as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
+
 
 ############################### TimeSync ##############################
 
