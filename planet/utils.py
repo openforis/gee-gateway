@@ -125,7 +125,7 @@ def features_layer(features, name='Planet'):
     layer = res.json()['name']
     return {"date": feature_date(features[0]), "layerID": layer}
 
-# Add a layer with features similar to one the specified one.
+# Add a layer with features similar to one the requested one.
 def add_similar_features(feature, geometry):
     features = search(
         item_types=[feature['properties']['item_type']],
@@ -169,5 +169,3 @@ def getPlanetMapID(api_key, geometry, start, end=None, layerCount=1, item_types=
     if len(fullList) == 0:
         fullList.append({"date": "null", "layerID": "null"})
     return fullList
-
-
