@@ -526,15 +526,22 @@ def getTimeSeriesForPoint(point, dateFrom=None, dateTo=datetime.datetime.now()):
     """ https://code.earthengine.google.com/49592558df4df130e9082f94a23a887f """
 
     bandNames = ['blue', 'green', 'red', 'nir', 'swir1', 'swir2', 'temp', 'pixel_qa']
-    properties = bandNames + ['date']
+    #TODO: implement image_year and image_julday on the client side. Keep it for now for TimeSync
+    properties = bandNames + ['date', 'image_year', 'image_julday']
 
     def toValue(image):
         image = ee.Image(image)
-        return ee.Feature(None, image.reduceRegion(
+        image_date = ee.Date(image.date())
+        year = image_date.get('year')
+        doy = image_date.getRelative('day', 'year')
+        return (ee.Feature(None, image.reduceRegion(
             reducer=ee.Reducer.first(),
             geometry=point,
             scale=1
-        ).set('date', image.date()))
+        )).set('date', image_date)
+         .set('image_year', year)
+         .set('image_julday', doy)
+        )
 
     def mask(image):
         image = ee.Image(image)
@@ -864,6 +871,26 @@ def createChip(image, point, vis, size=255):
 
     return {"iid": iid, "doy": doy, "chip_url": chip_url}
 
+def createChipXYZ(image, point, vis, size=255):
+    '''
+    generate a chip for an image
+    '''
+    this_image = ee.Image(image)
+    iid = this_image.get('system:id').getInfo()
+    doy = ee.Date(this_image.get('system:time_start')).getRelative('day', 'year').getInfo()
+
+    pixelSize = ee.Image(image).projection().nominalScale()
+    box = ee.Geometry.Point(point).buffer(pixelSize.multiply(size / 2.0), 5).bounds(5)
+
+    if vis == 'tc':
+        image = tcTransform(ee.Image(image))
+
+    mapid = ee.Image(image).clip(box).unmask().visualize(**VIS_SET[vis]).getMapId()
+    
+    chip_url = 'https://earthengine.googleapis.com/map/%s/{z}/{x}/{y}?token=%s' % (mapid['mapid'], mapid['token'])
+
+    return {"iid": iid, "doy": doy, "chip_url": chip_url}
+
 def qaTargetDay(point, day):
     def qa(img):
         #cfmask:    {0: clear, 1: water, 2: shadow, 3: snow, 4: cloud}
@@ -907,7 +934,11 @@ def getSpectralsForPoint(collection, point):
         image_date = ee.Date(image.date())
         year = image_date.get('year')
         doy = image_date.getRelative('day', 'year')
-        return (ee.Feature(None, image.reduceRegion(
+
+        #TODO: should rescaling be applied when collection is made?
+        scaled = image.select(["B1", "B2", "B3", "B4", "B5", "B7"]).divide(10000).addBands(image.select(['cfmask']))
+
+        return (ee.Feature(None, scaled.reduceRegion(
             reducer=ee.Reducer.first(),
             geometry=point,
             scale=30,
@@ -971,4 +1002,3 @@ def getTsTimeSeriesForPointByTargetDay(point, day, startYear=1985, endYear=None)
 
     return getSpectralsForPoint(ee.ImageCollection(images), ee.Geometry.Point(point))
     # return getTimeSeriesForPoint(ee.Geometry.Point(point))
-
