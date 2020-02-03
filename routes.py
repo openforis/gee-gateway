@@ -825,63 +825,6 @@ def getAllLandsatImagesForPlot(lng, lat, year):
         }
     return jsonify(values), 200
 
-@gee_gateway.route('/ts/chip/<lng>/<lat>/<int:year>/<int:day>/<vis>', methods=['GET'])
-def getChipForYearByTargetDay(lng, lat, year, day, vis):
-    """
-    get image chip for specified year for plot coordinate.
-    """
-
-    values = {}
-    try:
-        values = getLandsatChipForYearByTargetDay((float(lng), float(lat)), year, day, vis)
-        fp = urllib2.urlopen(values.get('chip_url'))
-        fname = '%s_%s.png' % (values.get('iid'), values.get('doy'))
-        response = make_response(send_file(fp, mimetype='image/png', as_attachment=True, attachment_filename=fname))
-        response.headers['doy'] = values.get('doy')
-        response.headers['iid'] = values.get('iid')
-        response.headers['chip_url'] = values.get('chip_url')
-        return response, 200
-    except GEEException as e:
-        logger.error(e.message)
-        values = {
-            'errMsg': e.message
-        }
-        return jsonify(values), 500
-
-@gee_gateway.route('/ts/image_chip/<lng>/<lat>/<path:iid>/<vis>/<int:size>', methods=['GET'])
-def getImageChip(lng, lat, iid, vis, size=255):
-    """
-    get image chip for specified image
-
-    @param
-        {
-            "lat":
-            "lng":
-            "iid": LANDSAT/LE07/C01/T1_SR/LE07_045030_20000122
-            "vis":
-        }
-    @return
-    """
-
-    values = {}
-    try:
-        values = createChip(iid, (float(lng), float(lat)), vis, size)
-        fp = urllib2.urlopen(values.get('chip_url'))
-        fname = '%s_%s.png' % (values.get('iid'), values.get('doy'))
-        response = make_response(send_file(fp, mimetype='image/png', as_attachment=True, attachment_filename=fname))
-        response.headers['doy'] = values.get('doy')
-        response.headers['iid'] = values.get('iid')
-        response.headers['chip_url'] = values.get('chip_url')
-        return response, 200
-    except Exception as e:
-        logger.error(e.message)
-        values = {
-            'errMsg': e.message
-        }
-        return jsonify(values), 500
-    # return jsonify(values), 200
-
-
 @gee_gateway.route('/ts/chip_url/<lng>/<lat>/<int:year>/<int:day>/<vis>', methods=['GET'])
 def getChipForYearByTargetDayURL(lng, lat, year, day, vis):
     """
