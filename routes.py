@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, render_template, json, current_app, s
 from flask_cors import CORS, cross_origin
 import logging
 from logging.handlers import RotatingFileHandler
-import urllib2
+
 
 logger = logging.getLogger(__name__)
 handler = RotatingFileHandler('gee-gateway-nginx.log', maxBytes=10485760, backupCount=10)
