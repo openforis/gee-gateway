@@ -1,10 +1,11 @@
 from gee.gee_exception import GEEException
 from gee.utils import *
 from planet.utils import *
-from flask import Flask, request, jsonify, render_template, json, current_app
+from flask import Flask, request, jsonify, render_template, json, current_app, send_file, make_response
 from flask_cors import CORS, cross_origin
 import logging
 from logging.handlers import RotatingFileHandler
+import urllib2
 
 logger = logging.getLogger(__name__)
 handler = RotatingFileHandler('gee-gateway-nginx.log', maxBytes=10485760, backupCount=10)
@@ -879,6 +880,81 @@ def getImageChip(lng, lat, iid, vis, size=255):
         }
         return jsonify(values), 500
     # return jsonify(values), 200
+
+
+@gee_gateway.route('/ts/chip_url/<lng>/<lat>/<int:year>/<int:day>/<vis>', methods=['GET'])
+def getChipForYearByTargetDayURL(lng, lat, year, day, vis):
+    """
+    get image chip for specified year for plot coordinate.
+    """
+
+    values = {}
+    try:
+        values = getLandsatChipForYearByTargetDay((float(lng), float(lat)), year, day, vis)
+        return values.get('chip_url'), 200
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+        return jsonify(values), 500
+
+@gee_gateway.route('/ts/image_chip_url/<lng>/<lat>/<path:iid>/<vis>/<int:size>', methods=['GET'])
+def getImageChipURL(lng, lat, iid, vis, size=255):
+    """
+    get image chip for specified image
+
+    @param
+        {
+            "lat":
+            "lng":
+            "iid": LANDSAT/LE07/C01/T1_SR/LE07_045030_20000122
+            "vis":
+        }
+    @return
+    """
+
+    values = {}
+    try:
+        values = createChip(iid, (float(lng), float(lat)), vis, size)
+        return jsonify(values), 200
+    except Exception as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+        return jsonify(values), 500
+    # return jsonify(values), 200
+
+
+
+@gee_gateway.route('/ts/image_chip_xyz/<lng>/<lat>/<path:iid>/<vis>/<int:size>', methods=['GET'])
+def getImageChipXYZ(lng, lat, iid, vis, size=255):
+    """
+    get image chip for specified image
+
+    @param
+        {
+            "lat":
+            "lng":
+            "iid": LANDSAT/LE07/C01/T1_SR/LE07_045030_20000122
+            "vis":
+        }
+    @return
+    """
+
+    values = {}
+    try:
+        values = createChipXYZ(iid, (float(lng), float(lat)), vis, size)
+        return jsonify(values), 200 
+    except Exception as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+        return jsonify(values), 500
+    # return jsonify(values), 200
+
 
 #TODO: refactory the next three methods
 @gee_gateway.route('/ts/spectrals/<lng>/<lat>', methods=['GET'])
