@@ -917,7 +917,7 @@ def getImageChipURL(lng, lat, iid, vis, size=255):
     try:
         values = createChip(iid, (float(lng), float(lat)), vis, size)
         return jsonify(values), 200
-    except Exception as e:
+    except GEEException as e:
         logger.error(e.message)
         values = {
             'errMsg': e.message
@@ -946,7 +946,7 @@ def getImageChipXYZ(lng, lat, iid, vis, size=255):
     try:
         values = createChipXYZ(iid, (float(lng), float(lat)), vis, size)
         return jsonify(values), 200 
-    except Exception as e:
+    except GEEException as e:
         logger.error(e.message)
         values = {
             'errMsg': e.message
