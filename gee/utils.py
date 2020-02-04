@@ -854,20 +854,23 @@ def createChip(image, point, vis, size=255):
     this_image = ee.Image(image)
     iid = this_image.get('system:id').getInfo()
     doy = ee.Date(this_image.get('system:time_start')).getRelative('day', 'year').getInfo()
+    sensor = this_image.get('SATELLITE').getInfo()
+    src_bands = BAND_SET['LT05']
+    if sensor == 'LANDSAT_8':
+        src_bands = BAND_SET['LC08']
 
     pixelSize = ee.Image(image).projection().nominalScale()
     box = ee.Geometry.Point(point).buffer(pixelSize.multiply(size / 2.0), 5).bounds(5)
 
+    image = this_image.select(src_bands, BAND_NAMES)
     if vis == 'tc':
-        image = tcTransform(ee.Image(image))
+        image = tcTransform(image)
 
-    rgb = ee.Image(image).visualize(**VIS_SET[vis]).unmask()
+    params = {'dimensions': '%dx%d' % (size, size),
+              'region': box,
+              'format': 'png'}
 
-    thumbID = ee.data.getThumbId({'image': rgb.serialize(),
-                                  'dimensions': '%dx%d' % (size, size),
-                                  'region': box.getInfo()['coordinates'],
-                                  'format': 'png'})
-    chip_url = ee.data.makeThumbUrl(thumbID)
+    chip_url = ee.Image(image).visualize(**VIS_SET[vis]).unmask().getThumbURL(params)
 
     return {"iid": iid, "doy": doy, "chip_url": chip_url}
 
@@ -878,12 +881,17 @@ def createChipXYZ(image, point, vis, size=255):
     this_image = ee.Image(image)
     iid = this_image.get('system:id').getInfo()
     doy = ee.Date(this_image.get('system:time_start')).getRelative('day', 'year').getInfo()
+    sensor = this_image.get('SATELLITE').getInfo()
+    src_bands = BAND_SET['LT05']
+    if sensor == 'LANDSAT_8':
+        src_bands = BAND_SET['LC08']
 
     pixelSize = ee.Image(image).projection().nominalScale()
     box = ee.Geometry.Point(point).buffer(pixelSize.multiply(size / 2.0), 5).bounds(5)
 
+    image = this_image.select(src_bands, BAND_NAMES)
     if vis == 'tc':
-        image = tcTransform(ee.Image(image))
+        image = tcTransform(image)
 
     mapid = ee.Image(image).clip(box).unmask().visualize(**VIS_SET[vis]).getMapId()
     
