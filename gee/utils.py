@@ -867,7 +867,7 @@ def createChip(image, point, vis, size=255):
         image = tcTransform(image)
 
     params = {'dimensions': '%dx%d' % (size, size),
-              'region': box,
+              'region': box.getInfo()['coordinates'],
               'format': 'png'}
 
     chip_url = ee.Image(image).visualize(**VIS_SET[vis]).unmask().getThumbURL(params)
@@ -967,7 +967,7 @@ def getSpectralsForPoint(collection, point):
         .get('list') \
         .getInfo()
 
-    collectionBands = map(listToObject, collectionBands)
+    collectionBands = list(map(listToObject, collectionBands))
 
     return collectionBands
 
