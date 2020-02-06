@@ -158,7 +158,7 @@ def getPlanetMapID(api_key, geometry, start, end=None, layerCount=1, item_types=
         item_types=item_types,
         filters=[
             date_filter(fstart, fend), #date_filter(start, end),
-            geometry_filter(Polygon(geometry).centroid),
+            geometry_filter(Polygon(geometry)),
             string_filter('quality_category', ['standard'])
         ],
         sort=True
