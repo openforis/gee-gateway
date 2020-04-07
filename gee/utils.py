@@ -371,7 +371,9 @@ def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[
                 theReducer = ee.Reducer.mean()
             if indexName != None:
                 indexValue = image.reduceRegion(theReducer, geometry, scale).get(indexName)
+                print("had indexName: " + indexName + " and indexValue is: " + indexValue)
             else:
+                print("noooooooooo indexName")
                 indexValue = image.reduceRegion(theReducer, geometry, scale)
             date = image.get('system:time_start')
             indexImage = ee.Image().set('indexValue', [ee.Number(date), indexValue])
