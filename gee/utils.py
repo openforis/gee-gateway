@@ -349,6 +349,7 @@ def filteredImageInCHIRPSToMapId(dateFrom=None, dateTo=None):
 
 def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[], dateFrom=None, dateTo=None, reducer=None):
     """  """
+    print("************getTimeSeriesByCollectionAndIndex**********************")
     try:
         geometry = None
         indexCollection = None
