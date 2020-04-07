@@ -40,7 +40,8 @@ def imageToMapId(imageName, visParams={}):
         logger.error('******imageToMapId complete************')
         values = {
             'mapid': mapId['mapid'],
-            'token': mapId['token']
+            'token': mapId['token'],
+            'url': mapId['tile_fetcher'].url_format
         }
     except EEException as e:
         logger.error("******imageToMapId error************", sys.exc_info()[0])
