@@ -349,7 +349,7 @@ def filteredImageInCHIRPSToMapId(dateFrom=None, dateTo=None):
 
 def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[], dateFrom=None, dateTo=None, reducer=None):
     """  """
-    print("************getTimeSeriesByCollectionAndIndex**********************")
+    logger.error("************getTimeSeriesByCollectionAndIndex**********************")
     try:
         geometry = None
         indexCollection = None
@@ -372,9 +372,9 @@ def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[
                 theReducer = ee.Reducer.mean()
             if indexName != None:
                 indexValue = image.reduceRegion(theReducer, geometry, scale).get(indexName)
-                print("had indexName: " + indexName + " and indexValue is: " + indexValue)
+                logger.error("had indexName: " + indexName + " and indexValue is: " + indexValue)
             else:
-                print("noooooooooo indexName")
+                logger.error("noooooooooo indexName")
                 indexValue = image.reduceRegion(theReducer, geometry, scale)
             date = image.get('system:time_start')
             indexImage = ee.Image().set('indexValue', [ee.Number(date), indexValue])
