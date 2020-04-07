@@ -358,11 +358,14 @@ def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[
         else:
             geometry = ee.Geometry.Point(coords)
         if indexName != None:
+            logger.error("collection: " + collectionName + " - indexName: " + indexName)
             indexCollection = ee.ImageCollection(collectionName).filterDate(dateFrom, dateTo).select(indexName)
         else:
+            logger.error("indexName missing")
             indexCollection = ee.ImageCollection(collectionName).filterDate(dateFrom, dateTo)
         def getIndex(image):
             """  """
+            logger.error("entered getImage")
             theReducer = None;
             if(reducer == 'min'):
                 theReducer = ee.Reducer.min()
