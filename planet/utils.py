@@ -1,12 +1,10 @@
-import os
-import requests
-import json
-import urllib
-import sys
 import datetime
+import json
+
 import dateutil.parser
-from shapely.geometry import Polygon
+import requests
 from shapely.geometry import CAP_STYLE
+from shapely.geometry import Polygon
 from shapely_geojson import dumps
 
 global PLANET_API_KEY

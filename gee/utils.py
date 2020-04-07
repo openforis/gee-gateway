@@ -1,15 +1,13 @@
 import datetime
 import ee
 from ee.ee_exception import EEException
-from gee_exception import GEEException
+from gee.gee_exception import GEEException
 from itertools import groupby
 import logging
 import logging.config
 from logging.handlers import RotatingFileHandler
 import math
 import numpy as np
-from oauth2client.client import OAuth2Credentials
-from oauth2client.service_account import ServiceAccountCredentials
 import sys
 
 logger = logging.getLogger(__name__)
@@ -20,18 +18,15 @@ logger.setLevel(logging.DEBUG)
 
 def initialize(ee_account='', ee_key_path='', ee_user_token=''):
     try:
-        if ee_user_token:
-            credentials = OAuth2Credentials(ee_user_token, None, None, None, None, None, None)
-            ee.InitializeThread(credentials)
-        elif ee_account and ee_key_path:
-            credentials = ServiceAccountCredentials.from_p12_keyfile(
-                service_account_email=ee_account,
-                filename=ee_key_path,
-                private_key_password='notasecret',
-                scopes=ee.oauth.SCOPE + ' https://www.googleapis.com/auth/drive')
-            ee.Initialize(credentials)
+        if ee_account and ee_key_path:
+            try:
+                credentials = ee.ServiceAccountCredentials(ee_account, ee_key_path)
+                ee.Initialize(credentials)
+
+            except EEException as e:
+                print(str(e))
         else:
-            ee.Initialize()
+            raise Exception("EE Initialize error", "No credentials found")
     except (EEException, TypeError) as e:
         logger.error("******EE initialize error************", sys.exc_info()[0])
         pass
