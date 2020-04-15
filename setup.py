@@ -24,15 +24,14 @@ setup(
     packages=['gee_gateway', 'gee_gateway.gee', 'gee_gateway.web'],
     include_package_data=True,
     install_requires=[
-        'Flask>=0.12.2',
-        'Flask-Cors==3.0.3',
-        'google-api-python-client>=1.6.2',
+        'Flask>=1.1.2',
+        'Flask-Cors>=3.0.8',
+        'google-api-python-client>=1.8.0',
         'pyCrypto>=2.6.1',
-        'numpy==1.14.1',
-        'oauth2client>=4.1.2',
-        'earthengine-api==0.1.137'
+        'numpy>=1.18.2',
+        'oauth2client>=4.1.3'
     ],
     dependency_links=[
-        'git+https://github.com/openforis/earthengine-api.git@79ecb2b3cd63f3fbd4afecce48432e8da04755d8#egg=earthengine-api-0.1.137'
+        'git+git://github.com/openforis/earthengine-api.git@v0.1.217#egg=earthengine-api&subdirectory=python'
     ]
 )

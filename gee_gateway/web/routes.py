@@ -82,9 +82,9 @@ def image():
 
                 values = imageToMapId(imageName, visParams)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -136,9 +136,9 @@ def firstImageByMosaicCollection():
                 dateTo = json.get('dateTo', None)
                 values = firstImageInMosaicToMapId(collectionName, visParams, dateFrom, dateTo)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -190,9 +190,9 @@ def meanImageByMosaicCollections():
                 dateTo = json.get('dateTo', None)
                 values = meanImageInMosaicToMapId(collectionName, visParams, dateFrom, dateTo)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -237,9 +237,9 @@ def imageByMosaicCollection():
                 dateTo = json.get('dateTo', None)
                 values = filteredImageByIndexToMapId(dateFrom, dateTo, collectionName)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -290,9 +290,9 @@ def cloudMaskImageByMosaicCollection():
                 dateTo = json.get('dateTo', None)
                 values = firstCloudFreeImageInMosaicToMapId(collectionName, visParams, dateFrom, dateTo)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -343,9 +343,9 @@ def meanImageByMosaicCollection():
                 dateTo = json.get('dateTo', None)
                 values = filteredImageInMosaicToMapId(collectionName, visParams, dateFrom, dateTo)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -359,9 +359,9 @@ def getCHIRPSImage():
            dateTo = json.get('dateTo', None)
            values = filteredImageInCHIRPSToMapId(dateFrom, dateTo)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -376,9 +376,9 @@ def ImageCollectionbyIndex():
            index = json.get('index', 'ndvi')
            values = filteredImageByIndexToMapId(dateFrom, dateTo, index)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -443,9 +443,9 @@ def timeSeriesIndex():
                     'timeseries': timeseries
                 }
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -469,9 +469,9 @@ def timeSeriesIndex2():
                     'timeseries': timeseries
                 }
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -495,9 +495,9 @@ def timeSeriesIndex3():
                     'timeseries': timeseries
                 }
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -515,9 +515,9 @@ def timeSeriesForPoint():
                     'timeseries': timeseries
                 }
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -576,9 +576,9 @@ def timeSeriesIndexGet():
                     'timeseries': timeseries
                 }
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -617,9 +617,9 @@ def getStats():
         paramValue = json.get('paramValue', None)
         values = getStatistics(paramType, paramValue)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -634,9 +634,9 @@ def asterMosaic():
             dateTo = json.get('dateTo', None)
             values = getAsterMosaic(visParams, dateFrom, dateTo)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -651,9 +651,9 @@ def ndviChange():
             yearTo = json.get('yearTo', None)
             values = getNdviChange(visParams, yearFrom, yearTo)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 @gee_gateway.route('/Landsat5Filtered', methods=['POST'])
@@ -664,9 +664,9 @@ def Landsat5Filtered():
         if json:
             values = getFiltered('LANDSAT/LT05/C01/T1', json, 50)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -678,9 +678,9 @@ def Landsat7Filtered():
         if json:
             values = getFiltered('LANDSAT/LE07/C01/T1', json, 60)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -692,9 +692,9 @@ def Landsat8Filtered():
         if json:
             values = getFiltered('LANDSAT/LC08/C01/T1_RT', json, 50)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -717,9 +717,9 @@ def FilteredSentinel():
             }
             values = filteredSentinelComposite(visParams, dateFrom, dateTo, cloudLessThan)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -733,9 +733,9 @@ def ImageCollectionAsset():
             visParams = json.get('visParams', {})
             values = getImageCollectionAsset(collection, visParams)
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -769,9 +769,9 @@ def getAllLandsatImagesForPlot(lng, lat, year):
         values = getLandsatImages((float(lng), float(lat)), year)
 
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
     return jsonify(values), 200
 
@@ -792,9 +792,9 @@ def getChipForYearByTargetDay(lng, lat, year, day, vis):
         response.headers['chip_url'] = values.get('chip_url')
         return response, 200
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
         return jsonify(values), 500
 
@@ -824,9 +824,9 @@ def getImageChip(lng, lat, iid, vis, size=255):
         response.headers['chip_url'] = values.get('chip_url')
         return response, 200
     except Exception as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
         return jsonify(values), 500
     # return jsonify(values), 200
@@ -852,9 +852,9 @@ def getPlotSpectrals(lng, lat):
         }
         return jsonify(values), 200
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
         return jsonify(values), 500
 
@@ -879,9 +879,9 @@ def getPlotSpectralsByYear(year, lng, lat):
         }
         return jsonify(values), 200
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
         return jsonify(values), 500
 
@@ -906,8 +906,8 @@ def getPlotSpectralsByJulday(julday, lng, lat):
         }
         return jsonify(values), 200
     except GEEException as e:
-        logger.error(e.message)
+        logger.error(str(e))
         values = {
-            'errMsg': e.message
+            'errMsg': str(e)
         }
         return jsonify(values), 500
