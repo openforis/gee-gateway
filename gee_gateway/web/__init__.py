@@ -1,2 +1,2 @@
-import routes
-import errors
+from . import routes
+from . import errors
