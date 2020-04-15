@@ -2,7 +2,7 @@ import ee
 import math
 from ee.ee_exception import EEException
 
-from gee_exception import GEEException
+from .gee_exception import GEEException
 
 from oauth2client.client import OAuth2Credentials
 from oauth2client.service_account import ServiceAccountCredentials
