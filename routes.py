@@ -803,8 +803,29 @@ def getPlanetTile():
         }
     return jsonify(values), 200
 
+@gee_gateway.route('/getAvailableBands', methods=['POST'])
+def getAvailableBands():
+    """  """
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            imageCollectionName = json.get('imageCollection', None)
+            imageName = json.get('image', None)
+            if imageCollectionName is None:
+                values = listAvailableBands(imageName, True)
+            else:
+                values = listAvailableBands(imageCollectionName, False)
+        else:
+            raise Exception("Need either image or imageCollection parameter containing the full name")
+    except Exception as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
 
-############################### TimeSync ##############################
+        ############################### TimeSync ##############################
 
 @gee_gateway.route('/ts')
 def tsIndex():

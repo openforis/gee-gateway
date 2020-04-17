@@ -374,6 +374,7 @@ def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[
             else:
                 theReducer = ee.Reducer.mean()
             if indexName != None:
+                logger.error("had indexName: " + indexName)
                 indexValue = image.reduceRegion(theReducer, geometry, scale).get(indexName)
                 logger.error("had indexName: " + indexName + " and indexValue is: " + indexValue)
             else:
@@ -765,6 +766,17 @@ def filteredSentinelComposite(visParams={}, dateFrom=None, dateTo=None, metadata
     m2017s2 = f2017s2.map(cloudScoreS2)
     m2017s3 = m2017s2.median()
     return imageToMapId(m2017s3, visParams)
+
+def listAvailableBands(name, isImage):
+    eeImage = None
+    if isImage is not None:
+        eeImage = ee.Image(name)
+    else:
+        eeImage = ee.ImageCollection(name).first()
+    return {
+        'bands': eeImage.bandNames()
+    }
+
 
 ########################## TimeSync Related Functions ##########################
 
