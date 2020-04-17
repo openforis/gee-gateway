@@ -815,8 +815,7 @@ def getAvailableBands():
             if imageCollectionName is None:
                 values = listAvailableBands(imageName, True)
             else:
-                getActualCollection(imageCollectionName);
-                values = listAvailableBands(imageCollectionName, False)
+                values = listAvailableBands(getActualCollection(imageCollectionName), False)
         else:
             raise Exception("Need either image or imageCollection parameter containing the full name")
     except Exception as e:
