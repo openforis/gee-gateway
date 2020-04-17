@@ -769,7 +769,7 @@ def filteredSentinelComposite(visParams={}, dateFrom=None, dateTo=None, metadata
 
 def listAvailableBands(name, isImage):
     eeImage = None
-    if isImage is not None:
+    if isImage == True:
         eeImage = ee.Image(name)
     else:
         eeImage = ee.ImageCollection(name).first()
