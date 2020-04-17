@@ -806,6 +806,7 @@ def getPlanetTile():
 @gee_gateway.route('/getAvailableBands', methods=['POST'])
 def getAvailableBands():
     """  """
+    logger.error("Debugging getAvailableBands")
     values = {}
     try:
         json = request.get_json()
@@ -815,7 +816,10 @@ def getAvailableBands():
             if imageCollectionName is None:
                 values = listAvailableBands(imageName, True)
             else:
-                values = listAvailableBands(getActualCollection(imageCollectionName), False)
+                logger.error("getAvailableBands else")
+                actualName = getActualCollection(imageCollectionName)
+                logger.error(actualName + "spaces?")
+                values = listAvailableBands(actualName, False)
         else:
             raise Exception("Need either image or imageCollection parameter containing the full name")
     except Exception as e:
