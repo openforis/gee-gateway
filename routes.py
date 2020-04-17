@@ -815,6 +815,7 @@ def getAvailableBands():
             if imageCollectionName is None:
                 values = listAvailableBands(imageName, True)
             else:
+                getActualCollection(imageCollectionName);
                 values = listAvailableBands(imageCollectionName, False)
         else:
             raise Exception("Need either image or imageCollection parameter containing the full name")
@@ -824,6 +825,16 @@ def getAvailableBands():
             'errMsg': e.message
         }
     return jsonify(values), 200
+
+def getActualCollection(name):
+    if name is "LANDSAT5":
+        return "LANDSAT/LT05/C01/T1"
+    elif name is "LANDSAT7":
+        return "LANDSAT/LE07/C01/T1";
+    elif name is "LANDSAT8":
+        return "LANDSAT/LC08/C01/T1_RT";
+    elif name is "SENTINAL2":
+        return "COPERNICUS/S2";
 
         ############################### TimeSync ##############################
 
