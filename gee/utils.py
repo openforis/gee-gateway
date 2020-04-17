@@ -774,7 +774,7 @@ def listAvailableBands(name, isImage):
     else:
         eeImage = ee.ImageCollection(name).first()
     return {
-        'bands': eeImage.bandNames()
+        'bands': str(eeImage.bandNames())
     }
 
 
