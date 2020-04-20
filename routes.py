@@ -1246,6 +1246,8 @@ def getActualCollection(name):
         return "LANDSAT/LC08/C01/T1_RT"
     elif name == "Sentinel2":
         return "COPERNICUS/S2"
+    else:
+        return name
 
         ############################### TimeSync ##############################
 
