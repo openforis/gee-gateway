@@ -1249,7 +1249,26 @@ def getActualCollection(name):
     else:
         return name
 
-        ############################### TimeSync ##############################
+@gee_gateway.route('/getImagePlotDegradition', methods=['POST'])
+def getImagePlotDegradition():
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            geometry = json.get('geometry')
+            start = json.get('start')
+            end = json.get('end')
+            values = getDegradationPlotsByPoint(geometry, start, end)
+        else:
+            raise Exception(
+                "Need either image or imageCollection parameter containing the full name")
+    except Exception as e:
+        logger.error(str(e))
+        values = {
+            'errMsg': str(e)
+        }
+    return jsonify(values), 200
+############################### TimeSync ##############################
 
 
 @gee_gateway.route('/ts')

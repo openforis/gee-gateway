@@ -9,6 +9,7 @@ from logging.handlers import RotatingFileHandler
 import math
 import numpy as np
 import sys
+import gee.inputs
 
 logger = logging.getLogger(__name__)
 handler = RotatingFileHandler('gee-gateway-nginx.log', maxBytes=10485760, backupCount=10)
@@ -524,6 +525,56 @@ def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=Non
     except EEException as e:
         raise GEEException(sys.exc_info()[0])
     return values
+
+def getDegradationPlotsByPoint(geometry, start, end):
+    logger.error("Entered getDegradationPlotsByPoint")
+    allLandsat = gee.inputs.getLandsat({
+        "start": start,
+        "end": end,
+        "targetBands": ['SWIR1','NIR','RED','GREEN','BLUE','SWIR2','NDFI']
+    })
+    geometry = None
+    if isinstance(geometry[0], list):
+        geometry = ee.Geometry.Polygon(geometry)
+    else:
+        geometry = ee.Geometry.Point(geometry)
+    landsatData = allLandsat.filterBounds(geometry)
+    return getImagePlot(landsatData,geometry, geometry, 'NDFI', 4)
+
+def getImagePlot(iCol, region, point, bandName, position):
+    # Make time series plot from image collection
+    def toValue(image):
+        image = ee.Image(image)
+        image_date = ee.Date(image.date())
+        year = image_date.get('year')
+        doy = image_date.getRelative('day', 'year')
+        return (ee.Feature(None, image.reduceRegion(
+            reducer=ee.Reducer.mean(),
+            geometry=point,
+            scale=30
+        )).set('date', image_date)
+                .set('image_year', year)
+                .set('image_julday', doy)
+                )
+    yminNew = ee.Image(iCol.min()) \
+        .reduceRegion({
+        'reducer': ee.Reducer.mean(),
+        'geometry': region,
+        'scale': 30
+    })
+    ymaxNew = ee.Image(iCol.max()) \
+        .reduceRegion({
+        'reducer': ee.Reducer.mean(),
+        'geometry': region,
+        'scale': 30
+    })
+    return ee.ImageCollection(iCol).select(bandName)\
+        .filterBounds(region) \
+        .map(toValue) \
+        .sort('date') \
+        .get('list') \
+        .getInfo()
+        #, ee.Reducer.mean(), 30
 
 def getTimeSeriesForPoint(point, dateFrom=None, dateTo=datetime.datetime.now()):
     """ https://code.earthengine.google.com/49592558df4df130e9082f94a23a887f """
