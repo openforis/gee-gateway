@@ -18,18 +18,12 @@ gee_gateway = Flask(__name__, instance_relative_config=True,
                     static_url_path="/static", static_folder="./static")
 gee_gateway.config.from_object('config')
 gee_gateway.config.from_pyfile('config.py', silent=True)
-ee_account_g = None
-ee_key_path_g = None
 
 @gee_gateway.before_request
 def before():
     ee_user_token = None
     ee_account = current_app.config.get('EE_ACCOUNT')
-    global ee_account_g
-    ee_account_g = ee_account
     ee_key_path = current_app.config.get('EE_KEY_PATH')
-    global ee_key_path_g
-    ee_key_path_g = ee_key_path
     if current_app.config.get('EE_TOKEN_ENABLED'):
         if 'sepal-user' in request.headers:
             user = json.loads(request.headers['sepal-user'])
