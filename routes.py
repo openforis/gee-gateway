@@ -1257,7 +1257,10 @@ def getImagePlotDegradition():
             geometry = json.get('geometry')
             start = json.get('start')
             end = json.get('end')
-            values = getDegradationPlotsByPoint(geometry, start, end)
+            values = {
+                'not working yet': 'true'
+            }
+            #values = getDegradationPlotsByPoint(geometry, start, end)
         else:
             raise Exception(
                 "Need either image or imageCollection parameter containing the full name")
