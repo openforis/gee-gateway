@@ -1,5 +1,5 @@
 import ee
-
+ee.Initialize()
 ORIGIN = 1721423
 
 MS_TO_DAYS = 86400000
