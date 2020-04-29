@@ -550,9 +550,9 @@ def getImagePlot(iCol, region, point, bandName, position):
     logger.error("entered getImagePlot")
     def toValue(image):
         logger.error("entered toValue")
-        image = ee.Image(image)
+        # image = ee.Image(image)
         image_date = ee.Date(image.date())
-        logger.error("image_date: " + str(image_date))
+        logger.error("image_date: " + str(image_date.getInfo()))
         year = image_date.get('year')
         doy = image_date.getRelative('day', 'year')
         logger.error("year and doy: " + str(year) + " - " + str(doy))
