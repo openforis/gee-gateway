@@ -1263,7 +1263,7 @@ def getImagePlotDegradition():
             values = {
                 'not working yet': 'true'
             }
-            #values = getDegradationPlotsByPoint(geometry, start, end)
+            values = getDegradationPlotsByPoint(geometry, start, end)
         else:
             raise Exception(
                 "Need either image or imageCollection parameter containing the full name")
