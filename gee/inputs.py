@@ -21,10 +21,13 @@ logger.setLevel(logging.DEBUG)
 ################################/*/
 
 def getLandsat(options):
+    logger.error("going to get LANDSAT")
     if options is None:
         return ("Error")
     else:
+        logger.error("got options")
         if 'start' in options:
+            logger.error("start exists")
             start = options['start']
         else:
             start = '1990-01-01'
@@ -58,6 +61,7 @@ def getLandsat(options):
             sensors = {"l4": True, "l5": True, "l7": True, "l8": True}
         if useMask == 'No':
             useMask = False
+        logger.error("all options set")
         # Filter using new filtering functions
         collection4 = ee.ImageCollection('LANDSAT/LT04/C01/T1_SR')\
             .filterDate(start, end)\
@@ -75,8 +79,11 @@ def getLandsat(options):
         col = collection4.merge(collection5) \
                             .merge(collection7) \
                             .merge(collection8)
+        logger.error("collections made")
         if region is not None:
+            logger.error("about to filter region")
             col = col.filterBounds(region)
+        logger.error("past region filter")
         indices = doIndices(col).select(targetBands)
         if "l5" not in sensors:
             indices = indices.filterMetadata('SATELLITE','not_equals','LANDSAT_5')
@@ -344,33 +351,37 @@ def prepareL4L5(image):
     bandList = ['B1', 'B2','B3','B4','B5','B7','B6']
     nameList = ['BLUE', 'GREEN', 'RED', 'NIR', 'SWIR1', 'SWIR2', 'TEMP']
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]
-    scaled = ee.Image(image.select(bandList).rename(nameList).divide(ee.Image.constant(scaling))).copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    scaled = ee.Image(image).select(bandList).rename(nameList).divide(ee.Image.constant(scaling))
 
+    logger.error("i bet it breaks here")
     validQA = [66, 130, 68, 132]
-    mask1 = ee.Image(image.select(['pixel_qa']).remap(validQA, ee.List.repeat(1, len(validQA)), 0)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    mask1 = ee.Image(image).select(['pixel_qa']).remap(validQA, ee.List.repeat(1, len(validQA)), 0)
+    logger.error("i made it past")
     # Gat valid data mask, for pixels without band saturation
-    mask2 = ee.Image(image.select('radsat_qa').eq(0)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
-    mask3 = ee.Image(image.select(bandList).reduce(ee.Reducer.min()).gt(0)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    mask2 = image.select('radsat_qa').eq(0)
+    mask3 = image.select(bandList).reduce(ee.Reducer.min()).gt(0)
     # Mask hazy pixels
-    mask4 = ee.Image(image.select("sr_atmos_opacity").lt(300)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
-    return ee.Image(image.addBands(scaled).updateMask(mask1).updateMask(mask2).updateMask(mask3).updateMask(mask4)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    mask4 = image.select("sr_atmos_opacity").lt(300)
+    combined = image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
+    return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
 def prepareL7(image):
     bandList = ['B1', 'B2','B3','B4','B5','B7','B6']
     nameList = ['BLUE', 'GREEN', 'RED', 'NIR', 'SWIR1', 'SWIR2', 'TEMP']
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]
-    scaled = ee.Image(image.select(bandList).rename(nameList).divide(ee.Image.constant(scaling))).copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    scaled = ee.Image(image).select(bandList).rename(nameList).divide(ee.Image.constant(scaling))
 
     validQA = [66, 130, 68, 132]
-    mask1 = ee.Image(image.select(['pixel_qa']).remap(validQA, ee.List.repeat(1, len(validQA)), 0)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    mask1 = ee.Image(image).select(['pixel_qa']).remap(validQA, ee.List.repeat(1, len(validQA)), 0)
     # Gat valid data mask, for pixels without band saturation
-    mask2 = ee.Image(image.select('radsat_qa').eq(0)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
-    mask3 = ee.Image(image.select(bandList).reduce(ee.Reducer.min()).gt(0)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    mask2 = image.select('radsat_qa').eq(0)
+    mask3 = image.select(bandList).reduce(ee.Reducer.min()).gt(0)
     # Mask hazy pixels
-    mask4 = ee.Image(image.select("sr_atmos_opacity").lt(300)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    mask4 = image.select("sr_atmos_opacity").lt(300)
     # Slightly erode bands to get rid of artifacts due to scan lines
-    mask5 = ee.Image(image.mask().reduce(ee.Reducer.min()).focal_min(2.5)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
-    return ee.Image(image.addBands(scaled).updateMask(mask1).updateMask(mask2).updateMask(mask3).updateMask(mask4).updateMask(mask5)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    mask5 = ee.Image(image).mask().reduce(ee.Reducer.min()).focal_min(2.5)
+    combined = image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4).And(mask5))
+    return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
 def prepareL8(image):
     bandList = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10']
@@ -380,12 +391,13 @@ def prepareL8(image):
     validTOA = [66, 68, 72, 80, 96, 100, 130, 132, 136, 144, 160, 164]
     validQA = [322, 386, 324, 388, 836, 900]
 
-    scaled = ee.Image(image.select(bandList).rename(nameList).divide(ee.Image.constant(scaling))).copyProperties(image).set('system:time_start', image.get('system:time_start'))
-    mask1 = ee.Image(image.select(['pixel_qa']).remap(validQA, ee.List.repeat(1, len(validQA)), 0)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
-    mask2 = ee.Image(image.select('radsat_qa').eq(0)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
-    mask3 = ee.Image(image.select(bandList).reduce(ee.Reducer.min()).gt(0)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
-    mask4 = ee.Image(image.select(['sr_aerosol']).remap(validTOA, ee.List.repeat(1, len(validTOA)), 0)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
-    return ee.Image(image.addBands(scaled).updateMask(mask1).updateMask(mask2).updateMask(mask3).updateMask(mask4)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    scaled = ee.Image(image).select(bandList).rename(nameList).divide(ee.Image.constant(scaling))
+    mask1 = ee.Image(image).select(['pixel_qa']).remap(validQA, ee.List.repeat(1, len(validQA)), 0)
+    mask2 = ee.Image(image).select('radsat_qa').eq(0)
+    mask3 = ee.Image(image).select(bandList).reduce(ee.Reducer.min()).gt(0)
+    mask4 = ee.Image(image).select(['sr_aerosol']).remap(validTOA, ee.List.repeat(1, len(validTOA)), 0)
+    combined = ee.Image(image).addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
+    return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
 def generateCollection(geom, startDate, endDate):
     filteredL8 = (ee.ImageCollection('LANDSAT/LC08/C01/T1_SR') \
