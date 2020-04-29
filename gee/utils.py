@@ -552,6 +552,7 @@ def getImagePlot(iCol, region, point, bandName, position):
         logger.error("entered toValue")
         image = ee.Image(image)
         image_date = ee.Date(image.date())
+        logger.error("image_date: " + image_date)
         year = image_date.get('year')
         doy = image_date.getRelative('day', 'year')
         return (ee.Feature(None, image.reduceRegion(
