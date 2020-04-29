@@ -535,7 +535,6 @@ def getDegradationPlotsByPoint(geometry, start, end):
         "targetBands": ['SWIR1','NIR','RED','GREEN','BLUE','SWIR2','NDFI']
     })
     logger.error("got LANDSAT")
-    geometry = None
     if isinstance(geometry[0], list):
         logger.error("making polygon")
         geometry = ee.Geometry.Polygon(geometry)
