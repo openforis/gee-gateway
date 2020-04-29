@@ -62,18 +62,15 @@ def getLandsat(options):
         if useMask == 'No':
             useMask = False
         logger.error("all options set")
+        logger.error("start, end" + start + ", " + end)
         # Filter using new filtering functions
-        fcollection4 = ee.ImageCollection('LANDSAT/LT04/C01/T1_SR') \
-            .filterDate(start, end)
+        fcollection4 = ee.ImageCollection('LANDSAT/LT04/C01/T1_SR').filterDate(start, end)
         collection4 = fcollection4.map(prepareL4L5).sort('system:time_start')
-        fcollection5 = ee.ImageCollection('LANDSAT/LT05/C01/T1_SR')\
-            .filterDate(start, end)
+        fcollection5 = ee.ImageCollection('LANDSAT/LT05/C01/T1_SR').filterDate(start, end)
         collection5 = fcollection5.map(prepareL4L5).sort('system:time_start')
-        fcollection7 = ee.ImageCollection('LANDSAT/LE07/C01/T1_SR')\
-            .filterDate(start, end)
+        fcollection7 = ee.ImageCollection('LANDSAT/LE07/C01/T1_SR').filterDate(start, end)
         collection7 = fcollection7.map(prepareL7).sort('system:time_start')
-        fcollection8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_SR')\
-            .filterDate(start, end)
+        fcollection8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_SR').filterDate(start, end)
         collection8 = fcollection8.map(prepareL8).sort('system:time_start')
 
         col = collection4.merge(collection5) \
