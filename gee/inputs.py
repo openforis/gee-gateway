@@ -352,7 +352,7 @@ def prepareL4L5(image):
 
     logger.error("i bet it breaks here")
     validQA = [66, 130, 68, 132]
-    mask1 = ee.Image(image).select(['pixel_qa']).remap(validQA, ee.List.repeat(1, validQA.length), 0)
+    mask1 = ee.Image(image).select(['pixel_qa']).remap(validQA, ee.List.repeat(1, len(validQA)), 0)
     logger.error("i made it past")
     # Gat valid data mask, for pixels without band saturation
     mask2 = image.select('radsat_qa').eq(0)
