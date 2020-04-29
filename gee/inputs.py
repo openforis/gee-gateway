@@ -368,7 +368,7 @@ def prepareL7(image):
     scaled = ee.Image(image).select(bandList).rename(nameList).divide(ee.Image.constant(scaling))
 
     validQA = [66, 130, 68, 132]
-    mask1 = ee.Image(image).select(['pixel_qa']).remap(validQA, ee.List.repeat(1, validQA.length), 0)
+    mask1 = ee.Image(image).select(['pixel_qa']).remap(validQA, ee.List.repeat(1, len(validQA)), 0)
     # Gat valid data mask, for pixels without band saturation
     mask2 = image.select('radsat_qa').eq(0)
     mask3 = image.select(bandList).reduce(ee.Reducer.min()).gt(0)
@@ -387,10 +387,10 @@ def prepareL8(image):
     validQA = [322, 386, 324, 388, 836, 900]
 
     scaled = ee.Image(image).select(bandList).rename(nameList).divide(ee.Image.constant(scaling))
-    mask1 = ee.Image(image).select(['pixel_qa']).remap(validQA, ee.List.repeat(1, validQA.length), 0)
+    mask1 = ee.Image(image).select(['pixel_qa']).remap(validQA, ee.List.repeat(1, len(validQA)), 0)
     mask2 = image.select('radsat_qa').eq(0)
     mask3 = image.select(bandList).reduce(ee.Reducer.min()).gt(0)
-    mask4 = ee.Image(image).select(['sr_aerosol']).remap(validTOA, ee.List.repeat(1, validTOA.length), 0)
+    mask4 = ee.Image(image).select(['sr_aerosol']).remap(validTOA, ee.List.repeat(1, len(validTOA)), 0)
     return ee.Image(image).addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
 
 def generateCollection(geom, startDate, endDate):
