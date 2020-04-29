@@ -362,7 +362,7 @@ def prepareL4L5(image):
     mask3 = image.select(bandList).reduce(ee.Reducer.min()).gt(0)
     # Mask hazy pixels
     mask4 = image.select("sr_atmos_opacity").lt(300)
-    return ee.Image(image).addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
+    return image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
 
 def prepareL7(image):
     bandList = ['B1', 'B2','B3','B4','B5','B7','B6']
@@ -379,7 +379,7 @@ def prepareL7(image):
     mask4 = image.select("sr_atmos_opacity").lt(300)
     # Slightly erode bands to get rid of artifacts due to scan lines
     mask5 = ee.Image(image).mask().reduce(ee.Reducer.min()).focal_min(2.5)
-    return ee.Image(image).addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4).And(mask5))
+    return image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4).And(mask5))
 
 def prepareL8(image):
     bandList = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10']
@@ -394,7 +394,7 @@ def prepareL8(image):
     mask2 = image.select('radsat_qa').eq(0)
     mask3 = image.select(bandList).reduce(ee.Reducer.min()).gt(0)
     mask4 = ee.Image(image).select(['sr_aerosol']).remap(validTOA, ee.List.repeat(1, len(validTOA)), 0)
-    return ee.Image(image).addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
+    return image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
 
 def generateCollection(geom, startDate, endDate):
     filteredL8 = (ee.ImageCollection('LANDSAT/LC08/C01/T1_SR') \
