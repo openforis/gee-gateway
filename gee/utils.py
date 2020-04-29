@@ -533,17 +533,23 @@ def getDegradationPlotsByPoint(geometry, start, end):
         "end": end,
         "targetBands": ['SWIR1','NIR','RED','GREEN','BLUE','SWIR2','NDFI']
     })
+    logger.error("got LANDSAT")
     geometry = None
     if isinstance(geometry[0], list):
+        logger.error("making polygon")
         geometry = ee.Geometry.Polygon(geometry)
     else:
+        logger.error("making point")
         geometry = ee.Geometry.Point(geometry)
     landsatData = allLandsat.filterBounds(geometry)
+    logger.error("filtered bounds")
     return getImagePlot(landsatData,geometry, geometry, 'NDFI', 4)
 
 def getImagePlot(iCol, region, point, bandName, position):
     # Make time series plot from image collection
+    logger.error("entered getImagePlot")
     def toValue(image):
+        logger.error("entered toValue")
         image = ee.Image(image)
         image_date = ee.Date(image.date())
         year = image_date.get('year')
@@ -556,18 +562,7 @@ def getImagePlot(iCol, region, point, bandName, position):
                 .set('image_year', year)
                 .set('image_julday', doy)
                 )
-    yminNew = ee.Image(iCol.min()) \
-        .reduceRegion({
-        'reducer': ee.Reducer.mean(),
-        'geometry': region,
-        'scale': 30
-    })
-    ymaxNew = ee.Image(iCol.max()) \
-        .reduceRegion({
-        'reducer': ee.Reducer.mean(),
-        'geometry': region,
-        'scale': 30
-    })
+
     return ee.ImageCollection(iCol).select(bandName)\
         .filterBounds(region) \
         .map(toValue) \
