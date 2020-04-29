@@ -528,6 +528,7 @@ def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=Non
 
 def getDegradationPlotsByPoint(geometry, start, end):
     logger.error("Entered getDegradationPlotsByPoint")
+    logger.error("going to get LANDSAT")
     allLandsat = gee.inputs.getLandsat({
         "start": start,
         "end": end,
