@@ -4,7 +4,7 @@ ORIGIN = 1721423
 
 MS_TO_DAYS = 86400000
 
-EPOCH_DAYS = ee.Number(719163)
+
 
 
 def msToDays(ms):
@@ -12,6 +12,7 @@ def msToDays(ms):
 
 
 def dateToJdays(str_date):
+    EPOCH_DAYS = ee.Number(719163)
     if (str_date is None):
         return ('Required parameter [str_date] missing')
     date = ee.Date(str_date)
@@ -19,6 +20,7 @@ def dateToJdays(str_date):
 
 
 def jdaysToms(jdays):
+    EPOCH_DAYS = ee.Number(719163)
     daysSinceEpoch = ee.Number(jdays).subtract(EPOCH_DAYS)
     return daysSinceEpoch.multiply(MS_TO_DAYS)
 
@@ -28,6 +30,7 @@ def jdaysToDate(jdays):
 
 
 def msToJdays(ms):
+    EPOCH_DAYS = ee.Number(719163)
     return ee.Number(msToDays(ms)).add(EPOCH_DAYS)
 
 
