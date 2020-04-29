@@ -547,9 +547,8 @@ def getDegradationPlotsByPoint(geometry, start, end):
 
 def getImagePlot(iCol, region, point, bandName, position):
     # Make time series plot from image collection
-    logger.error("entered getImagePlot")
     def toValue(image):
-        logger.error("entered toValue")
+        logger.error("debug toValue")
         # image = ee.Image(image)
         logger.error("image_date: " + str(image.get('system:time_start')))
         image_date = ee.Date(image.get('system:time_start'))

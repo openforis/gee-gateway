@@ -21,13 +21,10 @@ logger.setLevel(logging.DEBUG)
 ################################/*/
 
 def getLandsat(options):
-    logger.error("going to get LANDSAT")
     if options is None:
         return ("Error")
     else:
-        logger.error("got options")
         if 'start' in options:
-            logger.error("start exists")
             start = options['start']
         else:
             start = '1990-01-01'
@@ -61,7 +58,6 @@ def getLandsat(options):
             sensors = {"l4": True, "l5": True, "l7": True, "l8": True}
         if useMask == 'No':
             useMask = False
-        logger.error("all options set")
         # Filter using new filtering functions
         collection4 = ee.ImageCollection('LANDSAT/LT04/C01/T1_SR')\
             .filterDate(start, end)\
@@ -79,11 +75,8 @@ def getLandsat(options):
         col = collection4.merge(collection5) \
                             .merge(collection7) \
                             .merge(collection8)
-        logger.error("collections made")
         if region is not None:
-            logger.error("about to filter region")
             col = col.filterBounds(region)
-        logger.error("past region filter")
         indices = doIndices(col).select(targetBands)
         if "l5" not in sensors:
             indices = indices.filterMetadata('SATELLITE','not_equals','LANDSAT_5')
@@ -353,10 +346,8 @@ def prepareL4L5(image):
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]
     scaled = image.select(bandList).rename(nameList).divide(ee.Image.constant(scaling))
 
-    logger.error("i bet it breaks here")
     validQA = [66, 130, 68, 132]
     mask1 = image.select(['pixel_qa']).remap(validQA, ee.List.repeat(1, len(validQA)), 0)
-    logger.error("i made it past")
     # Gat valid data mask, for pixels without band saturation
     mask2 = image.select('radsat_qa').eq(0)
     mask3 = image.select(bandList).reduce(ee.Reducer.min()).gt(0)
