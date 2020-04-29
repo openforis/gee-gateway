@@ -348,7 +348,10 @@ def getS1(mode, focalSize):
     return data
 
 def prepareL4L5(image):
-    logger.error("prep 4&5 - image_date: " + str(image.get('system:time_start')))
+    date = ee.Date(image.get('system:time_start'))
+    date_dict = date.getInfo()
+    logger.error("The number of milliseconds since 1970-01-01T00:00:00Z.: " + date_dict['value'])
+    logger.error("Formatted date" + date.format('Y-M-d').getInfo())
     bandList = ['B1', 'B2','B3','B4','B5','B7','B6']
     nameList = ['BLUE', 'GREEN', 'RED', 'NIR', 'SWIR1', 'SWIR2', 'TEMP']
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]
