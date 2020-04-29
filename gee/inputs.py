@@ -353,7 +353,7 @@ def prepareL4L5(image):
     mask3 = ee.Image(image.select(bandList).reduce(ee.Reducer.min()).gt(0)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
     # Mask hazy pixels
     mask4 = ee.Image(image.select("sr_atmos_opacity").lt(300)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
-    return ee.Image(image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))).copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    return ee.Image(image.addBands(scaled).updateMask(mask1).updateMask(mask2).updateMask(mask3).updateMask(mask4)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
 def prepareL7(image):
     bandList = ['B1', 'B2','B3','B4','B5','B7','B6']
@@ -370,7 +370,7 @@ def prepareL7(image):
     mask4 = ee.Image(image.select("sr_atmos_opacity").lt(300)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
     # Slightly erode bands to get rid of artifacts due to scan lines
     mask5 = ee.Image(image.mask().reduce(ee.Reducer.min()).focal_min(2.5)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
-    return ee.Image(image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4).And(mask5))).copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    return ee.Image(image.addBands(scaled).updateMask(mask1).updateMask(mask2).updateMask(mask3).updateMask(mask4).updateMask(mask5)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
 def prepareL8(image):
     bandList = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10']
@@ -385,7 +385,7 @@ def prepareL8(image):
     mask2 = ee.Image(image.select('radsat_qa').eq(0)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
     mask3 = ee.Image(image.select(bandList).reduce(ee.Reducer.min()).gt(0)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
     mask4 = ee.Image(image.select(['sr_aerosol']).remap(validTOA, ee.List.repeat(1, len(validTOA)), 0)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
-    return ee.Image(image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))).copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    return ee.Image(image.addBands(scaled).updateMask(mask1).updateMask(mask2).updateMask(mask3).updateMask(mask4)).copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
 def generateCollection(geom, startDate, endDate):
     filteredL8 = (ee.ImageCollection('LANDSAT/LC08/C01/T1_SR') \
