@@ -567,8 +567,6 @@ def getImagePlot(iCol, region, point, bandName, position):
 
     return ee.ImageCollection(iCol).select(bandName)\
         .filterBounds(region) \
-        .map(toValue) \
-        .sort('date') \
         .get('list') \
         .getInfo()
         #, ee.Reducer.mean(), 30
