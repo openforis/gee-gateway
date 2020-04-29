@@ -4,6 +4,16 @@ import ee
 import gee.dates as dateUtils
 import gee.ccdc as ccdcUtils
 
+import logging
+import logging.config
+from logging.handlers import RotatingFileHandler
+
+logger = logging.getLogger(__name__)
+handler = RotatingFileHandler('gee-gateway-nginx.log', maxBytes=10485760, backupCount=10)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
+
+
 ##################################
 #
 # Utility functions for getting inputs for CCDC
@@ -11,10 +21,13 @@ import gee.ccdc as ccdcUtils
 ################################/*/
 
 def getLandsat(options):
+    logger.error("going to get LANDSAT")
     if options is None:
         return ("Error")
     else:
+        logger.error("got options")
         if 'start' in options:
+            logger.error("start exists")
             start = options['start']
         else:
             start = '1990-01-01'
@@ -48,6 +61,7 @@ def getLandsat(options):
             sensors = {"l4": True, "l5": True, "l7": True, "l8": True}
         if useMask == 'No':
             useMask = False
+        logger.error("all options set")
         # Filter using new filtering functions
         collection4 = ee.ImageCollection('LANDSAT/LT04/C01/T1_SR')\
             .filterDate(start, end)\
@@ -336,8 +350,10 @@ def prepareL4L5(image):
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]
     scaled = ee.Image(image).select(bandList).rename(nameList).divide(ee.Image.constant(scaling))
 
+    logger.error("i bet it breaks here")
     validQA = [66, 130, 68, 132]
     mask1 = ee.Image(image).select(['pixel_qa']).remap(validQA, ee.List.repeat(1, validQA.length), 0)
+    logger.error("i made it past")
     # Gat valid data mask, for pixels without band saturation
     mask2 = image.select('radsat_qa').eq(0)
     mask3 = image.select(bandList).reduce(ee.Reducer.min()).gt(0)
