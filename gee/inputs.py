@@ -46,7 +46,7 @@ def getLandsat(options):
         if 'region' in options:
             region = options['region']
         else:
-            region = {}
+            region = None
         if 'targetBands' in options:
             targetBands = options['targetBands']
         else:
