@@ -348,6 +348,7 @@ def getS1(mode, focalSize):
     return data
 
 def prepareL4L5(image):
+    logger.error("prep 4&5 - image_date: " + str(image.get('system:time_start')))
     bandList = ['B1', 'B2','B3','B4','B5','B7','B6']
     nameList = ['BLUE', 'GREEN', 'RED', 'NIR', 'SWIR1', 'SWIR2', 'TEMP']
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]
@@ -366,6 +367,7 @@ def prepareL4L5(image):
     return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
 def prepareL7(image):
+    logger.error("prep 7 - image_date: " + str(image.get('system:time_start')))
     bandList = ['B1', 'B2','B3','B4','B5','B7','B6']
     nameList = ['BLUE', 'GREEN', 'RED', 'NIR', 'SWIR1', 'SWIR2', 'TEMP']
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]
@@ -384,6 +386,7 @@ def prepareL7(image):
     return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
 def prepareL8(image):
+    logger.error("prep 8 - image_date: " + str(image.get('system:time_start')))
     bandList = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10']
     nameList = ['BLUE', 'GREEN', 'RED', 'NIR', 'SWIR1', 'SWIR2', 'TEMP']
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]
