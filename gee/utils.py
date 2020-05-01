@@ -561,9 +561,9 @@ def getImagePlot(iCol, region, point, bandName, position):
             geometry=point,
             scale=30
         ))#.set('date', image_date)
-                .set('image_year', year)
-                .set('image_julday', doy)
-                )
+                # .set('image_year', year)
+                # .set('image_julday', doy)
+                # )
 
     return iCol.select(bandName)\
         .filterBounds(region) \
