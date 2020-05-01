@@ -64,18 +64,36 @@ def getLandsat(options):
         logger.error("all options set")
         logger.error("start, end" + start + ", " + end)
         # Filter using new filtering functions
+        col = None
         fcollection4 = ee.ImageCollection('LANDSAT/LT04/C01/T1_SR').filterDate(start, end)
-        collection4 = fcollection4.map(prepareL4L5).sort('system:time_start')
+        if fcollection4.size().getInfo() > 0:
+            collection4 = fcollection4.map(prepareL4L5).sort('system:time_start')
+            col = collection4
         fcollection5 = ee.ImageCollection('LANDSAT/LT05/C01/T1_SR').filterDate(start, end)
-        collection5 = fcollection5.map(prepareL4L5).sort('system:time_start')
+        if fcollection5.size().getInfo() > 0:
+            collection5 = fcollection5.map(prepareL4L5).sort('system:time_start')
+            if col == None:
+                col = collection5
+            else:
+                col.merge(collection5)
         fcollection7 = ee.ImageCollection('LANDSAT/LE07/C01/T1_SR').filterDate(start, end)
-        collection7 = fcollection7.map(prepareL7).sort('system:time_start')
+        if fcollection7.size().getInfo() > 0:
+            collection7 = fcollection7.map(prepareL7).sort('system:time_start')
+            if col == None:
+                col = collection7
+            else:
+                col.merge(collection7)
         fcollection8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_SR').filterDate(start, end)
-        collection8 = fcollection8.map(prepareL8).sort('system:time_start')
+        if fcollection8.size().getInfo() > 0:
+            collection8 = fcollection8.map(prepareL8).sort('system:time_start')
+            if col == None:
+                col = collection8
+            else:
+                col.merge(collection8)
 
-        col = collection4.merge(collection5) \
-                            .merge(collection7) \
-                            .merge(collection8)
+        # col = collection4.merge(collection5) \
+        #                     .merge(collection7) \
+        #                     .merge(collection8)
         logger.error("collections made")
         if region is not None:
             logger.error("about to filter region")
