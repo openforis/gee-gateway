@@ -376,6 +376,7 @@ def getS1(mode, focalSize):
 
 def prepareL4L5(image):
     date = ee.Date(image.get('system:time_start'))
+    logger.error(date.getInfo())
     date_dict = date.getInfo()
     logger.error("The number of milliseconds since 1970-01-01T00:00:00Z.: " + date_dict['value'])
     logger.error("Formatted date" + date.format('Y-M-d').getInfo())
