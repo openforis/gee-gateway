@@ -758,9 +758,11 @@ def timeSeriesAssetForPoint():
             dateFrom = json.get('dateFromTimeSeries', None)
             dateTo = json.get('dateToTimeSeries', None)
             timeseries = getTimeSeriesAssetForPoint(geometry, dateFrom, dateTo)
+            print("have vals")
             values = {
                 'timeseries': timeseries
             }
+            print(str(values))
         else:
             logger.error("i didn't have json")
     except GEEException as e:
