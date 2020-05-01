@@ -66,25 +66,37 @@ def getLandsat(options):
         # Filter using new filtering functions
         col = None
         fcollection4 = ee.ImageCollection('LANDSAT/LT04/C01/T1_SR').filterDate(start, end)
-        if fcollection4.size().getInfo() > 0:
+        f4size = fcollection4.size().getInfo()
+        logger.error("f4size: " + str(f4size))
+        if f4size > 0:
+            logger.error("inside f4size")
             collection4 = fcollection4.map(prepareL4L5).sort('system:time_start')
             col = collection4
         fcollection5 = ee.ImageCollection('LANDSAT/LT05/C01/T1_SR').filterDate(start, end)
-        if fcollection5.size().getInfo() > 0:
+        f5size = fcollection5.size().getInfo()
+        logger.error("f5size: " + str(f5size))
+        if f5size > 0:
+            logger.error("inside f5size")
             collection5 = fcollection5.map(prepareL4L5).sort('system:time_start')
             if col == None:
                 col = collection5
             else:
                 col.merge(collection5)
         fcollection7 = ee.ImageCollection('LANDSAT/LE07/C01/T1_SR').filterDate(start, end)
-        if fcollection7.size().getInfo() > 0:
+        f7size = fcollection7.size().getInfo()
+        logger.error("f7size: " + str(f7size))
+        if f7size > 0:
+            logger.error("inside f7size")
             collection7 = fcollection7.map(prepareL7).sort('system:time_start')
             if col == None:
                 col = collection7
             else:
                 col.merge(collection7)
         fcollection8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_SR').filterDate(start, end)
+        f8size = fcollection8.size().getInfo()
+        logger.error("f8size: " + str(f8size))
         if fcollection8.size().getInfo() > 0:
+            logger.error("inside f8size")
             collection8 = fcollection8.map(prepareL8).sort('system:time_start')
             if col == None:
                 col = collection8
