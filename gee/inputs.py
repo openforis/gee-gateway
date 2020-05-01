@@ -375,6 +375,7 @@ def getS1(mode, focalSize):
     return data
 
 def prepareL4L5(image):
+    logger.error("inside l4l5")
     date = ee.Date(image.get('system:time_start'))
     logger.error(date.getInfo())
     date_dict = date.getInfo()
