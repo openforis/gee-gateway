@@ -376,11 +376,11 @@ def getS1(mode, focalSize):
 
 def prepareL4L5(image):
     logger.error("inside l4l5")
-    date = ee.Date(image.get('system:time_start'))
-    logger.error(date.getInfo())
-    date_dict = date.getInfo()
-    logger.error("The number of milliseconds since 1970-01-01T00:00:00Z.: " + date_dict['value'])
-    logger.error("Formatted date" + date.format('Y-M-d').getInfo())
+    # date = ee.Date(image.get('system:time_start'))
+    # logger.error(date.getInfo())
+    # date_dict = date.getInfo()
+    # logger.error("The number of milliseconds since 1970-01-01T00:00:00Z.: " + date_dict['value'])
+    # logger.error("Formatted date" + date.format('Y-M-d').getInfo())
     bandList = ['B1', 'B2','B3','B4','B5','B7','B6']
     nameList = ['BLUE', 'GREEN', 'RED', 'NIR', 'SWIR1', 'SWIR2', 'TEMP']
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]
@@ -395,11 +395,12 @@ def prepareL4L5(image):
     mask3 = image.select(bandList).reduce(ee.Reducer.min()).gt(0)
     # Mask hazy pixels
     mask4 = image.select("sr_atmos_opacity").lt(300)
-    combined = image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
-    return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    return image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
+    #combined = image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
+    #return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
 def prepareL7(image):
-    logger.error("prep 7 - image_date: " + str(image.get('system:time_start')))
+    logger.error("prep 7")
     bandList = ['B1', 'B2','B3','B4','B5','B7','B6']
     nameList = ['BLUE', 'GREEN', 'RED', 'NIR', 'SWIR1', 'SWIR2', 'TEMP']
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]
@@ -414,11 +415,12 @@ def prepareL7(image):
     mask4 = image.select("sr_atmos_opacity").lt(300)
     # Slightly erode bands to get rid of artifacts due to scan lines
     mask5 = ee.Image(image).mask().reduce(ee.Reducer.min()).focal_min(2.5)
-    combined = image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4).And(mask5))
-    return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4).And(mask5))
+    # combined = image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4).And(mask5))
+    # return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
 def prepareL8(image):
-    logger.error("prep 8 - image_date: " + str(image.get('system:time_start')))
+    logger.error("prep 8")
     bandList = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10']
     nameList = ['BLUE', 'GREEN', 'RED', 'NIR', 'SWIR1', 'SWIR2', 'TEMP']
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]
@@ -431,8 +433,9 @@ def prepareL8(image):
     mask2 = ee.Image(image).select('radsat_qa').eq(0)
     mask3 = ee.Image(image).select(bandList).reduce(ee.Reducer.min()).gt(0)
     mask4 = ee.Image(image).select(['sr_aerosol']).remap(validTOA, ee.List.repeat(1, len(validTOA)), 0)
-    combined = ee.Image(image).addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
-    return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
+    ee.Image(image).addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
+    # combined = ee.Image(image).addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
+    # return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
 def generateCollection(geom, startDate, endDate):
     filteredL8 = (ee.ImageCollection('LANDSAT/LC08/C01/T1_SR') \
