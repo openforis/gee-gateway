@@ -560,7 +560,7 @@ def getImagePlot(iCol, region, point, bandName, position):
             reducer=ee.Reducer.mean(),
             geometry=point,
             scale=30
-        ))#.set('date', image_date)
+        )))#.set('date', image_date)
                 # .set('image_year', year)
                 # .set('image_julday', doy)
                 # )
