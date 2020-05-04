@@ -529,18 +529,20 @@ def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=Non
 def getDegradationPlotsByPoint(geometry, start, end):
     logger.error("Entered getDegradationPlotsByPoint")
     logger.error("going to get LANDSAT")
-    allLandsat = gee.inputs.getLandsat({
-        "start": start,
-        "end": end,
-        "targetBands": ['SWIR1','NIR','RED','GREEN','BLUE','SWIR2','NDFI']
-    })
-    logger.error("got LANDSAT")
     if isinstance(geometry[0], list):
         logger.error("making polygon")
         geometry = ee.Geometry.Polygon(geometry)
     else:
         logger.error("making point")
         geometry = ee.Geometry.Point(geometry)
+    allLandsat = gee.inputs.getLandsat({
+        "start": start,
+        "end": end,
+        "targetBands": ['SWIR1','NIR','RED','GREEN','BLUE','SWIR2','NDFI'],
+        "region": geometry
+    })
+    logger.error("got LANDSAT")
+
     landsatData = allLandsat.filterDate(start, end).filterBounds(geometry)
     logger.error("filtered bounds")
 
