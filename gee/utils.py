@@ -539,7 +539,8 @@ def getDegradationPlotsByPoint(geometry, start, end):
         "start": start,
         "end": end,
         "targetBands": ['SWIR1','NIR','RED','GREEN','BLUE','SWIR2','NDFI'],
-        "region": geometry
+        "region": geometry,
+        "sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
     })
     logger.error("got LANDSAT")
 
