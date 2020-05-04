@@ -78,7 +78,7 @@ def getLandsat(options):
         if f5size > 0:
             logger.error("inside f5size")
             collection5 = fcollection5.map(prepareL4L5, True).sort('system:time_start')
-            if col == None:
+            if col is None:
                 col = collection5
             else:
                 col.merge(collection5)
@@ -88,7 +88,7 @@ def getLandsat(options):
         if f7size > 0:
             logger.error("inside f7size")
             collection7 = fcollection7.map(prepareL7, True).sort('system:time_start')
-            if col == None:
+            if col is None:
                 col = collection7
             else:
                 col.merge(collection7)
@@ -98,7 +98,7 @@ def getLandsat(options):
         if fcollection8.size().getInfo() > 0:
             logger.error("inside f8size")
             collection8 = fcollection8.map(prepareL8, True).sort('system:time_start')
-            if col == None:
+            if col is None:
                 col = collection8
             else:
                 col.merge(collection8)
@@ -106,7 +106,8 @@ def getLandsat(options):
         # col = collection4.merge(collection5) \
         #                     .merge(collection7) \
         #                     .merge(collection8)
-        logger.error("collections made")
+        logger.error("collections size: " + col.size().getInfo())
+
         if region is not None:
             logger.error("about to filter region")
             col = col.filterBounds(region)
