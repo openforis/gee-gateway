@@ -65,14 +65,14 @@ def getLandsat(options):
         logger.error("start, end" + start + ", " + end)
         # Filter using new filtering functions
         col = None
-        fcollection4 = ee.ImageCollection('LANDSAT/LT04/C01/T1_SR').filterDate(start, end)
+        fcollection4 = ee.ImageCollection('LANDSAT/LT04/C01/T1_SR').filterDate(start, end).filterBounds(region)
         f4size = fcollection4.size().getInfo()
         logger.error("f4size: " + str(f4size))
         if f4size > 0:
             logger.error("inside f4size")
             collection4 = fcollection4.map(prepareL4L5, True).sort('system:time_start')
             col = collection4
-        fcollection5 = ee.ImageCollection('LANDSAT/LT05/C01/T1_SR').filterDate(start, end)
+        fcollection5 = ee.ImageCollection('LANDSAT/LT05/C01/T1_SR').filterDate(start, end).filterBounds(region)
         f5size = fcollection5.size().getInfo()
         logger.error("f5size: " + str(f5size))
         if f5size > 0:
@@ -82,7 +82,7 @@ def getLandsat(options):
                 col = collection5
             else:
                 col.merge(collection5)
-        fcollection7 = ee.ImageCollection('LANDSAT/LE07/C01/T1_SR').filterDate(start, end)
+        fcollection7 = ee.ImageCollection('LANDSAT/LE07/C01/T1_SR').filterDate(start, end).filterBounds(region)
         f7size = fcollection7.size().getInfo()
         logger.error("f7size: " + str(f7size))
         if f7size > 0:
@@ -92,7 +92,7 @@ def getLandsat(options):
                 col = collection7
             else:
                 col.merge(collection7)
-        fcollection8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_SR').filterDate(start, end)
+        fcollection8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_SR').filterDate(start, end).filterBounds(region)
         f8size = fcollection8.size().getInfo()
         logger.error("f8size: " + str(f8size))
         if fcollection8.size().getInfo() > 0:
