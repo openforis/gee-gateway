@@ -538,7 +538,7 @@ def getDegradationPlotsByPoint(geometry, start, end):
     allLandsat = gee.inputs.getLandsat({
         "start": start,
         "end": end,
-        "targetBands": ['NDFI'],
+        "targetBands": ['SWIR1','SWIR2'],
         "region": geometry,
         "sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
     })
