@@ -541,9 +541,21 @@ def getDegradationPlotsByPoint(geometry, start, end):
     else:
         logger.error("making point")
         geometry = ee.Geometry.Point(geometry)
-    landsatData = allLandsat.filterBounds(geometry)
+    landsatData = allLandsat.filterDate(start, end).filterBounds(geometry)
     logger.error("filtered bounds")
-    return getImagePlot(landsatData,geometry, geometry, 'NDFI', 4)
+
+    def myimageMapper(img):
+        theReducer = ee.Reducer.mean()
+        indexValue = img.reduceRegion(theReducer, geometry, 30)
+        date = img.get('system:time_start')
+        indexImage = ee.Image().set('indexValue', [ee.Number(date), indexValue])
+        return indexImage
+    lsd = landsatData.map(myimageMapper)
+    indexCollection2 = lsd.aggregate_array('indexValue')
+    values = indexCollection2.getInfo()
+    #print(values)
+    return values
+    #return getImagePlot(landsatData,geometry, geometry, 'NDFI', 4)
 
 def getImagePlot(iCol, region, point, bandName, position):
     # Make time series plot from image collection
