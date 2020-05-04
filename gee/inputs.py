@@ -417,7 +417,7 @@ def prepareL7(image):
     mask4 = image.select("sr_atmos_opacity").lt(300)
     # Slightly erode bands to get rid of artifacts due to scan lines
     mask5 = ee.Image(image).mask().reduce(ee.Reducer.min()).focal_min(2.5)
-    image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4).And(mask5))
+    return image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4).And(mask5))
     # combined = image.addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4).And(mask5))
     # return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
@@ -435,7 +435,7 @@ def prepareL8(image):
     mask2 = ee.Image(image).select('radsat_qa').eq(0)
     mask3 = ee.Image(image).select(bandList).reduce(ee.Reducer.min()).gt(0)
     mask4 = ee.Image(image).select(['sr_aerosol']).remap(validTOA, ee.List.repeat(1, len(validTOA)), 0)
-    ee.Image(image).addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
+    return ee.Image(image).addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
     # combined = ee.Image(image).addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
     # return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
