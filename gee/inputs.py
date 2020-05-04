@@ -70,14 +70,14 @@ def getLandsat(options):
         logger.error("f4size: " + str(f4size))
         if f4size > 0:
             logger.error("inside f4size")
-            collection4 = fcollection4.map(prepareL4L5).sort('system:time_start')
+            collection4 = fcollection4.map(prepareL4L5, True).sort('system:time_start')
             col = collection4
         fcollection5 = ee.ImageCollection('LANDSAT/LT05/C01/T1_SR').filterDate(start, end)
         f5size = fcollection5.size().getInfo()
         logger.error("f5size: " + str(f5size))
         if f5size > 0:
             logger.error("inside f5size")
-            collection5 = fcollection5.map(prepareL4L5).sort('system:time_start')
+            collection5 = fcollection5.map(prepareL4L5, True).sort('system:time_start')
             if col == None:
                 col = collection5
             else:
@@ -87,7 +87,7 @@ def getLandsat(options):
         logger.error("f7size: " + str(f7size))
         if f7size > 0:
             logger.error("inside f7size")
-            collection7 = fcollection7.map(prepareL7).sort('system:time_start')
+            collection7 = fcollection7.map(prepareL7, True).sort('system:time_start')
             if col == None:
                 col = collection7
             else:
@@ -97,7 +97,7 @@ def getLandsat(options):
         logger.error("f8size: " + str(f8size))
         if fcollection8.size().getInfo() > 0:
             logger.error("inside f8size")
-            collection8 = fcollection8.map(prepareL8).sort('system:time_start')
+            collection8 = fcollection8.map(prepareL8, True).sort('system:time_start')
             if col == None:
                 col = collection8
             else:

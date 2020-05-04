@@ -550,7 +550,7 @@ def getDegradationPlotsByPoint(geometry, start, end):
         date = img.get('system:time_start')
         indexImage = ee.Image().set('indexValue', [ee.Number(date), indexValue])
         return indexImage
-    lsd = landsatData.map(myimageMapper)
+    lsd = landsatData.map(myimageMapper, True)
     indexCollection2 = lsd.aggregate_array('indexValue')
     values = indexCollection2.getInfo()
     #print(values)
