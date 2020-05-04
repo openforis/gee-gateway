@@ -98,6 +98,7 @@ def getLandsat(options):
         if fcollection8.size().getInfo() > 0:
             logger.error("inside f8size")
             collection8 = fcollection8.map(prepareL8, True).sort('system:time_start')
+            logger.error("size after l8 map: " + str(collection8.size().getInfo()))
             if col is None:
                 col = collection8
             else:
