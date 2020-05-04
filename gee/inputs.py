@@ -106,7 +106,7 @@ def getLandsat(options):
         # col = collection4.merge(collection5) \
         #                     .merge(collection7) \
         #                     .merge(collection8)
-        logger.error("collections size: " + col.size().getInfo())
+        logger.error("collections size: " + str(col.size().getInfo()))
 
         if region is not None:
             logger.error("about to filter region")
