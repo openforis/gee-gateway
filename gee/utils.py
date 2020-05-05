@@ -540,7 +540,7 @@ def getDegradationPlotsByPoint(geometry, start, end):
         "end": end,
         "targetBands": ['SWIR1','NIR','RED','GREEN','BLUE','SWIR2','NDFI'],
         "region": geometry,
-        "sensors": {"l4": False, "l5": False, "l7": True, "l8": True}
+        "sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
     })
     logger.error("landsatData size: " + str(landsatData.size().getInfo()))
 
