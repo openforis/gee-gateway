@@ -387,11 +387,8 @@ def prepareL4L5(image):
     nameList = ['BLUE', 'GREEN', 'RED', 'NIR', 'SWIR1', 'SWIR2', 'TEMP']
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]
     scaled = ee.Image(image).select(bandList).rename(nameList).divide(ee.Image.constant(scaling))
-
-    logger.error("i bet it breaks here")
     validQA = [66, 130, 68, 132]
     mask1 = ee.Image(image).select(['pixel_qa']).remap(validQA, ee.List.repeat(1, len(validQA)), 0)
-    logger.error("i made it past")
     # Gat valid data mask, for pixels without band saturation
     mask2 = image.select('radsat_qa').eq(0)
     mask3 = image.select(bandList).reduce(ee.Reducer.min()).gt(0)
