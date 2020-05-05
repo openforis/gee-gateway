@@ -110,10 +110,10 @@ def getLandsat(options):
         logger.error("collections size: " + str(col.size().getInfo()))
 
         if region is not None:
-            logger.error("about to filter region")
             col = col.filterBounds(region)
-        logger.error("past region filter")
+        logger.error("past region filter: " + str(col.size().getInfo()))
         indices = doIndices(col).select(targetBands)
+        logger.error("indices select bands: " + str(indices.size().getInfo()))
         if "l5" not in sensors:
             indices = indices.filterMetadata('SATELLITE','not_equals','LANDSAT_5')
         if "l4" not in sensors:
@@ -123,6 +123,7 @@ def getLandsat(options):
         if "l8" not in sensors:
             indices = indices.filterMetadata('SATELLITE','not_equals','LANDSAT_8')
         indices = indices.filter(ee.Filter.dayOfYear(startDOY, endDOY))
+        logger.error("indices filtered: " + str(indices.size().getInfo()))
     return ee.ImageCollection(indices)
 
 def doIndices(collection):

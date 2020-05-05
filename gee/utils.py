@@ -535,16 +535,16 @@ def getDegradationPlotsByPoint(geometry, start, end):
     else:
         logger.error("making point")
         geometry = ee.Geometry.Point(geometry)
-    allLandsat = gee.inputs.getLandsat({
+    landsatData = gee.inputs.getLandsat({
         "start": start,
         "end": end,
         "targetBands": ['SWIR1','NIR','RED','GREEN','BLUE','SWIR2','NDFI'],
         "region": geometry,
         "sensors": {"l4": False, "l5": False, "l7": True, "l8": True}
     })
-    logger.error("allLandsat size: " + str(allLandsat.size().getInfo()))
+    logger.error("landsatData size: " + str(landsatData.size().getInfo()))
 
-    landsatData = allLandsat.filterDate(start, end).filterBounds(geometry)
+    #landsatData = allLandsat.filterDate(start, end).filterBounds(geometry)
 
     logger.error("landsatData size: " + str(landsatData.size().getInfo()))
     logger.error("filtered bounds")
