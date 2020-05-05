@@ -99,7 +99,7 @@ def firstCloudFreeImageInMosaicToMapId(collectionName, visParams={}, dateFrom=No
                 if ("lc8" in collectionName.lower()):
                     sID = 'OLI_TIRS'
                 elif ("le7" in collectionName.lower()):
-                   sID = 'ETM'
+                    sID = 'ETM'
                 elif ("lt5" in collectionName.lower()):
                     sID = 'TM'
                 scored = ee.Algorithms.Landsat.simpleCloudScore(eeFirstImage.set('SENSOR_ID', sID))
@@ -155,8 +155,8 @@ def filteredImageByIndexToMapId(iniDate=None, endDate=None, index='NDVI'):
 def filteredImageNDVIToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcNDVI(img):
-        return img.expression('(i.nir - i.red) / (i.nir + i.red)',  {'i': img}).rename(['NDVI'])\
-                .set('system:time_start',img.get('system:time_start'))
+        return img.expression('(i.nir - i.red) / (i.nir + i.red)',  {'i': img}).rename(['NDVI']) \
+            .set('system:time_start',img.get('system:time_start'))
     try:
         eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='c9c0bf,435ebf,eee8aa,006400'
@@ -173,8 +173,8 @@ def filteredImageNDVIToMapId(iniDate=None, endDate=None,outCollection=False):
 def filteredImageEVIToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcEVI(img):
-        return img.expression('2.5 * (i.nir - i.red) / (i.nir + 6.0 * i.red - 7.5 * i.blue + 1)',  {'i': img}).rename(['EVI'])\
-                .set('system:time_start',img.get('system:time_start'))
+        return img.expression('2.5 * (i.nir - i.red) / (i.nir + 6.0 * i.red - 7.5 * i.blue + 1)',  {'i': img}).rename(['EVI']) \
+            .set('system:time_start',img.get('system:time_start'))
     try:
         eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='F5F5F5,E6D3C5,C48472,B9CF63,94BF3D,6BB037,42A333,00942C,008729,007824,004A16'
@@ -191,8 +191,8 @@ def filteredImageEVIToMapId(iniDate=None, endDate=None,outCollection=False):
 def filteredImageEVI2ToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcEVI2(img):
-        return img.expression('2.5 * (i.nir - i.red) / (i.nir + 2.4 * i.red + 1)',  {'i': img}).rename(['EVI2'])\
-                .set('system:time_start',img.get('system:time_start'))
+        return img.expression('2.5 * (i.nir - i.red) / (i.nir + 2.4 * i.red + 1)',  {'i': img}).rename(['EVI2']) \
+            .set('system:time_start',img.get('system:time_start'))
     try:
         eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='F5F5F5,E6D3C5,C48472,B9CF63,94BF3D,6BB037,42A333,00942C,008729,007824,004A16'
@@ -209,8 +209,8 @@ def filteredImageEVI2ToMapId(iniDate=None, endDate=None,outCollection=False):
 def filteredImageNDMIToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcNDMI(img):
-        return img.expression('(i.nir - i.swir1) / (i.nir + i.swir1)',  {'i': img}).rename(['NDMI'])\
-                .set('system:time_start',img.get('system:time_start'))
+        return img.expression('(i.nir - i.swir1) / (i.nir + i.swir1)',  {'i': img}).rename(['NDMI']) \
+            .set('system:time_start',img.get('system:time_start'))
     try:
         eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='0000FE,2E60FD,31B0FD,00FEFE,50FE00,DBFE66,FEFE00,FFBB00,FF6F00,FE0000'
@@ -227,8 +227,8 @@ def filteredImageNDMIToMapId(iniDate=None, endDate=None,outCollection=False):
 def filteredImageNDWIToMapId(iniDate=None, endDate=None,outCollection=False):
     """  """
     def calcNDWI(img):
-        return img.expression('(i.green - i.nir) / (i.green + i.nir)',  {'i': img}).rename(['NDWI'])\
-                .set('system:time_start',img.get('system:time_start'))
+        return img.expression('(i.green - i.nir) / (i.green + i.nir)',  {'i': img}).rename(['NDWI']) \
+            .set('system:time_start',img.get('system:time_start'))
     try:
         eeCollection = getLandSatMergedCollection().filterDate(iniDate,endDate) #ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8))
         colorPalette='505050,E8E8E8,00FF33,003300'
@@ -254,21 +254,21 @@ def getLandSatMergedCollection():
         metadataCloudCoverMax = 100
         #region = ee.Geometry.Point([5.2130126953125,15.358356179450585])
         #.filterBounds(region).filterDate(iniDate,endDate)\
-        lt4 = ee.ImageCollection('LANDSAT/LT4_L1T_TOA')\
-            .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
+        lt4 = ee.ImageCollection('LANDSAT/LT4_L1T_TOA') \
+            .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax) \
             .select(sensorBandDictLandsatTOA['L4'],bandNamesLandsatTOA).map(lsMaskClouds)
-        lt5 = ee.ImageCollection('LANDSAT/LT5_L1T_TOA')\
-            .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
+        lt5 = ee.ImageCollection('LANDSAT/LT5_L1T_TOA') \
+            .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax) \
             .select(sensorBandDictLandsatTOA['L5'],bandNamesLandsatTOA).map(lsMaskClouds)
-        le7 = ee.ImageCollection('LANDSAT/LE7_L1T_TOA')\
-            .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
+        le7 = ee.ImageCollection('LANDSAT/LE7_L1T_TOA') \
+            .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax) \
             .select(sensorBandDictLandsatTOA['L7'],bandNamesLandsatTOA).map(lsMaskClouds)
-        lc8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_TOA')\
-            .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax)\
+        lc8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_TOA') \
+            .filterMetadata('CLOUD_COVER','less_than',metadataCloudCoverMax) \
             .select(sensorBandDictLandsatTOA['L8'],bandNamesLandsatTOA).map(lsMaskClouds)
-        s2 = ee.ImageCollection('COPERNICUS/S2')\
-            .filterMetadata('CLOUDY_PIXEL_PERCENTAGE','less_than',metadataCloudCoverMax)\
-            .map(s2MaskClouds).select(sensorBandDictLandsatTOA['S2'],bandNamesLandsatTOA)\
+        s2 = ee.ImageCollection('COPERNICUS/S2') \
+            .filterMetadata('CLOUDY_PIXEL_PERCENTAGE','less_than',metadataCloudCoverMax) \
+            .map(s2MaskClouds).select(sensorBandDictLandsatTOA['S2'],bandNamesLandsatTOA) \
             .map(bandPassAdjustment)
         eeCollection = ee.ImageCollection(lt4.merge(lt5).merge(le7).merge(lc8).merge(s2))
     except EEException as e:
@@ -304,32 +304,32 @@ def lsMaskClouds(img,cloudThresh=10):
     return img.addBands(score);
 
 def s2MaskClouds(img):
-  qa = img.select('QA60');
+    qa = img.select('QA60');
 
-  # Bits 10 and 11 are clouds and cirrus, respectively.
-  cloudBitMask = int(math.pow(2, 10));
-  cirrusBitMask = int(math.pow(2, 11));
+    # Bits 10 and 11 are clouds and cirrus, respectively.
+    cloudBitMask = int(math.pow(2, 10));
+    cirrusBitMask = int(math.pow(2, 11));
 
-  # clear if both flags set to zero.
-  clear = qa.bitwiseAnd(cloudBitMask).eq(0).And(
-             qa.bitwiseAnd(cirrusBitMask).eq(0));
+    # clear if both flags set to zero.
+    clear = qa.bitwiseAnd(cloudBitMask).eq(0).And(
+        qa.bitwiseAnd(cirrusBitMask).eq(0));
 
-  return img.divide(10000).updateMask(clear).set('system:time_start',img.get('system:time_start'))
+    return img.divide(10000).updateMask(clear).set('system:time_start',img.get('system:time_start'))
 
 def bandPassAdjustment(img):
-  keep = img.select(['temp'])
-  bands = ['blue','green','red','nir','swir1','swir2'];
-  # linear regression coefficients for adjustment
-  gain = ee.Array([[0.977], [1.005], [0.982], [1.001], [1.001], [0.996]]);
-  bias = ee.Array([[-0.00411],[-0.00093],[0.00094],[-0.00029],[-0.00015],[-0.00097]]);
-  # Make an Array Image, with a 2-D Array per pixel.
-  arrayImage2D = img.select(bands).toArray().toArray(1);
+    keep = img.select(['temp'])
+    bands = ['blue','green','red','nir','swir1','swir2'];
+    # linear regression coefficients for adjustment
+    gain = ee.Array([[0.977], [1.005], [0.982], [1.001], [1.001], [0.996]]);
+    bias = ee.Array([[-0.00411],[-0.00093],[0.00094],[-0.00029],[-0.00015],[-0.00097]]);
+    # Make an Array Image, with a 2-D Array per pixel.
+    arrayImage2D = img.select(bands).toArray().toArray(1);
 
-  # apply correction factors and reproject array to geographic image
-  componentsImage = ee.Image(gain).multiply(arrayImage2D).add(ee.Image(bias))\
-    .arrayProject([0]).arrayFlatten([bands]).float();
+    # apply correction factors and reproject array to geographic image
+    componentsImage = ee.Image(gain).multiply(arrayImage2D).add(ee.Image(bias)) \
+        .arrayProject([0]).arrayFlatten([bands]).float();
 
-  return keep.addBands(componentsImage)#.set('system:time_start',img.get('system:time_start'));
+    return keep.addBands(componentsImage)#.set('system:time_start',img.get('system:time_start'));
 
 def filteredImageInCHIRPSToMapId(dateFrom=None, dateTo=None):
     """  """
@@ -517,9 +517,9 @@ def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=Non
         collection = ee.ImageCollection([])
         for name in bandsByCollection:
             collection = collection.merge(create(name))
-        values = ee.ImageCollection(ee.ImageCollection(collection).sort('system:time_start').distinct('system:time_start'))\
-            .map(reduceRegion)\
-            .filterMetadata('index', 'not_equals', None)\
+        values = ee.ImageCollection(ee.ImageCollection(collection).sort('system:time_start').distinct('system:time_start')) \
+            .map(reduceRegion) \
+            .filterMetadata('index', 'not_equals', None) \
             .aggregate_array('timeIndex')
         values = values.getInfo()
     except EEException as e:
@@ -538,13 +538,15 @@ def getDegradationPlotsByPoint(geometry, start, end):
     allLandsat = gee.inputs.getLandsat({
         "start": start,
         "end": end,
-        "targetBands": ['SWIR1','SWIR2'],
+        "targetBands": ['SWIR1','NIR','RED','GREEN','BLUE','SWIR2','NDFI'],
         "region": geometry,
-        "sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
+        "sensors": {"l4": False, "l5": False, "l7": True, "l8": True}
     })
-    logger.error("got LANDSAT")
+    logger.error("allLandsat size: " + str(allLandsat.size().getInfo()))
 
     landsatData = allLandsat.filterDate(start, end).filterBounds(geometry)
+
+    logger.error("landsatData size: " + str(landsatData.size().getInfo()))
     logger.error("filtered bounds")
 
     def myimageMapper(img):
@@ -576,17 +578,17 @@ def getImagePlot(iCol, region, point, bandName, position):
             geometry=point,
             scale=30
         )))#.set('date', image_date)
-                # .set('image_year', year)
-                # .set('image_julday', doy)
-                # )
+        # .set('image_year', year)
+        # .set('image_julday', doy)
+        # )
 
-    return iCol.select(bandName)\
+    return iCol.select(bandName) \
         .filterBounds(region) \
         .map(toValue) \
         .sort('date') \
         .get('list') \
         .getInfo()
-        #, ee.Reducer.mean(), 30
+    #, ee.Reducer.mean(), 30
 
 def getTimeSeriesForPoint(point, dateFrom=None, dateTo=datetime.datetime.now()):
     """ https://code.earthengine.google.com/49592558df4df130e9082f94a23a887f """
@@ -605,9 +607,9 @@ def getTimeSeriesForPoint(point, dateFrom=None, dateTo=datetime.datetime.now()):
             geometry=point,
             scale=1
         )).set('date', image_date)
-         .set('image_year', year)
-         .set('image_julday', doy)
-        )
+                .set('image_year', year)
+                .set('image_julday', doy)
+                )
 
     def mask(image):
         image = ee.Image(image)
@@ -641,11 +643,11 @@ def getTimeSeriesForPoint(point, dateFrom=None, dateTo=datetime.datetime.now()):
     collectionBands = collectionBands.filterBounds(point)
     if dateFrom:
         collectionBands = collectionBands.filterDate(dateFrom, dateTo)
-    collectionBands = collectionBands.map(mask)\
-        .map(toValue)\
-        .sort('date')\
-        .reduceColumns(ee.Reducer.toList(len(properties)), properties)\
-        .get('list')\
+    collectionBands = collectionBands.map(mask) \
+        .map(toValue) \
+        .sort('date') \
+        .reduceColumns(ee.Reducer.toList(len(properties)), properties) \
+        .get('list') \
         .getInfo()
     collectionBands = map(listToObject, collectionBands)
 
@@ -696,15 +698,15 @@ def getTimeSeriesAssetForPoint(point, dateFrom=None, dateTo=datetime.datetime.no
 def getStatistics(paramType, aOIPoly):
     values = {}
     if (paramType == 'basin'):
-      basinFC = ee.FeatureCollection('ft:1aIbTi69cXMMIm5ZvHNC67hVmhefPDLfEat15iike')
-      basin = basinFC.filter(ee.Filter.eq('SubBasin', aOIPoly)).first();
-      poly = basin.geometry()
+        basinFC = ee.FeatureCollection('ft:1aIbTi69cXMMIm5ZvHNC67hVmhefPDLfEat15iike')
+        basin = basinFC.filter(ee.Filter.eq('SubBasin', aOIPoly)).first();
+        poly = basin.geometry()
     elif (paramType == 'landscape'):
-      lscapeFC = ee.FeatureCollection('ft:1XuZH2r-oai_knDgWiOUxyDjlHZQKsEZChOjGsTjr')
-      landscape = lscapeFC.filter(ee.Filter.eq('NAME', aOIPoly)).first();
-      poly = landscape.geometry()
+        lscapeFC = ee.FeatureCollection('ft:1XuZH2r-oai_knDgWiOUxyDjlHZQKsEZChOjGsTjr')
+        landscape = lscapeFC.filter(ee.Filter.eq('NAME', aOIPoly)).first();
+        poly = landscape.geometry()
     else:
-      poly = ee.Geometry.Polygon(aOIPoly)
+        poly = ee.Geometry.Polygon(aOIPoly)
     elev = ee.Image('USGS/GTOPO30')
     minmaxElev = elev.reduceRegion(ee.Reducer.minMax(), poly, 1000, maxPixels=500000000)
     minElev = minmaxElev.get('elevation_min').getInfo()
@@ -972,7 +974,7 @@ def createChipXYZ(image, point, vis, size=255):
         image = tcTransform(image)
 
     mapid = ee.Image(image).clip(box).unmask().visualize(**VIS_SET[vis]).getMapId()
-    
+
     chip_url = 'https://earthengine.googleapis.com/map/%s/{z}/{x}/{y}?token=%s' % (mapid['mapid'], mapid['token'])
 
     return {"iid": iid, "doy": doy, "chip_url": chip_url}
