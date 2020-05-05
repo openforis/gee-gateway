@@ -81,7 +81,7 @@ def getLandsat(options):
             if col is None:
                 col = collection5
             else:
-                col.merge(collection5)
+                col = col.merge(collection5)
         fcollection7 = ee.ImageCollection('LANDSAT/LE07/C01/T1_SR').filterDate(start, end).filterBounds(region)
         f7size = fcollection7.size().getInfo()
         logger.error("f7size: " + str(f7size))
@@ -91,7 +91,7 @@ def getLandsat(options):
             if col is None:
                 col = collection7
             else:
-                col.merge(collection7)
+                col = col.merge(collection7)
         fcollection8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_SR').filterDate(start, end).filterBounds(region)
         f8size = fcollection8.size().getInfo()
         logger.error("f8size: " + str(f8size))
@@ -102,7 +102,7 @@ def getLandsat(options):
             if col is None:
                 col = collection8
             else:
-                col.merge(collection8)
+                col = col.merge(collection8)
 
         # col = collection4.merge(collection5) \
         #                     .merge(collection7) \
