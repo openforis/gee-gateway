@@ -554,9 +554,9 @@ def getDegradationPlotsByPoint(geometry, start, end):
         indexValue = img.reduceRegion(theReducer, geometry, 30)
         date = img.get('system:time_start')
         visParams = {'bands': 'RED,GREEN,BLUE', 'min': 0, 'max': 1400}
-        unimage = ee.Image(img.multiply(10000).toInt16().unmask())
+        #unimage = ee.Image(img.multiply(10000).toInt16().unmask())
         logger.error("pre - theStuff ")
-        mapparams = unimage.getMapId(visParams)
+        mapparams = img.getMapId(visParams)
         logger.error("theStuff: " + str(mapparams))
         indexImage = ee.Image().set('indexValue', [ee.Number(date), indexValue])
         return indexImage
