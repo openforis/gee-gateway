@@ -556,8 +556,8 @@ def getDegradationPlotsByPoint(geometry, start, end):
         visParams = {'bands': 'RED,GREEN,BLUE', 'min': 0, 'max': 1400}
         #unimage = ee.Image(img.multiply(10000).toInt16().unmask())
         logger.error("pre - theStuff ")
-        mapparams = img.getMapId(visParams)
-        logger.error("theStuff: " + str(mapparams))
+        # mapparams = img.getMapId(visParams)
+        # logger.error("theStuff: " + str(mapparams))
         indexImage = ee.Image().set('indexValue', [ee.Number(date), indexValue])
         return indexImage
     lsd = landsatData.map(myimageMapper, True)
