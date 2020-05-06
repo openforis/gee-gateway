@@ -553,10 +553,12 @@ def getDegradationPlotsByPoint(geometry, start, end):
         theReducer = ee.Reducer.mean()
         indexValue = img.reduceRegion(theReducer, geometry, 30)
         date = img.get('system:time_start')
-        unimage = img.multiply(10000).toInt16().unmask()
         visParams = {'bands': 'RED,GREEN,BLUE', 'min': 0, 'max': 1400}
-
-        indexImage = ee.Image().set('indexValue', [ee.Number(date), indexValue]).set('visualization', imageToMapId(unimage, visParams))
+        unimage = img.multiply(10000).toInt16().unmask()
+        logger.error("pre - theStuff ")
+        theStuff = imageToMapId(unimage, visParams)
+        logger.error("theStuff: " + str(theStuff))
+        indexImage = ee.Image().set('indexValue', [ee.Number(date), indexValue])
         return indexImage
     lsd = landsatData.map(myimageMapper, True)
     indexCollection2 = lsd.aggregate_array('indexValue')
