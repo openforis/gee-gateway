@@ -534,9 +534,17 @@ def getDegraditionTileUrlByDate(geometry, date):
     imDate = ee.Date(date)
     befDate = imDate.advance(-1, 'day')
     aftDate = imDate.advance(1, 'day')
+    logger.error("imDate: " + date)
 
     starttime = datetime.datetime.fromtimestamp(befDate.getInfo()['value'])
     endtime = datetime.datetime.fromtimestamp(aftDate.getInfo()['value'])
+
+
+    logger.error("starttime value: " + str(starttime))
+    logger.error("endtime  value: " + str(endtime))
+
+    logger.error("starttime: " + starttime.strftime('%Y-%m-%d'))
+    logger.error("endtime: " + endtime.strftime('%Y-%m-%d'))
 
     if isinstance(geometry[0], list):
         logger.error("making polygon")
