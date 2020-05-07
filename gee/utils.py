@@ -534,6 +534,10 @@ def getDegraditionTileUrlByDate(geometry, date):
     imDate = ee.Date(date)
     befDate = imDate.advance(-1, 'day')
     aftDate = imDate.advance(1, 'day')
+
+    starttime = datetime.datetime.fromtimestamp(befDate.getInfo()['value'])
+    endtime = datetime.datetime.fromtimestamp(aftDate.getInfo()['value'])
+
     if isinstance(geometry[0], list):
         logger.error("making polygon")
         geometry = ee.Geometry.Polygon(geometry)
@@ -541,8 +545,8 @@ def getDegraditionTileUrlByDate(geometry, date):
         logger.error("making point")
         geometry = ee.Geometry.Point(geometry)
     landsatData = gee.inputs.getLandsat({
-        "start": str(befDate.getInfo()['value']),
-        "end": str(aftDate.getInfo()['value']),
+        "start": starttime.strftime('%Y-%m-%d'),
+        "end": endtime.strftime('%Y-%m-%d'),
         "targetBands": ['RED','GREEN','BLUE'],
         "region": geometry,
         "sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
