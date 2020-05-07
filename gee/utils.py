@@ -529,22 +529,10 @@ def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=Non
 def getDegraditionTileUrlByDate(geometry, date):
 
     visParams = {'bands': 'RED,GREEN,BLUE', 'min': 0, 'max': 1400}
-    #col = ee.ImageCollection('LANDSAT/LC08/C01/T1_SR').filterBounds(region)
 
-    imDate = ee.Date(date)
-    befDate = imDate.advance(-1, 'day')
-    aftDate = imDate.advance(1, 'day')
-    logger.error("imDate: " + date)
-
-    starttime = datetime.datetime.fromtimestamp(befDate.getInfo()['value'])
-    endtime = datetime.datetime.fromtimestamp(aftDate.getInfo()['value'])
-
-
-    logger.error("starttime value: " + str(starttime))
-    logger.error("endtime  value: " + str(endtime))
-
-    logger.error("starttime: " + starttime.strftime('%Y-%m-%d'))
-    logger.error("endtime: " + endtime.strftime('%Y-%m-%d'))
+    imDate = datetime.datetime.strptime(date, "%Y-%m-%d")
+    befDate = imDate - datetime.timedelta(days=1)
+    aftDate = imDate + datetime.timedelta(days=1)
 
     if isinstance(geometry[0], list):
         logger.error("making polygon")
@@ -553,8 +541,8 @@ def getDegraditionTileUrlByDate(geometry, date):
         logger.error("making point")
         geometry = ee.Geometry.Point(geometry)
     landsatData = gee.inputs.getLandsat({
-        "start": starttime.strftime('%Y-%m-%d'),
-        "end": endtime.strftime('%Y-%m-%d'),
+        "start": befDate.strftime('%Y-%m-%d'),
+        "end": aftDate.strftime('%Y-%m-%d'),
         "targetBands": ['RED','GREEN','BLUE'],
         "region": geometry,
         "sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
