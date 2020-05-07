@@ -1277,6 +1277,28 @@ def getImagePlotDegradition():
         }
     return jsonify(values), 200
 
+@gee_gateway.route('/getDegraditionTileUrl', methods=['POST'])
+def getDegraditionTileUrl():
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            imageDate = json.get('imageDate', None)
+            geometry = json.get('geometry')
+            values = {
+                "url": getDegraditionTileUrlByDate(geometry, imageDate)
+            }
+        else:
+            raise Exception(
+                "Need either imageDate and geometry parameters")
+    except Exception as e:
+        logger.error(str(e))
+        values = {
+            'errMsg': str(e)
+        }
+    return jsonify(values), 200
+
+
 @gee_gateway.route('/FilteredSentinelSAR', methods=['POST'])
 def FilteredSentinelSAR():
     values = {}

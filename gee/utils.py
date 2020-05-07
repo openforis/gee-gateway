@@ -526,6 +526,31 @@ def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=Non
         raise GEEException(sys.exc_info()[0])
     return values
 
+def getDegraditionTileUrlByDate(geometry, date):
+
+    visParams = {'bands': 'RED,GREEN,BLUE', 'min': 0, 'max': 1400}
+    #col = ee.ImageCollection('LANDSAT/LC08/C01/T1_SR').filterBounds(region)
+
+    imDate = ee.Date(date)
+    befDate = imDate.advance(-1, 'day')
+    aftDate = imDate.advance(1, 'day')
+
+    prefcollection8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_SR').filterDate(befDate, aftDate).filterBounds(geometry)
+    fcollection8 = prefcollection8.map(prepareL8)
+
+    landsatData = gee.inputs.getLandsat({
+        "start": befDate,
+        "end": aftDate,
+        "targetBands": ['RED','GREEN','BLUE'],
+        "region": geometry,
+        "sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
+    })
+
+    selectedImage = landsatData.first()
+    unmasked = ee.Image(selectedImage).multiply(10000).toInt16().unmask()
+    mapparams = unmasked.getMapId(visParams)
+    return mapparams['tile_fetcher'].url_format
+
 def getDegradationPlotsByPoint(geometry, start, end):
     logger.error("Entered getDegradationPlotsByPoint")
     logger.error("going to get LANDSAT")
