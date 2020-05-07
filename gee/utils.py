@@ -848,6 +848,30 @@ def listAvailableBands(name, isImage):
         'imageName' : name
     }
 
+def filteredSentinelSARComposite(visParams, dbValue, dateFrom, dateTo):
+    def toNatural(img):
+        return ee.Image(10).pow(img.divide(10))
+
+    def addRatioBands(img):
+        # not using angle band
+        vv = img.select('VV')
+        vh = img.select('VH')
+        vv_vh = vv.divide(vh).rename('VV/VH')
+        vh_vv = vh.divide(vv).rename('VH/VV')
+        return vv.addBands(vh).addBands(vv_vh).addBands(vh_vv)
+
+    sentinel1 = ee.ImageCollection('COPERNICUS/S1_GRD')
+    sentinel1 = sentinel1.filterDate(dateFrom, dateTo) \
+        .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VV')) \
+        .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH')) \
+        .filter(ee.Filter.eq('instrumentMode', 'IW'))
+
+    if not dbValue:
+        sentinel1 = sentinel1.map(toNatural)
+
+    sentinel1 = sentinel1.map(addRatioBands)
+    median = sentinel1.median()
+    return imageToMapId(median, visParams)
 
 ########################## TimeSync Related Functions ##########################
 

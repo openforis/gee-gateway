@@ -1276,6 +1276,31 @@ def getImagePlotDegradition():
             'errMsg': str(e)
         }
     return jsonify(values), 200
+
+@gee_gateway.route('/FilteredSentinelSAR', methods=['POST'])
+def FilteredSentinelSAR():
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            dateFrom = json.get('dateFrom', None)
+            dateTo = json.get('dateTo', None)
+            bands = json.get('bands', 'VH,VV,VH/VV')
+            min = json.get('min', '0')
+            max = json.get('max', '0.3')
+            dbValue = json.get('dbValue', False)
+            visParams = {
+                'min': min,
+                'max': max,
+                'bands': bands
+            }
+            values = filteredSentinelSARComposite(visParams, dbValue, dateFrom, dateTo)
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200
 ############################### TimeSync ##############################
 
 
