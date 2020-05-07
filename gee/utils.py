@@ -377,7 +377,7 @@ def getTimeSeriesByCollectionAndIndex(collectionName, indexName, scale, coords=[
             if indexName != None:
                 logger.error("had indexName: " + indexName)
                 indexValue = image.reduceRegion(theReducer, geometry, scale).get(indexName)
-                logger.error("had indexName: " + indexName + " and indexValue is: " + indexValue.getInfo())
+                #logger.error("had indexName: " + indexName + " and indexValue is: " + indexValue.getInfo())
             else:
                 logger.error("noooooooooo indexName")
                 indexValue = image.reduceRegion(theReducer, geometry, scale)
