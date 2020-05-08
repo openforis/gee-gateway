@@ -553,7 +553,7 @@ def getDegraditionTileUrlByDate(geometry, date, visParams):
     mapparams = unmasked.getMapId(visParams)
     return mapparams['tile_fetcher'].url_format
 
-def getDegradationPlotsByPoint(geometry, start, end):
+def getDegradationPlotsByPoint(geometry, start, end, band):
     logger.error("Entered getDegradationPlotsByPoint")
     logger.error("going to get LANDSAT")
     if isinstance(geometry[0], list):
@@ -565,7 +565,7 @@ def getDegradationPlotsByPoint(geometry, start, end):
     landsatData = gee.inputs.getLandsat({
         "start": start,
         "end": end,
-        "targetBands": ['SWIR1','NIR','RED','GREEN','BLUE','SWIR2','NDFI'],
+        "targetBands": [band], #['SWIR1','NIR','RED','GREEN','BLUE','SWIR2','NDFI'],
         "region": geometry,
         "sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
     })

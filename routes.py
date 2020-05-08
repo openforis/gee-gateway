@@ -1262,8 +1262,9 @@ def getImagePlotDegradition():
             geometry = json.get('geometry')
             start = json.get('start')
             end = json.get('end')
+            band = json.get('band', 'NDFI')
             values = {
-                'timeseries': getDegradationPlotsByPoint(geometry, start, end)
+                'timeseries': getDegradationPlotsByPoint(geometry, start, end, band)
             }
             logger.error("we did it")
             logger.error(str(values))
