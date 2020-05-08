@@ -1285,8 +1285,12 @@ def getDegraditionTileUrl():
         if json:
             imageDate = json.get('imageDate', None)
             geometry = json.get('geometry')
+            stretch = json.get('stretch', 321)
+            visParams = {'bands': 'RED,GREEN,BLUE', 'min': 0, 'max': 1400}
+            if stretch == 543:
+                visParams ={'bands': 'SWIR1,NIR,RED', 'min': 0, 'max': 7000}
             values = {
-                "url": getDegraditionTileUrlByDate(geometry, imageDate)
+                "url": getDegraditionTileUrlByDate(geometry, imageDate, visParams)
             }
         else:
             raise Exception(

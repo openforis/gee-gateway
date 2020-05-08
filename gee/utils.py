@@ -526,9 +526,9 @@ def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=Non
         raise GEEException(sys.exc_info()[0])
     return values
 
-def getDegraditionTileUrlByDate(geometry, date):
+def getDegraditionTileUrlByDate(geometry, date, visParams):
 
-    visParams = {'bands': 'RED,GREEN,BLUE', 'min': 0, 'max': 1400}
+    #visParams = {'bands': 'RED,GREEN,BLUE', 'min': 0, 'max': 1400}
 
     imDate = datetime.datetime.strptime(date, "%Y-%m-%d")
     befDate = imDate - datetime.timedelta(days=1)
