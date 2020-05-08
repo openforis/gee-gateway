@@ -543,7 +543,7 @@ def getDegraditionTileUrlByDate(geometry, date, visParams):
     landsatData = gee.inputs.getLandsat({
         "start": befDate.strftime('%Y-%m-%d'),
         "end": aftDate.strftime('%Y-%m-%d'),
-        "targetBands": ['RED','GREEN','BLUE','SWIR1','NIR','RED'],
+        "targetBands": ['RED','GREEN','BLUE','SWIR1','NIR'],
         "region": geometry,
         "sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
     })
