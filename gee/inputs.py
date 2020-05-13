@@ -67,14 +67,11 @@ def getLandsat(options):
         col = None
         fcollection4 = ee.ImageCollection('LANDSAT/LT04/C01/T1_SR').filterDate(start, end).filterBounds(region)
         f4size = fcollection4.size().getInfo()
-        logger.error("f4size: " + str(f4size))
         if f4size > 0:
-            logger.error("inside f4size")
             collection4 = fcollection4.map(prepareL4L5, True).sort('system:time_start')
             col = collection4
         fcollection5 = ee.ImageCollection('LANDSAT/LT05/C01/T1_SR').filterDate(start, end).filterBounds(region)
         f5size = fcollection5.size().getInfo()
-        logger.error("f5size: " + str(f5size))
         if f5size > 0:
             logger.error("inside f5size")
             collection5 = fcollection5.map(prepareL4L5, True).sort('system:time_start')
@@ -84,9 +81,7 @@ def getLandsat(options):
                 col = col.merge(collection5)
         fcollection7 = ee.ImageCollection('LANDSAT/LE07/C01/T1_SR').filterDate(start, end).filterBounds(region)
         f7size = fcollection7.size().getInfo()
-        logger.error("f7size: " + str(f7size))
         if f7size > 0:
-            logger.error("inside f7size")
             collection7 = fcollection7.map(prepareL7, True).sort('system:time_start')
             if col is None:
                 col = collection7
@@ -94,26 +89,16 @@ def getLandsat(options):
                 col = col.merge(collection7)
         fcollection8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_SR').filterDate(start, end).filterBounds(region)
         f8size = fcollection8.size().getInfo()
-        logger.error("f8size: " + str(f8size))
         if fcollection8.size().getInfo() > 0:
-            logger.error("inside f8size")
             collection8 = fcollection8.map(prepareL8, True).sort('system:time_start')
-            logger.error("size after l8 map: " + str(collection8.size().getInfo()))
             if col is None:
                 col = collection8
             else:
                 col = col.merge(collection8)
 
-        # col = collection4.merge(collection5) \
-        #                     .merge(collection7) \
-        #                     .merge(collection8)
-        logger.error("collections size: " + str(col.size().getInfo()))
-
         if region is not None:
             col = col.filterBounds(region)
-        logger.error("past region filter: " + str(col.size().getInfo()))
         indices = doIndices(col).select(targetBands)
-        logger.error("indices select bands: " + str(indices.size().getInfo()))
         if "l5" not in sensors:
             indices = indices.filterMetadata('SATELLITE','not_equals','LANDSAT_5')
         if "l4" not in sensors:
@@ -123,7 +108,6 @@ def getLandsat(options):
         if "l8" not in sensors:
             indices = indices.filterMetadata('SATELLITE','not_equals','LANDSAT_8')
         indices = indices.filter(ee.Filter.dayOfYear(startDOY, endDOY))
-        logger.error("indices filtered: " + str(indices.size().getInfo()))
     return ee.ImageCollection(indices)
 
 def doIndices(collection):
@@ -378,12 +362,6 @@ def getS1(mode, focalSize):
     return data
 
 def prepareL4L5(image):
-    logger.error("inside l4l5")
-    # date = ee.Date(image.get('system:time_start'))
-    # logger.error(date.getInfo())
-    # date_dict = date.getInfo()
-    # logger.error("The number of milliseconds since 1970-01-01T00:00:00Z.: " + date_dict['value'])
-    # logger.error("Formatted date" + date.format('Y-M-d').getInfo())
     bandList = ['B1', 'B2','B3','B4','B5','B7','B6']
     nameList = ['BLUE', 'GREEN', 'RED', 'NIR', 'SWIR1', 'SWIR2', 'TEMP']
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]
@@ -400,7 +378,6 @@ def prepareL4L5(image):
     #return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
 def prepareL7(image):
-    logger.error("prep 7")
     bandList = ['B1', 'B2','B3','B4','B5','B7','B6']
     nameList = ['BLUE', 'GREEN', 'RED', 'NIR', 'SWIR1', 'SWIR2', 'TEMP']
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]
@@ -420,7 +397,6 @@ def prepareL7(image):
     # return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
 def prepareL8(image):
-    logger.error("prep 8")
     bandList = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10']
     nameList = ['BLUE', 'GREEN', 'RED', 'NIR', 'SWIR1', 'SWIR2', 'TEMP']
     scaling = [10000, 10000, 10000, 10000, 10000, 10000, 1000]

@@ -1266,8 +1266,6 @@ def getImagePlotDegradition():
             values = {
                 'timeseries': getDegradationPlotsByPoint(geometry, start, end, band)
             }
-            logger.error("we did it")
-            logger.error(str(values))
         else:
             raise Exception(
                 "Need either image or imageCollection parameter containing the full name")

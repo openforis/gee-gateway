@@ -527,18 +527,13 @@ def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=Non
     return values
 
 def getDegraditionTileUrlByDate(geometry, date, visParams):
-
-    #visParams = {'bands': 'RED,GREEN,BLUE', 'min': 0, 'max': 1400}
-
     imDate = datetime.datetime.strptime(date, "%Y-%m-%d")
     befDate = imDate - datetime.timedelta(days=1)
     aftDate = imDate + datetime.timedelta(days=1)
 
     if isinstance(geometry[0], list):
-        logger.error("making polygon")
         geometry = ee.Geometry.Polygon(geometry)
     else:
-        logger.error("making point")
         geometry = ee.Geometry.Point(geometry)
     landsatData = gee.inputs.getLandsat({
         "start": befDate.strftime('%Y-%m-%d'),
@@ -554,45 +549,29 @@ def getDegraditionTileUrlByDate(geometry, date, visParams):
     return mapparams['tile_fetcher'].url_format
 
 def getDegradationPlotsByPoint(geometry, start, end, band):
-    logger.error("Entered getDegradationPlotsByPoint")
-    logger.error("going to get LANDSAT")
     if isinstance(geometry[0], list):
-        logger.error("making polygon")
         geometry = ee.Geometry.Polygon(geometry)
     else:
-        logger.error("making point")
         geometry = ee.Geometry.Point(geometry)
     landsatData = gee.inputs.getLandsat({
         "start": start,
         "end": end,
         "targetBands": [band], #['SWIR1','NIR','RED','GREEN','BLUE','SWIR2','NDFI'],
         "region": geometry,
-        "sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
+        "sensors": {"l4": True, "l5": True, "l7": True, "l8": True}
     })
-    logger.error("landsatData size: " + str(landsatData.size().getInfo()))
-
-    #landsatData = allLandsat.filterDate(start, end).filterBounds(geometry)
-
-    logger.error("landsatData size: " + str(landsatData.size().getInfo()))
-    logger.error("filtered bounds")
 
     def myimageMapper(img):
         theReducer = ee.Reducer.mean()
         indexValue = img.reduceRegion(theReducer, geometry, 30)
         date = img.get('system:time_start')
         visParams = {'bands': 'RED,GREEN,BLUE', 'min': 0, 'max': 1400}
-        #unimage = ee.Image(img.multiply(10000).toInt16().unmask())
-        logger.error("pre - theStuff ")
-        # mapparams = img.getMapId(visParams)
-        # logger.error("theStuff: " + str(mapparams))
         indexImage = ee.Image().set('indexValue', [ee.Number(date), indexValue])
         return indexImage
     lsd = landsatData.map(myimageMapper, True)
     indexCollection2 = lsd.aggregate_array('indexValue')
     values = indexCollection2.getInfo()
-    #print(values)
     return values
-    #return getImagePlot(landsatData,geometry, geometry, 'NDFI', 4)
 
 def getImagePlot(iCol, region, point, bandName, position):
     # Make time series plot from image collection
