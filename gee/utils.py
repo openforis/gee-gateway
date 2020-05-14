@@ -525,6 +525,51 @@ def getTimeSeriesByIndex2(indexName, scale, coords=[], dateFrom=None, dateTo=Non
     except EEException as e:
         raise GEEException(sys.exc_info()[0])
     return values
+def getDegraditionTileUrlByDateS1(geometry, date, visParams):
+    imDate = datetime.datetime.strptime(date, "%Y-%m-%d")
+    befDate = imDate - datetime.timedelta(days=1)
+    aftDate = imDate + datetime.timedelta(days=1)
+
+    if isinstance(geometry[0], list):
+        geometry = ee.Geometry.Polygon(geometry)
+    else:
+        geometry = ee.Geometry.Point(geometry)
+
+    sentinel1Data = gee.inputs.getS1Alt({
+        "targetBands": ['VV','VH','VV/VH'],
+        'region':geometry})
+
+    start = befDate.strftime('%Y-%m-%d')
+    end = aftDate.strftime('%Y-%m-%d')
+
+    selectedImage = sentinel1Data.filterDate(start,end).first()
+
+    selectedImage = ee.Image(selectedImage)
+
+    mapparams = selectedImage.getMapId(visParams)
+    return mapparams['tile_fetcher'].url_format
+
+def getDegradationPlotsByPointS1(geometry, start, end, band):
+    if isinstance(geometry[0], list):
+        geometry = ee.Geometry.Polygon(geometry)
+    else:
+        geometry = ee.Geometry.Point(geometry)
+
+    sentinel1Data = gee.inputs.getS1Alt({
+        "targetBands": ['VV','VH','VV/VH'],
+        'region':geometry}).filterDate(start,end)
+
+    def myimageMapper(img):
+        theReducer = ee.Reducer.mean()
+        indexValue = img.reduceRegion(theReducer, geometry, 30)
+        date = img.get('system:time_start')
+        visParams = {'bands':['VV','VH','ratioVVVH'],'min':[-15,-25,.40],'max':[0,-10,1],'gamma':1.6}
+        indexImage = ee.Image().set('indexValue', [ee.Number(date), indexValue])
+        return indexImage
+    lsd = sentinel1Data.map(myimageMapper, True)
+    indexCollection2 = lsd.aggregate_array('indexValue')
+    values = indexCollection2.getInfo()
+    return values
 
 def getDegraditionTileUrlByDate(geometry, date, visParams):
     imDate = datetime.datetime.strptime(date, "%Y-%m-%d")
