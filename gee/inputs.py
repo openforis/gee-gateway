@@ -343,7 +343,7 @@ def prepare(orbit):
     .filter(ee.Filter.eq('instrumentMode', 'IW')) \
     .filter(ee.Filter.eq('orbitProperties_pass', orbit))
 
-def getS1Alt(mode, focalSize, options):
+def getS1Alt(options):
     if options is None:
         pass
     else:
@@ -394,6 +394,24 @@ def getS1Alt(mode, focalSize, options):
         data = data.filterBounds(region)
 
     return data.select(targetBands)
+
+def getS1(mode, focalSize):
+    if focalSize is None:
+        focalSize = 3
+    if mode is None:
+        mode = 'ASCENDING'
+    def s1Mapper(img):
+        fmean = img.add(30).focal_mean(focalSize)
+        ratio = fmean.select('VH').divide(fmean.select('VV')).rename('ratio').multiply(30)
+        return img.select().addBands(fmean).addBands(ratio)
+    data = ee.ImageCollection('COPERNICUS/S1_GRD') \
+    .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VV')) \
+    .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH')) \
+    .filter(ee.Filter.eq('instrumentMode', 'IW')) \
+    .select('V.') \
+    .map(s1Mapper)
+
+    return data
 
 def prepareL4L5(image):
     bandList = ['B1', 'B2','B3','B4','B5','B7','B6']
