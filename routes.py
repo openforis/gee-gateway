@@ -1296,7 +1296,7 @@ def getDegraditionTileUrl():
             #     visParams = tparams
             # logger.error("visParams was: " + str(visParams))
             values = {
-                "url": (getDegraditionTileUrlByDateS1(geometry, imageDate, visParams),getDegraditionTileUrlByDate(geometry, imageDate, visParams))[dataType == "landsat"]
+                "url": getDegraditionTileUrlByDate(geometry, imageDate, visParams)#(getDegraditionTileUrlByDateS1(geometry, imageDate, visParams),getDegraditionTileUrlByDate(geometry, imageDate, visParams))[dataType == "landsat"]
             }
         else:
             raise Exception(
