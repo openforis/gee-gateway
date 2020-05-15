@@ -355,7 +355,7 @@ def getS1Alt(options):
             focalSize = options['focalSize']
         else:
             focalSize = None
-        if mode in options:
+        if "mode" in options:
             mode = options['mode']
         else:
             mode = 'ASCENDING'
@@ -368,7 +368,7 @@ def getS1Alt(options):
         fmean = img.add(30).focal_mean(focalSize)
         ratio0 = fmean.select('VH').divide(fmean.select('VV')).rename('VH/VV').multiply(30)
         ratio1 = fmean.select('VV').divide(fmean.select('VH')).rename('VV/VH').multiply(30)
-        return img.select().addBands(fmean).addBands(ratio0)..addBands(ratio1)
+        return img.select().addBands(fmean).addBands(ratio0).addBands(ratio1)
 
     def s1Deg(img):
         pwr = ee.Image(10).pow(img.divide(10))
