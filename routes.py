@@ -1289,15 +1289,20 @@ def getDegraditionTileUrl():
             visParams = {'bands': 'RED,GREEN,BLUE', 'min': 0, 'max': 1400}
             if stretch == 543:
                 visParams ={'bands': 'SWIR1,NIR,RED', 'min': 0, 'max': 7000}
-            # tparams = json.get('visParams', "")
-            #
-            # dataType = json.get('dataType', 'landsat')
-            # if tparams != "":
-            #     visParams = tparams
-            # logger.error("visParams was: " + str(visParams))
-            values = {
-                "url": getDegraditionTileUrlByDate(geometry, imageDate, visParams)#(getDegraditionTileUrlByDateS1(geometry, imageDate, visParams),getDegraditionTileUrlByDate(geometry, imageDate, visParams))[dataType == "landsat"]
-            }
+            tparams = json.get('visParams', "")
+
+            dataType = json.get('dataType', 'landsat')
+            if tparams != "":
+                visParams = tparams
+
+            if dataType == 'landsat':
+                values = {
+                    "url": getDegraditionTileUrlByDate(geometry, imageDate, visParams)#(getDegraditionTileUrlByDateS1(geometry, imageDate, visParams),getDegraditionTileUrlByDate(geometry, imageDate, visParams))[dataType == "landsat"]
+                }
+            else:
+                values = {
+                    "url": getDegraditionTileUrlByDateS1(geometry, imageDate, visParams)
+                }
         else:
             raise Exception(
                 "Need either imageDate and geometry parameters")
