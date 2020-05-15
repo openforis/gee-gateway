@@ -1263,8 +1263,9 @@ def getImagePlotDegradition():
             start = json.get('start')
             end = json.get('end')
             band = json.get('band', 'NDFI')
+            dataType = json.get('dataType', 'landsat')
             values = {
-                'timeseries': getDegradationPlotsByPoint(geometry, start, end, band)
+                'timeseries': (getDegradationPlotsByPointS1(geometry, start, end, band), getDegradationPlotsByPoint(geometry, start, end, band))[dataType == "landsat"]
             }
         else:
             raise Exception(
@@ -1288,8 +1289,12 @@ def getDegraditionTileUrl():
             visParams = {'bands': 'RED,GREEN,BLUE', 'min': 0, 'max': 1400}
             if stretch == 543:
                 visParams ={'bands': 'SWIR1,NIR,RED', 'min': 0, 'max': 7000}
+            tparams = json.get('visParams', "")
+            dataType = json.get('dataType', 'landsat')
+            if tparams != "":
+                visParams = tparams
             values = {
-                "url": getDegraditionTileUrlByDate(geometry, imageDate, visParams)
+                "url": (getDegraditionTileUrlByDateS1(geometry, imageDate, visParams),getDegraditionTileUrlByDate(geometry, imageDate, visParams))[dataType == "landsat"]
             }
         else:
             raise Exception(
