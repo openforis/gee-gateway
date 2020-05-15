@@ -1264,9 +1264,14 @@ def getImagePlotDegradition():
             end = json.get('end')
             band = json.get('band', 'NDFI')
             dataType = json.get('dataType', 'landsat')
-            values = {
-                'timeseries': (getDegradationPlotsByPointS1(geometry, start, end, band), getDegradationPlotsByPoint(geometry, start, end, band))[dataType == "landsat"]
-            }
+            if dataType == 'landsat':
+                values = {
+                    'timeseries': getDegradationPlotsByPoint(geometry, start, end, band)
+                }
+            else:
+                values = {
+                    'timeseries': getDegradationPlotsByPointS1(geometry, start, end, band)
+                }
         else:
             raise Exception(
                 "Need either image or imageCollection parameter containing the full name")
