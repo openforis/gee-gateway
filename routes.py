@@ -1291,9 +1291,13 @@ def getDegraditionTileUrl():
             imageDate = json.get('imageDate', None)
             geometry = json.get('geometry')
             stretch = json.get('stretch', 321)
-            visParams = {'bands': 'RED,GREEN,BLUE', 'min': 0, 'max': 1400}
-            if stretch == 543:
+            visParams = {}
+            if stretch == 321:
+                visParams = {'bands': 'RED,GREEN,BLUE', 'min': 0, 'max': 1400}
+            elif stretch == 543:
                 visParams ={'bands': 'SWIR1,NIR,RED', 'min': 0, 'max': 7000}
+            elif stretch == "SAR":
+                visParams = {'bands':'VV,VH,VV/VH', 'min':'-15,-25,.40', 'max': '0,-10,1', 'gamma': '1.6' }
             tparams = json.get('visParams', "")
 
             dataType = json.get('dataType', 'landsat')
