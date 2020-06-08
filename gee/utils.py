@@ -541,8 +541,14 @@ def getDegraditionTileUrlByDateS1(geometry, date, visParams):
 
     start = befDate.strftime('%Y-%m-%d')
     end = aftDate.strftime('%Y-%m-%d')
+    filtereddate = sentinel1Data.filterDate(start,end)
 
-    selectedImage = sentinel1Data.filterDate(start,end).first()
+    logger.error("filtereddate Size: " + str(filtereddate.size().getInfo()))
+    if filtereddate.size().getInfo() == 0:
+        befDate = imDate - datetime.timedelta(days=2)
+        aftDate = imDate + datetime.timedelta(days=2)
+        filtereddate = sentinel1Data.filterDate(befDate.strftime('%Y-%m-%d'),aftDate.strftime('%Y-%m-%d'))
+    selectedImage = filtereddate.first()
 
     selectedImage = ee.Image(selectedImage)
 
@@ -551,8 +557,10 @@ def getDegraditionTileUrlByDateS1(geometry, date, visParams):
 
 def getDegradationPlotsByPointS1(geometry, start, end, band):
     if isinstance(geometry[0], list):
+        logger.error("it actually was a geometry")
         geometry = ee.Geometry.Polygon(geometry)
     else:
+        logger.error("it thinks it's a point")
         geometry = ee.Geometry.Point(geometry)
 
     sentinel1Data = gee.inputs.getS1Alt({

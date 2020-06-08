@@ -1303,7 +1303,6 @@ def getDegraditionTileUrl():
             dataType = json.get('dataType', 'landsat')
             if tparams != "":
                 visParams = tparams
-
             if dataType == 'landsat':
                 values = {
                     "url": getDegraditionTileUrlByDate(geometry, imageDate, visParams)#(getDegraditionTileUrlByDateS1(geometry, imageDate, visParams),getDegraditionTileUrlByDate(geometry, imageDate, visParams))[dataType == "landsat"]

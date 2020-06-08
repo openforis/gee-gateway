@@ -392,7 +392,6 @@ def getS1Alt(options):
 
     if region is not None:
         data = data.filterBounds(region)
-
     return data.select(targetBands)
 
 def getS1(mode, focalSize):
