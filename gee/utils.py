@@ -545,9 +545,15 @@ def getDegraditionTileUrlByDateS1(geometry, date, visParams):
 
     logger.error("filtereddate Size: " + str(filtereddate.size().getInfo()))
     if filtereddate.size().getInfo() == 0:
+        logger.error("adjusting date range")
         befDate = imDate - datetime.timedelta(days=2)
         aftDate = imDate + datetime.timedelta(days=2)
+        logger.error("New range" + befDate.strftime('%Y-%m-%d') + " - " + aftDate.strftime('%Y-%m-%d'))
         filtereddate = sentinel1Data.filterDate(befDate.strftime('%Y-%m-%d'),aftDate.strftime('%Y-%m-%d'))
+        logger.error("filtereddate Size after: " + str(filtereddate.size().getInfo()))
+
+    logger.error("filtereddate Size out of block: " + str(filtereddate.size().getInfo()))
+
     selectedImage = filtereddate.first()
 
     selectedImage = ee.Image(selectedImage)
@@ -583,18 +589,32 @@ def getDegraditionTileUrlByDate(geometry, date, visParams):
     imDate = datetime.datetime.strptime(date, "%Y-%m-%d")
     befDate = imDate - datetime.timedelta(days=1)
     aftDate = imDate + datetime.timedelta(days=1)
-
+    landsatData = None
     if isinstance(geometry[0], list):
         geometry = ee.Geometry.Polygon(geometry)
     else:
         geometry = ee.Geometry.Point(geometry)
-    landsatData = gee.inputs.getLandsat({
-        "start": befDate.strftime('%Y-%m-%d'),
-        "end": aftDate.strftime('%Y-%m-%d'),
-        "targetBands": ['RED','GREEN','BLUE','SWIR1','NIR'],
-        "region": geometry,
-        "sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
-    })
+    try:
+        landsatData = gee.inputs.getLandsat({
+        	"start": befDate.strftime('%Y-%m-%d'),
+        	"end": aftDate.strftime('%Y-%m-%d'),
+        	"targetBands": ['RED','GREEN','BLUE','SWIR1','NIR'],
+        	"region": geometry,
+        	"sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
+        })
+    except:
+        befDate = imDate - datetime.timedelta(days=2)
+        aftDate = imDate + datetime.timedelta(days=2)
+        logger.error("New range" + befDate.strftime('%Y-%m-%d') + " - " + aftDate.strftime('%Y-%m-%d'))
+        landsatData = gee.inputs.getLandsat({
+        	"start": befDate.strftime('%Y-%m-%d'),
+        	"end": aftDate.strftime('%Y-%m-%d'),
+        	"targetBands": ['RED','GREEN','BLUE','SWIR1','NIR'],
+        	"region": geometry,
+        	"sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
+        })
+
+
 
     selectedImage = landsatData.first()
     unmasked = ee.Image(selectedImage).multiply(10000).toInt16().unmask()
