@@ -1329,7 +1329,7 @@ def getTileUrlFromFeatureCollection():
     try:
         json = request.get_json()
         if json:
-            defaultVisParams = {"max": 1, "palette": ['yellow']}
+            defaultVisParams = {"max": 1, "palette": ['red']}
             featureCollection = json.get('featureCollection', None)
             field = json.get('field', 'PLOTID')
             matchID = int(json.get('matchID', None))
