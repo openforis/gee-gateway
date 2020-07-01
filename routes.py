@@ -1323,7 +1323,48 @@ def getDegraditionTileUrl():
         }
     return jsonify(values), 200
 
+@gee_gateway.route('/getTileUrlFromFeatureCollection', methods=['POST'])
+def getTileUrlFromFeatureCollection():
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            defaultVisParams = {"max": 1, "palette": ['yellow']}
+            featureCollection = json.get('featureCollection', None)
+            field = json.get('field', 'PLOTID')
+            matchID = int(json.get('matchID', None))
+            visParams = json.get('visParams', defaultVisParams)
+            if visParams == {}:
+                visParams = defaultVisParams
+            values = {
+                    "url": getFeatureCollectionTileUrl(featureCollection, field, matchID, visParams)
+                }
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200    
 
+@gee_gateway.route('/getLatestImage', methods=['POST'])
+def getLatestImage():
+    values = {}
+    try:
+        json = request.get_json()
+        if json:
+            imageCollection = json.get('imageCollection', "LANDSAT/LC08/C01/T1_TOA") # l8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_TOA')
+            visParams = json.get('visParams', {"bands": "B4,B3,B2", "max": "0.3"})
+            dateFrom = json.get('dateFrom', None)
+            dateTo = json.get('dateTo', None)
+            values = {
+                    "url": getLatestImageTileUrl(imageCollection, dateFrom, dateTo,visParams)
+                }
+    except GEEException as e:
+        logger.error(e.message)
+        values = {
+            'errMsg': e.message
+        }
+    return jsonify(values), 200    
 @gee_gateway.route('/FilteredSentinelSAR', methods=['POST'])
 def FilteredSentinelSAR():
     values = {}

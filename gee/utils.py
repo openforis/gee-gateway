@@ -646,6 +646,22 @@ def getDegradationPlotsByPoint(geometry, start, end, band):
     values = indexCollection2.getInfo()
     return values
 
+def getFeatureCollectionTileUrl(featureCollection, field, matchID, visParams):
+    fc = ee.FeatureCollection(featureCollection)
+    single = fc.filter(ee.Filter.equals(field, matchID))
+    Pimage = ee.Image().paint(single,0,2)
+    iobj = Pimage.getMapId(visParams)
+    return iobj['tile_fetcher'].url_format
+
+def getLatestImageTileUrl(imageCollection, dateFrom, dateTo, visParams):
+    ic = ee.ImageCollection(imageCollection) \
+    .filterBounds(ee.Geometry.Polygon([[-91.34029931757813, 14.897852537402175],[-91.34029931757813, 14.529926456359712],[-91.06152124140625, 14.529926456359712],[-91.06152124140625, 14.897852537402175]])) \
+    .filterDate(dateFrom, dateTo) #\
+    #.sort('CLOUD_COVER')
+    first = ic.sort('system:time_start', False).limit(10).mosaic()
+    iobj = first.getMapId(visParams)
+    return iobj['tile_fetcher'].url_format
+
 def getImagePlot(iCol, region, point, bandName, position):
     # Make time series plot from image collection
     def toValue(image):
