@@ -600,7 +600,7 @@ def getDegraditionTileUrlByDate(geometry, date, visParams):
         	"end": aftDate.strftime('%Y-%m-%d'),
         	"targetBands": ['RED','GREEN','BLUE','SWIR1','NIR'],
         	"region": geometry,
-        	"sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
+        	"sensors": {"l4": False, "l5": False, "l7": True, "l8": True}
         })
     except:
         befDate = imDate - datetime.timedelta(days=2)
@@ -611,12 +611,12 @@ def getDegraditionTileUrlByDate(geometry, date, visParams):
         	"end": aftDate.strftime('%Y-%m-%d'),
         	"targetBands": ['RED','GREEN','BLUE','SWIR1','NIR'],
         	"region": geometry,
-        	"sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
+        	"sensors": {"l4": False, "l5": False, "l7": True, "l8": True}
         })
 
 
 
-    selectedImage = landsatData.first()
+    selectedImage = landsatData.mosaic()
     unmasked = ee.Image(selectedImage).multiply(10000).toInt16().unmask()
     mapparams = unmasked.getMapId(visParams)
     return mapparams['tile_fetcher'].url_format
@@ -653,14 +653,72 @@ def getFeatureCollectionTileUrl(featureCollection, field, matchID, visParams):
     iobj = Pimage.getMapId(visParams)
     return iobj['tile_fetcher'].url_format
 
-def getLatestImageTileUrl(imageCollection, dateFrom, dateTo, visParams):
+def mosaicByDate(imcol):
+  # imcol: An image collection
+  # returns: An image collection
+  imlist = imcol.toList(imcol.size())
+
+  def udatesmapper(im):
+      return ee.Image(im).date().format("YYYY-MM-dd")
+  unique_dates = imlist.map(udatesmapper).distinct()
+
+  def mosaicmapper(d):
+      d = ee.Date(d)
+      im = imcol.filterDate(d, d.advance(1, "day")).mosaic()
+      return im.set("system:time_start", d.millis(), "system:id", d.format("YYYY-MM-dd"))
+
+  mosaic_imlist = unique_dates.map(mosaicmapper)
+
+  return ee.ImageCollection(mosaic_imlist)
+
+def getLatestImageTileUrl(imageCollection, visParams):
     ic = ee.ImageCollection(imageCollection) \
     .filterBounds(ee.Geometry.Polygon([[-91.34029931757813, 14.897852537402175],[-91.34029931757813, 14.529926456359712],[-91.06152124140625, 14.529926456359712],[-91.06152124140625, 14.897852537402175]])) \
-    .filterDate(dateFrom, dateTo) #\
-    #.sort('CLOUD_COVER')
-    first = ic.sort('system:time_start', False).limit(10).mosaic()
+    .sort('system:time_start', False).limit(10) 
+    most_current = ee.Date(ic.first().get('system:time_start')).format('YYYY-MM-dd')
+    first = ic.filterDate(most_current, ee.Date(most_current).advance(1, "day")).mosaic()
+
     iobj = first.getMapId(visParams)
-    return iobj['tile_fetcher'].url_format
+    
+    # videoArgs = {
+    #     "dimensions": 128,
+    #     "framesPerSecond": 7,
+    #     "region": ee.Geometry.Polygon([[-91.3156, 14.58], [-91.0835, 14.58], [-91.0835, 14.78], [-91.3156, 14.78], [-91.3156, 14.58]]),
+    #     "crs": "EPSG:3857",
+    #     "max": 0.3,
+    #     "bands": ["B4","B3","B2"]
+    #     };
+    # def doymapper(img):
+    #     doy = ee.Date(img.get('system:time_start')).getRelative('day', 'year')
+    #     logger.error("DOY: " + str(doy.getInfo()))
+    #     return img.set('doy', doy)
+    # ic = ic.map(doymapper)
+    # filter = ee.Filter.equals({"leftField": "doy", "rightField": "doy"})
+    # #Define a join.
+    # join = ee.Join.saveAll("doy_matches")
+    
+    # #Apply the join and convert the resulting FeatureCollection to an
+    # #ImageCollection.
+    # # ee.Image(ic.sort('system:time_start').first())
+    # oldest = ee.Date(ic.sort('system:time_start').first().get('system:time_start')).format('YYYY-MM-dd')
+    # distinctDOY = ic.filterDate(most_current, oldest);  
+    # joinCol = ee.ImageCollection(join.apply(distinctDOY, ic, filter));
+    videoArgs = {
+        "dimensions": 128,
+        "framesPerSecond": 3,
+        "region": ee.Geometry.Polygon([[-91.3156, 14.58], [-91.0835, 14.58], [-91.0835, 14.78], [-91.3156, 14.78], [-91.3156, 14.58]]),
+        "crs": "EPSG:3857"
+        };
+
+    merged_dict = {**visParams, **videoArgs}
+
+
+    values = {
+        "url": iobj['tile_fetcher'].url_format,
+        "count": str(ic.size().getInfo()),
+        "animation": mosaicByDate(ic).getVideoThumbURL(merged_dict)
+    }
+    return values
 
 def getImagePlot(iCol, region, point, bandName, position):
     # Make time series plot from image collection

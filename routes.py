@@ -1354,11 +1354,7 @@ def getLatestImage():
         if json:
             imageCollection = json.get('imageCollection', "LANDSAT/LC08/C01/T1_TOA") # l8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_TOA')
             visParams = json.get('visParams', {"bands": "B4,B3,B2", "max": "0.3"})
-            dateFrom = json.get('dateFrom', None)
-            dateTo = json.get('dateTo', None)
-            values = {
-                    "url": getLatestImageTileUrl(imageCollection, dateFrom, dateTo,visParams)
-                }
+            values = getLatestImageTileUrl(imageCollection,visParams)
     except GEEException as e:
         logger.error(e.message)
         values = {
