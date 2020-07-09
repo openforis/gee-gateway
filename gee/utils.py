@@ -617,8 +617,8 @@ def getDegraditionTileUrlByDate(geometry, date, visParams):
 
 
     selectedImage = landsatData.mosaic()
-    unmasked = ee.Image(selectedImage).multiply(10000).toInt16().unmask()
-    mapparams = unmasked.getMapId(visParams)
+    #unmasked = ee.Image(selectedImage).multiply(10000).toInt16().unmask()
+    mapparams = selectedImage.getMapId(visParams)
     return mapparams['tile_fetcher'].url_format
 
 def getDegradationPlotsByPoint(geometry, start, end, band):
