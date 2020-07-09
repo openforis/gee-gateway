@@ -460,7 +460,8 @@ def prepareL8(image):
     mask2 = ee.Image(image).select('radsat_qa').eq(0)
     mask3 = ee.Image(image).select(bandList).reduce(ee.Reducer.min()).gt(0)
     mask4 = ee.Image(image).select(['sr_aerosol']).remap(validTOA, ee.List.repeat(1, len(validTOA)), 0)
-    return ee.Image(image).addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
+    return ee.Image(image).addBands(scaled).updateMask(mask1).updateMask(mask2).updateMask(mask3).updateMask(mask4)
+    #return ee.Image(image).addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
     # combined = ee.Image(image).addBands(scaled).updateMask(mask1.And(mask2).And(mask3).And(mask4))
     # return combined.copyProperties(image).set('system:time_start', image.get('system:time_start'))
 
