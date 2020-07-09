@@ -66,11 +66,11 @@ def getLandsat(options):
         # Filter using new filtering functions
         col = None
         if "l4" in sensors and sensors["l4"]:
-        fcollection4 = ee.ImageCollection('LANDSAT/LT04/C01/T1_SR').filterDate(start, end).filterBounds(region)
-        f4size = fcollection4.size().getInfo()
-        if f4size > 0:
-            collection4 = fcollection4.map(prepareL4L5, True).sort('system:time_start')
-            col = collection4
+            fcollection4 = ee.ImageCollection('LANDSAT/LT04/C01/T1_SR').filterDate(start, end).filterBounds(region)
+            f4size = fcollection4.size().getInfo()
+            if f4size > 0:
+                collection4 = fcollection4.map(prepareL4L5, True).sort('system:time_start')
+                col = collection4
         if "l5" in sensors and sensors["l5"]:
             fcollection5 = ee.ImageCollection('LANDSAT/LT05/C01/T1_SR').filterDate(start, end).filterBounds(region)
             f5size = fcollection5.size().getInfo()
