@@ -98,6 +98,7 @@ def getLandsat(options):
 
         if region is not None:
             col = col.filterBounds(region)
+        return col
         indices = doIndices(col).select(targetBands)
         if "l5" not in sensors:
             indices = indices.filterMetadata('SATELLITE','not_equals','LANDSAT_5')
