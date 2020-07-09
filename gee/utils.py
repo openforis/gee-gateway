@@ -600,7 +600,7 @@ def getDegraditionTileUrlByDate(geometry, date, visParams):
         	"end": aftDate.strftime('%Y-%m-%d'),
         	"targetBands": ['RED','GREEN','BLUE','SWIR1','NIR'],
         	"region": geometry,
-        	"sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
+        	"sensors": {"l4": True, "l5": True, "l7": True, "l8": True}
         })
     except:
         befDate = imDate - datetime.timedelta(days=2)
@@ -611,7 +611,7 @@ def getDegraditionTileUrlByDate(geometry, date, visParams):
         	"end": aftDate.strftime('%Y-%m-%d'),
         	"targetBands": ['RED','GREEN','BLUE','SWIR1','NIR'],
         	"region": geometry,
-        	"sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
+        	"sensors": {"l4": True, "l5": True, "l7": True, "l8": True}
         })
 
 
@@ -631,7 +631,7 @@ def getDegradationPlotsByPoint(geometry, start, end, band):
         "end": end,
         "targetBands": [band], #['SWIR1','NIR','RED','GREEN','BLUE','SWIR2','NDFI'],
         "region": geometry,
-        "sensors": {"l4": False, "l5": False, "l7": False, "l8": True}
+        "sensors": {"l4": True, "l5": True, "l7": True, "l8": True}
     })
 
     def myimageMapper(img):
