@@ -65,36 +65,40 @@ def getLandsat(options):
         logger.error("start, end" + start + ", " + end)
         # Filter using new filtering functions
         col = None
+        if "l4" in sensors and sensors["l4"]:
         fcollection4 = ee.ImageCollection('LANDSAT/LT04/C01/T1_SR').filterDate(start, end).filterBounds(region)
         f4size = fcollection4.size().getInfo()
         if f4size > 0:
             collection4 = fcollection4.map(prepareL4L5, True).sort('system:time_start')
             col = collection4
-        fcollection5 = ee.ImageCollection('LANDSAT/LT05/C01/T1_SR').filterDate(start, end).filterBounds(region)
-        f5size = fcollection5.size().getInfo()
-        if f5size > 0:
-            logger.error("inside f5size")
-            collection5 = fcollection5.map(prepareL4L5, True).sort('system:time_start')
-            if col is None:
-                col = collection5
-            else:
-                col = col.merge(collection5)
-        fcollection7 = ee.ImageCollection('LANDSAT/LE07/C01/T1_SR').filterDate(start, end).filterBounds(region)
-        f7size = fcollection7.size().getInfo()
-        if f7size > 0:
-            collection7 = fcollection7.map(prepareL7, True).sort('system:time_start')
-            if col is None:
-                col = collection7
-            else:
-                col = col.merge(collection7)
-        fcollection8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_SR').filterDate(start, end).filterBounds(region)
-        f8size = fcollection8.size().getInfo()
-        if fcollection8.size().getInfo() > 0:
-            collection8 = fcollection8.map(prepareL8, True).sort('system:time_start')
-            if col is None:
-                col = collection8
-            else:
-                col = col.merge(collection8)
+        if "l5" in sensors and sensors["l5"]:
+            fcollection5 = ee.ImageCollection('LANDSAT/LT05/C01/T1_SR').filterDate(start, end).filterBounds(region)
+            f5size = fcollection5.size().getInfo()
+            if f5size > 0:
+                logger.error("inside f5size")
+                collection5 = fcollection5.map(prepareL4L5, True).sort('system:time_start')
+                if col is None:
+                    col = collection5
+                else:
+                    col = col.merge(collection5)
+        if "l7" in sensors and sensors["l7"]:
+            fcollection7 = ee.ImageCollection('LANDSAT/LE07/C01/T1_SR').filterDate(start, end).filterBounds(region)
+            f7size = fcollection7.size().getInfo()
+            if f7size > 0:
+                collection7 = fcollection7.map(prepareL7, True).sort('system:time_start')
+                if col is None:
+                    col = collection7
+                else:
+                    col = col.merge(collection7)
+        if "l8" in sensors and sensors["l8"]:
+            fcollection8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_SR').filterDate(start, end).filterBounds(region)
+            f8size = fcollection8.size().getInfo()
+            if fcollection8.size().getInfo() > 0:
+                collection8 = fcollection8.map(prepareL8, True).sort('system:time_start')
+                if col is None:
+                    col = collection8
+                else:
+                    col = col.merge(collection8)
 
         if region is not None:
             col = col.filterBounds(region)
