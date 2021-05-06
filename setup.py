@@ -25,7 +25,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'Flask>=0.12.2',
-        'Flask-Cors==3.0.3',
+        'Flask-Cors==3.0.9',
         'google-api-python-client>=1.6.2',
         'pyCrypto>=2.6.1',
         'numpy==1.14.1',
